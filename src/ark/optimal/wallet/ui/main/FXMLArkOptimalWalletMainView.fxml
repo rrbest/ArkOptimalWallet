@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXToolbar?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="850.0" prefWidth="1367.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ark.optimal.wallet.ui.main.FXMLArkOptimalWalletMainViewController">
+   <children>
+      <VBox prefHeight="850.0" prefWidth="1368.0">
+         <children>
+            <JFXToolbar fx:id="toolBar" prefHeight="50.0" prefWidth="1416.0" styleClass="toolbar" stylesheets="@custom.css">
+               <right>
+                  <HBox fx:id="toolBarRight" prefHeight="40.0" prefWidth="26.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Label fx:id="lblMenu" prefHeight="38.0" prefWidth="21.0">
+                           <graphic>
+                              <MaterialDesignIconView fill="WHITE" glyphName="DOTS_VERTICAL" size="22" />
+                           </graphic>
+                        </Label>
+                     </children>
+                  </HBox>
+               </right>
+               <center>
+                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Ark Optimal Wallet" wrappingWidth="273.13671875" BorderPane.alignment="CENTER">
+                     <font>
+                        <Font name="System Bold" size="26.0" />
+                     </font>
+                  </Text>
+               </center>
+            </JFXToolbar>
+            <HBox prefHeight="720.0" prefWidth="1447.0">
+               <children>
+                  <AnchorPane fx:id="sideAnchor" prefHeight="700.0" prefWidth="204.0" styleClass="side-bar">
+                     <children>
+                        <JFXButton fx:id="btnAccounts" contentDisplay="TOP" layoutX="2.0" layoutY="1.0" onAction="#onAccounts" prefHeight="117.0" prefWidth="223.0" styleClass="side-buttons" stylesheets="@custom.css" text="My Accounts" textFill="#757575">
+                           <graphic>
+                              <ImageView fitHeight="52.0" fitWidth="47.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../../../resources/accounts.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </JFXButton>
+                        <JFXButton fx:id="btnDelegateView" contentDisplay="TOP" layoutX="1.0" layoutY="117.0" onAction="#onDelegateView" prefHeight="117.0" prefWidth="223.0" styleClass="side-buttons" stylesheets="@custom.css" text="Delegate View" textFill="#757575">
+                           <graphic>
+                              <ImageView fitHeight="52.0" fitWidth="47.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../../../resources/delegates.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </JFXButton>
+                        <JFXButton fx:id="btnProxyVoting" contentDisplay="TOP" layoutY="234.0" onAction="#onProxyVotingView" prefHeight="117.0" prefWidth="223.0" styleClass="side-buttons" stylesheets="@custom.css" text="Proxy Voting" textFill="#757575">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                           <graphic>
+                              <ImageView fitHeight="52.0" fitWidth="47.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../../../resources/voting.jpg" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </JFXButton>
+                        <JFXButton fx:id="btnSettings" contentDisplay="TOP" layoutY="351.0" onAction="#onSettings" prefHeight="117.0" prefWidth="223.0" styleClass="side-buttons" stylesheets="@custom.css" text="Settings" textFill="#757575">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                           <graphic>
+                              <ImageView fitHeight="52.0" fitWidth="47.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../../../resources/settings.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </JFXButton>
+                     </children>
+                  </AnchorPane>
+                  <Separator orientation="VERTICAL" prefHeight="731.0" prefWidth="13.0" />
+                  <AnchorPane fx:id="holderPane" prefHeight="800.0" prefWidth="1300.0" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

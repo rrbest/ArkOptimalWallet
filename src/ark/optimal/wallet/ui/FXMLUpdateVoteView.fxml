@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="334.0" prefWidth="718.0" style="-fx-background-radius: 10;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ark.optimal.wallet.ui.FXMLUpdateVoteViewController">
+   <children>
+      <Label prefHeight="52.0" prefWidth="713.0" style="-fx-alignment: LEFT_CENTER; -fx-background-radius: 5;" styleClass="toolbar" stylesheets="@main/custom.css" text="Update Vote" textFill="#fffdfd">
+         <font>
+            <Font name="System Bold" size="22.0" />
+         </font>
+         <padding>
+            <Insets left="10.0" />
+         </padding>
+      </Label>
+      <JFXTextField fx:id="passphrase" focusColor="#2d40eb" labelFloat="true" layoutX="17.0" layoutY="204.0" maxWidth="657.0" minWidth="214.0" prefHeight="36.0" prefWidth="657.0" promptText="Passphrase" unFocusColor="#f8f4f4">
+         <font>
+            <Font name="Roboto Black" size="13.0" />
+         </font>
+      </JFXTextField>
+      <JFXButton fx:id="accountVoteNext" layoutX="415.0" layoutY="271.0" onAction="#onAccountVoteNext" prefHeight="28.0" prefWidth="100.0" text="Next" textFill="#634eda">
+         <font>
+            <Font size="19.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
+      <JFXButton fx:id="accountVoteCancel" layoutX="522.0" layoutY="272.0" onAction="#onAccountVoteCancel" prefHeight="27.0" prefWidth="100.0" text="Cancel" textFill="#634eda">
+         <font>
+            <Font size="18.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
+      <JFXTextField fx:id="votedDelegateName" editable="false" focusColor="#2d40eb" labelFloat="true" layoutX="17.0" layoutY="140.0" maxWidth="657.0" minWidth="214.0" prefHeight="38.0" prefWidth="657.0" promptText="delegate" unFocusColor="#f8f4f4">
+         <font>
+            <Font name="Roboto Black" size="13.0" />
+         </font>
+      </JFXTextField>
+      <JFXComboBox fx:id="accounts" focusColor="#1547dd" layoutX="21.0" layoutY="76.0" prefHeight="24.0" prefWidth="605.0" promptText="Account" unFocusColor="#f8f4f4" />
+   </children>
+</AnchorPane>

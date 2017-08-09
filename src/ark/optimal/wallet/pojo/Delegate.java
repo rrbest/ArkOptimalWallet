@@ -1,0 +1,127 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package ark.optimal.wallet.pojo;
+
+/**
+ *
+ * @author Mastadon
+ */
+public class Delegate {
+    private String username;
+    private String address;
+    private String publicKey;
+    private Integer vote;
+    private Integer producedblocks;
+    private Integer missedblocks;
+    private Integer rate;
+    private Double approval;
+    private Double productivity;
+    
+    private Double poolPercentage;
+    private Double payoutFrequency;
+    private Double minPayout;
+    private Double payoutPercentage;
+
+    public Delegate(String username, String address, String publicKey, Integer vote, Integer producedblocks, Integer missedblocks, Integer rate, Double approval, Double productivity, Double poolPercentage, Double payoutFrequency, Double minPayout, Double payoutPercentage) {
+        this.username = username;
+        this.address = address;
+        this.publicKey = publicKey;
+        this.vote = vote;
+        this.producedblocks = producedblocks;
+        this.missedblocks = missedblocks;
+        this.rate = rate;
+        this.approval = approval;
+        this.productivity = productivity;
+        this.poolPercentage = poolPercentage;
+        this.payoutFrequency = payoutFrequency;
+        this.minPayout = minPayout;
+        this.payoutPercentage = payoutPercentage;
+    }
+
+    public Double getPoolPercentage() {
+        return poolPercentage;
+    }
+
+    public void setPoolPercentage(Double poolPercentage) {
+        this.poolPercentage = poolPercentage;
+    }
+
+    public Double getPayoutFrequency() {
+        return payoutFrequency;
+    }
+
+    public void setPayoutFrequency(Double payoutFrequency) {
+        this.payoutFrequency = payoutFrequency;
+    }
+
+    public Double getMinPayout() {
+        return minPayout;
+    }
+
+    public void setMinPayout(Double minPayout) {
+        this.minPayout = minPayout;
+    }
+
+    public Double getPayoutPercentage() {
+        return payoutPercentage;
+    }
+
+    public void setPayoutPercentage(Double payoutPercentage) {
+        this.payoutPercentage = payoutPercentage;
+    }
+    
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public Integer getVote() {
+        return vote;
+    }
+
+    public Integer getProducedblocks() {
+        return producedblocks;
+    }
+
+    public Integer getMissedblocks() {
+        return missedblocks;
+    }
+
+    public Integer getRate() {
+        return rate;
+    }
+
+    public Double getApproval() {
+        return approval;
+    }
+
+    public Double getProductivity() {
+        return productivity;
+    }
+
+    public Delegate(String username, String address, String publicKey, Integer vote, Integer producedblocks, Integer missedblocks, Integer rate, Double approval, Double productivity) {
+        this.username = username;
+        this.address = address;
+        this.publicKey = publicKey;
+        this.vote = vote;
+        this.producedblocks = producedblocks;
+        this.missedblocks = missedblocks;
+        this.rate = rate;
+        this.approval = approval;
+        this.productivity = productivity;
+    }
+    
+    
+    
+}
