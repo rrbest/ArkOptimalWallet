@@ -109,13 +109,13 @@ public class Crypto {
         
         try {
             String NODE_SCRIPT = ""
-                    + "var bip39 = require('/Users/Mastadon/ark/ark-apps/ark-java/node_modules/bip39/index.js');\n"
+                    + "var bip39 = require('/Users/Masoud/ark/ark-apps/ark-java/node_modules/bip39/index.js');\n"
                     + "var hockeyTeam = {name : 'WolfPack'};\n"
                     + "var data = { passphrase: bip39.generateMnemonic() };";
             // TODO: Access the person object
 
             final NodeJS nodeJS = NodeJS.createNodeJS();
-            final V8Object bip39 = nodeJS.require(new File("/Users/Mastadon/ark/ark-apps/ark-java/node_modules/bip39"));
+            final V8Object bip39 = nodeJS.require(new File("/Users/Masoud/ark/ark-apps/ark-java/node_modules/bip39"));
             V8Function callback = new V8Function(nodeJS.getRuntime(), new JavaCallback() {
                 public Object invoke(V8Object receiver, V8Array parameters) {
                     return "Hello, JavaWorld!";

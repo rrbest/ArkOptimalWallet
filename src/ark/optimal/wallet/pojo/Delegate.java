@@ -24,6 +24,8 @@ public class Delegate {
     private Double payoutFrequency;
     private Double minPayout;
     private Double payoutPercentage;
+    
+    private Boolean checked;
 
     public Delegate(String username, String address, String publicKey, Integer vote, Integer producedblocks, Integer missedblocks, Integer rate, Double approval, Double productivity, Double poolPercentage, Double payoutFrequency, Double minPayout, Double payoutPercentage) {
         this.username = username;
@@ -39,6 +41,16 @@ public class Delegate {
         this.payoutFrequency = payoutFrequency;
         this.minPayout = minPayout;
         this.payoutPercentage = payoutPercentage;
+        this.checked = false;
+
+    }
+
+    public Boolean getChecked() {
+        return checked;
+    }
+
+    public void setChecked(Boolean checked) {
+        this.checked = checked;
     }
 
     public Double getPoolPercentage() {
@@ -120,6 +132,7 @@ public class Delegate {
         this.rate = rate;
         this.approval = approval;
         this.productivity = productivity;
+        this.checked = false;
     }
     
     

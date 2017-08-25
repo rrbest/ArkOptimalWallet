@@ -12,6 +12,7 @@ import ark.optimal.wallet.qrcode.QRCodeGenerator;
 import ark.optimal.wallet.services.accountservices.AccountService;
 import ark.optimal.wallet.services.storageservices.StorageService;
 import ark.optimal.wallet.services.xchangeservices.XChangeServices;
+import ark.optimal.wallet.ui.main.FXMLArkOptimalWalletMainViewController;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDrawer;
 import com.jfoenix.controls.JFXHamburger;
@@ -28,12 +29,14 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.animation.FadeTransition;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Hyperlink;
@@ -53,6 +56,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
+import javafx.util.Duration;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
@@ -93,26 +97,18 @@ public class FXMLAccountViewController implements Initializable {
     private JFXButton btnVotes;
     @FXML
     private JFXButton btnExchange;
-    @FXML
-    private TableView<TransactionItem> transactionsTable;
-    @FXML
-    private TableColumn<TransactionItem, Hyperlink> _transactionid;
-    @FXML
-    private TableColumn<TransactionItem, Integer> _transactionconfirmations;
-    @FXML
-    private TableColumn<TransactionItem, DateTime> _transactiondate;
-    @FXML
-    private TableColumn<TransactionItem, String> _transactiontype;
-    @FXML
-    private TableColumn<TransactionItem, Double> __transactiontotal;
-    @FXML
-    private TableColumn<TransactionItem, String> __transactionfrom;
-    @FXML
-    private TableColumn<TransactionItem, String> __transactionto;
-    @FXML
-    private TableColumn<TransactionItem, String> __transactionSmartBridge;
+
     @FXML
     private JFXButton btnSendArk;
+    @FXML
+    private AnchorPane accountHolderPane;
+
+    private AnchorPane transactionsView, votesView;
+    private FXMLTransactionsViewController transactionsViewController;
+    private FXMLVotesViewController votesViewController;
+    private FXMLAccountsViewMenuController menuController;
+
+    private Account account;
 
     /**
      * Initializes the controller class.
@@ -123,7 +119,7 @@ public class FXMLAccountViewController implements Initializable {
             // TODO
             FXMLLoader loader = new FXMLLoader(getClass().getResource("FXMLAccountsViewMenu.fxml"));
             VBox vb = loader.load();
-            FXMLAccountsViewMenuController menuController = loader.getController();
+            menuController = loader.getController();
             menuController.setAccountViewController(this);
 
             accountsDrawer.setSidePane(vb);
@@ -146,39 +142,8 @@ public class FXMLAccountViewController implements Initializable {
                 }
             });
 
-            _transactionid.setCellValueFactory(new PropertyValueFactory<TransactionItem, Hyperlink>("id_link"));
-            _transactionid.setCellFactory(new HyperlinkCell());
+            createPages();
 
-            _transactionconfirmations.setCellValueFactory(new PropertyValueFactory<TransactionItem, Integer>("confirmations"));
-            _transactionconfirmations.setCellFactory(new ColumnFormatter<TransactionItem, Integer>());
-
-            _transactiondate.setCellValueFactory(new PropertyValueFactory<TransactionItem, DateTime>("date"));
-            _transactiondate.setCellFactory(new ColumnFormatter<TransactionItem, DateTime>());
-
-            _transactiontype.setCellValueFactory(new PropertyValueFactory<TransactionItem, String>("type"));
-            _transactiontype.setCellFactory(new ColumnFormatter<TransactionItem, String>());
-
-            __transactiontotal.setCellValueFactory(new PropertyValueFactory<TransactionItem, Double>("amount"));
-            __transactiontotal.setCellFactory(new ColumnFormatter<TransactionItem, Double>());
-
-            __transactionfrom.setCellValueFactory(new PropertyValueFactory<TransactionItem, String>("from"));
-            __transactionfrom.setCellFactory(new ColumnFormatter<TransactionItem, String>());
-
-            __transactionto.setCellValueFactory(new PropertyValueFactory<TransactionItem, String>("to"));
-            __transactionto.setCellFactory(new ColumnFormatter<TransactionItem, String>());
-
-            __transactionSmartBridge.setCellValueFactory(new PropertyValueFactory<TransactionItem, String>("smartBridge"));
-            __transactionSmartBridge.setCellFactory(new ColumnFormatter<TransactionItem, String>());
-
-            /*transactionsTable.setRowFactory(param -> new TableRow<TransactionItem>() {
-                @Override
-                protected void updateItem(TransactionItem item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (!empty) {
-                        disableProperty().bind(true);
-                    }
-                }
-            });*/
         } catch (IOException ex) {
             Logger.getLogger(FXMLAccountViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -193,122 +158,70 @@ public class FXMLAccountViewController implements Initializable {
     private void OnAccountBalanceExchangeValue(ActionEvent event) {
     }
 
-    void selectAccount(Account account) {
+    public void selectAccount(Account account) {
+        this.account = account;
         accountName.setText(account.getUsername());
         accountAddress.setText(account.getAddress());
         accountBalance.setText(accountBalance.getText().charAt(0) + account.getBalance().toString());
         accountBalanceExchangeValue.setText(NumberFormat.getCurrencyInstance().format(new Double(account.getBalance() * XChangeServices.getPrice("usd"))));
-        updateTransactionsTable(account.getTransactions());
+        transactionsViewController.updateTransactionsTable(account.getTransactions());
         addQRCode(account.getAddress());
-        btnTransactions.setFocusTraversable(true);
+        btnTransactions.requestFocus();
+        setNode(transactionsView);
+        menuController.selectAccountItem(account);
+        
     }
 
     @FXML
     private void onFetchTransactions(ActionEvent event) {
         List<Transaction> transactions = AccountService.getTransactions(accountAddress.getText(), 50);
-        updateTransactionsTable(transactions);
+        transactionsViewController.updateTransactionsTable(transactions);
+        btnTransactions.requestFocus();
+        setNode(transactionsView);
+
     }
 
-    private void updateTransactionsTable(List<Transaction> transactions) {
+    private void setNode(Node node) {
+        accountHolderPane.getChildren().clear();
+        accountHolderPane.getChildren().add((Node) node);
 
-        if (transactions == null)
-            return;
-        transactionsTable.getItems().clear();
+        FadeTransition ft = new FadeTransition(Duration.millis(500));
+        ft.setNode(node);
+        ft.setFromValue(0.1);
+        ft.setToValue(1);
+        ft.setCycleCount(1);
+        ft.setAutoReverse(false);
+        ft.play();
+    }
 
-        for (Transaction t : transactions) {
-            System.out.println(t.getId());
-            System.out.println(t.getAmount());
-            System.out.println(formatTransactionTimeStamp((long) t.getTimestamp()));
-            DateTime dt = ConvertTransactionTimeStampToLocal(t.getTimestamp());
-            Double amount = t.getAmount().doubleValue() / 100000000.0;
-            String type = "";
-            if (t.getType() == 0) {
-                type = "Receive Ark";
-            } else if (t.getType() == 3) {
-                type = "Vote";
-                amount = -1 * t.getFee().doubleValue() / 100000000.0;
+    private void createPages() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLTransactionsView.fxml"));
+            transactionsView = fxmlLoader.load();
+            transactionsViewController = (FXMLTransactionsViewController) fxmlLoader.getController();
+            transactionsViewController.setAccountsViewController(this);
 
-            } else if (t.getType() == 2) {
-                type = "Delegate Registration";
-                amount = -1 * t.getFee().doubleValue() / 100000000.0;
-            } else {
-                type = "Send Ark";
-                amount = -1 * amount;
-            }
-            String smartbridge = t.getVendorField();
-            String from = t.getFrom();
-            if (t.getSenderId() != null) {
-                Account account = StorageService.getInstance().getUserAccounts().get(t.getSenderId());
-                if (account != null) {
-                    from = account.getUsername();
-                } else {
-                    account = StorageService.getInstance().getWatchAccounts().get(t.getSenderId());
-                    if (account != null) {
-                        from = account.getUsername();
-                    }
-                }
-
-            }
-
-            String to = t.getTo();
-            if (t.getRecipientId() != null) {
-                Account account = StorageService.getInstance().getUserAccounts().get(t.getRecipientId());
-                if (account != null) {
-                    to = account.getUsername();
-                } else {
-                    account = StorageService.getInstance().getWatchAccounts().get(t.getRecipientId());
-                    if (account != null) {
-                        to = account.getUsername();
-                    }
-                }
-
-            }
-
-            TransactionItem ti = new TransactionItem(t.getId(), t.getConfirmations(), dt, type, amount, from, to, smartbridge);
-            transactionsTable.getItems().add(ti);
-
+            fxmlLoader = new FXMLLoader(getClass().getResource("FXMLVotesView.fxml"));
+            votesView = fxmlLoader.load();
+            votesViewController = (FXMLVotesViewController) fxmlLoader.getController();
+            votesViewController.setAccountsViewController(this);
+            //set up default node on page load
+            setNode(transactionsView);
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLArkOptimalWalletMainViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        if (transactionsTable.getItems().size() * 40 > 450) {
-            transactionsTable.setPrefHeight(transactionsTable.getItems().size() * 40);
-        }
     }
 
     @FXML
     private void onFetchVotes(ActionEvent event) {
+        btnVotes.requestFocus();
+        votesViewController.viewVotes(this.account);
+        setNode(votesView);
     }
 
     @FXML
     private void onExchange(ActionEvent event) {
-    }
-
-    private String formatTransactionTimeStamp(long timestamp) {
-
-        DateTime d = new DateTime(2017, 3, 21, 13, 0, 0, 0);
-        long start = d.getMillis() / 1000;
-        Timestamp date = new Timestamp((long) (timestamp + start) * 1000);
-        System.out.println(date.toString());
-
-        DateTimeFormatter fmt = DateTimeFormat.forPattern("MM/dd/yy HH:mm:ss");
-        String timestr = fmt.print((long) (timestamp + start) * 1000);
-        System.out.println(timestr);
-
-        return timestr;
-    }
-
-    private DateTime ConvertTransactionTimeStampToLocal(long timestamp) {
-
-        DateTime d = new DateTime(2017, 3, 21, 13, 0, 0, 0);
-        long start = d.getMillis() / 1000;
-        Timestamp date = new Timestamp((long) (timestamp + start) * 1000);
-        System.out.println(date.toString());
-        DateTime dt = new LocalDateTime(date.getTime()).toDateTime(DateTimeZone.UTC);
-
-        DateTimeFormatter fmt = DateTimeFormat.forPattern("MM/dd/yy HH:mm:ss");
-        String timestr = fmt.print((long) (timestamp + start) * 1000);
-        System.out.println(timestr);
-
-        return dt;
     }
 
     private void addQRCode(String address) {
@@ -321,17 +234,18 @@ public class FXMLAccountViewController implements Initializable {
 
     @FXML
     private void onSendArk(ActionEvent event) {
-        
-        if (accountAddress.getText() == null)
+
+        if (accountAddress.getText() == null) {
             return;
-        
-         try {
+        }
+
+        try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLSendArkView.fxml"));
             Parent root1 = (Parent) fxmlLoader.load();
             FXMLSendArkViewController sendArkController = (FXMLSendArkViewController) fxmlLoader.getController();
             sendArkController.setAccountMenuController(this);
             sendArkController.setSenderAddress(accountAddress.getText());
-            
+
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.initStyle(StageStyle.UNDECORATED);
@@ -341,9 +255,26 @@ public class FXMLAccountViewController implements Initializable {
         } catch (IOException ex) {
             Logger.getLogger(FXMLAccountsViewMenuController.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+    }
+
+    public void runImportAccount(){
+        menuController.runImportAccount();
         
     }
 
+    public void addToUserAccountsMenu(Account account) {
+       menuController.addToUserAccountsMenu(account); 
+    }
+    
+    public void addToWatchAccountsMenu(Account account) {
+       menuController.addToWatchAccountsMenu(account); 
+    }
+
+    public void clearAccountsMenu() {
+        menuController.clearAccountsMenu();
+    }
+    
     private class HyperlinkCell implements Callback<TableColumn<TransactionItem, Hyperlink>, TableCell<TransactionItem, Hyperlink>> {
 
         @Override

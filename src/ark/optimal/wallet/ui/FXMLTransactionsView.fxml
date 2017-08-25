@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="1077.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ark.optimal.wallet.ui.FXMLTransactionsViewController">
+   <children>
+      <TableView fx:id="transactionsTable" prefHeight="500.0" prefWidth="1036.0" styleClass="transactions-table-view" stylesheets="@main/custom.css">
+         <columns>
+            <TableColumn fx:id="_transactionid" prefWidth="76.0" text="Id" />
+            <TableColumn fx:id="_transactionconfirmations" prefWidth="105.0" text="Confirmations" />
+            <TableColumn fx:id="_transactiondate" prefWidth="144.0" text="Date" />
+            <TableColumn fx:id="_transactiontype" prefWidth="144.0" text="Type" />
+            <TableColumn fx:id="__transactiontotal" prefWidth="94.0" text="Total Ѧ" />
+            <TableColumn fx:id="__transactionfrom" prefWidth="100.0" text="From" />
+            <TableColumn fx:id="__transactionto" prefWidth="114.0" text="To" />
+            <TableColumn fx:id="__transactionSmartBridge" prefWidth="200.0" text="Smart Bridge" />
+         </columns>
+      </TableView>
+   </children>
+</AnchorPane>

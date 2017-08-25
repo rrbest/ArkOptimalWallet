@@ -38,16 +38,15 @@ public class FXMLUpdateVoteViewController implements Initializable {
     private JFXButton accountVoteNext;
     @FXML
     private JFXButton accountVoteCancel;
-    @FXML
     private JFXTextField votedDelegateName;
 
-    private FXMLDelegateViewController delegateViewController;
+    private FXMLDelegatesViewController delegateViewController;
     private String delegateName;
 
     @FXML
     private JFXComboBox<Account> accounts;
 
-    public void setDelegateViewController(FXMLDelegateViewController delegateViewController) {
+    public void setDelegateViewController(FXMLDelegatesViewController delegateViewController) {
         this.delegateViewController = delegateViewController;
     }
 
@@ -64,9 +63,9 @@ public class FXMLUpdateVoteViewController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
          ObservableList<Account> userAccounts = FXCollections.observableArrayList();
-         userAccounts.addAll(StorageService.getInstance().getUserAccounts().values());
+         userAccounts.addAll(StorageService.getInstance().getWallet().getUserAccounts().values());
          accounts.setItems(userAccounts);
-         accounts.getSelectionModel().selectFirst();
+         //accounts.getSelectionModel().selectFirst();
          
          
          accounts.setCellFactory(new Callback<ListView<Account>,ListCell<Account>>(){
@@ -104,9 +103,10 @@ public class FXMLUpdateVoteViewController implements Initializable {
 
     @FXML
     private void onAccountVoteNext(ActionEvent event) {
-        
-        Transaction tx = TransactionService.createVote(accounts.getSelectionModel().getSelectedItem().getAddress(),votedDelegateName.getText(), passphrase.getText(), false );
-        TransactionService.PostTransaction(tx);
+        Account account = accounts.getSelectionModel().getSelectedItem();
+        delegateViewController.optimize(account, passphrase.getText());
+        //Transaction tx = TransactionService.createVote(accounts.getSelectionModel().getSelectedItem().getAddress(),votedDelegateName.getText(), passphrase.getText(), false );
+        //TransactionService.PostTransaction(tx);
         closeWindow();
     }
 

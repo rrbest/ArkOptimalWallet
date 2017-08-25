@@ -158,7 +158,7 @@ public class AccountService {
 
             List<Transaction> transactions = getTransactions(a.getAddress(), 50);
             a.setTransactions(transactions);
-
+            a.setVotedDelegates(getVotedDelegates(a.getAddress()));
             return a;
         } catch (IOException ex) {
             Logger.getLogger(AccountService.class.getName()).log(Level.SEVERE, null, ex);
@@ -181,6 +181,41 @@ public class AccountService {
         }
 
         return account;
+
+    }
+    
+    public static List<Delegate> getVotedDelegates(String address){
+        String response = NetworkService.getFromPeer("/api/accounts/delegates/?address="+address);
+        System.out.println(response);
+        
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> respMap = new HashMap<String, Object>();
+        List<Delegate> delegates = new ArrayList<Delegate>();
+        try {
+            // convert JSON string to Map
+            respMap = mapper.readValue(response, new TypeReference<Map<String, Object>>() {
+            });
+            List<Map> dels = (List<Map>) respMap.get("delegates");
+            for (Map delegateMap : dels) {
+                Double vote = Double.parseDouble((String) delegateMap.get("vote")) / 100000000;
+                int v = vote.intValue();
+                Delegate d = new Delegate((String) delegateMap.get("username"),
+                    (String) delegateMap.get("address"),
+                    (String) delegateMap.get("publicKey"),
+                    v,
+                    (Integer) delegateMap.get("producedblocks"),
+                    (Integer) delegateMap.get("missedblocks"),
+                    (Integer) delegateMap.get("rate"),
+                    (delegateMap.get("approval") instanceof Integer) ? (Double) ((Integer) delegateMap.get("approval") * 1.0) : (Double) delegateMap.get("approval"),
+                    (delegateMap.get("productivity") instanceof Integer) ? (Double) ((Integer) delegateMap.get("productivity") * 1.0) : (Double) delegateMap.get("productivity"));
+            
+                delegates.add(d);
+            }
+
+        } catch (IOException ex) {
+            Logger.getLogger(AccountService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return delegates;
 
     }
 
@@ -225,7 +260,6 @@ public class AccountService {
 
             }
 
-            System.out.println("ark.optimal.wallet.services.accountservices.AccountService.getTransactions()");
         } catch (IOException ex) {
             Logger.getLogger(AccountService.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -274,5 +308,6 @@ public class AccountService {
             nodeJS.handleMessage();
         }
     }
+    
 
 }

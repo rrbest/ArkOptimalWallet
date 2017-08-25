@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="178.0" prefWidth="864.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ark.optimal.wallet.ui.FXMLVotedDelegateViewController">
+   <children>
+      <TableView fx:id="votedDelegateTable" layoutY="7.0" prefHeight="88.0" prefWidth="859.0" styleClass="transactions-table-view" stylesheets="@main/custom.css">
+         <columns>
+            <TableColumn fx:id="votedDelegateCheck" prefWidth="76.0" />
+            <TableColumn fx:id="delegateRank" text="Rank" />
+            <TableColumn fx:id="delegateName" prefWidth="149.0" text="Delegate Name" />
+            <TableColumn fx:id="delegateAddress" prefWidth="340.0" text="Address" />
+            <TableColumn fx:id="delegateApproval" prefWidth="107.0" text="Approval" />
+            <TableColumn fx:id="delegateProductivity" prefWidth="100.0" text="Productivity" />
+         </columns>
+      </TableView>
+      <JFXButton fx:id="votebtn" layoutX="320.0" layoutY="117.0" prefHeight="34.0" prefWidth="127.0" style="-fx-background-color: #f44336;" text="VOTE" textFill="WHITE">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </JFXButton>
+      <Separator layoutX="19.0" layoutY="160.0" prefHeight="5.0" prefWidth="837.0" />
+   </children>
+</AnchorPane>

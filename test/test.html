@@ -1,0 +1,13 @@
+<html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+        
+        <script type="text/javascript">
+            var bip39 = require('bip39');
+            var data = { passphrase: bip39.generateMnemonic() };
+            alert(data.passphrase);
+            </script>
+    </body>
+</html>

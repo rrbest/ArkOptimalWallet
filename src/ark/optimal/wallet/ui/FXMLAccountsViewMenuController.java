@@ -7,6 +7,7 @@ package ark.optimal.wallet.ui;
 
 import ark.optimal.wallet.pojo.Account;
 import ark.optimal.wallet.services.storageservices.StorageService;
+import com.google.gson.Gson;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXListCell;
 import com.jfoenix.controls.JFXListView;
@@ -124,9 +125,14 @@ public class FXMLAccountsViewMenuController implements Initializable {
         });
 
         watchAcountsListView.setPrefHeight(watchAcountsListView.getItems().size() * 40);
+        
+        
 
     }
 
+    public void runImportAccount(){
+        onImportAccount(null);
+    }
     @FXML
     private void onImportAccount(ActionEvent event) {
 
@@ -196,7 +202,7 @@ public class FXMLAccountsViewMenuController implements Initializable {
     }
 
     private void addToMyAccounts(Account account) {
-        if (!StorageService.getInstance().getUserAccounts().containsKey(account.getAddress())) {
+        if (!StorageService.getInstance().getWallet().getUserAccounts().containsKey(account.getAddress())) {
             StorageService.getInstance().addAccountToUserAccounts(account);
             myAcountsListView.getItems().add(new AccountItem(account.getUsername(), account.getAddress()));
         }
@@ -210,7 +216,7 @@ public class FXMLAccountsViewMenuController implements Initializable {
     }
 
     private void addToWatchAccounts(Account account) {
-        if (!StorageService.getInstance().getWatchAccounts().containsKey(account.getAddress())) {
+        if (!StorageService.getInstance().getWallet().getWatchAccounts().containsKey(account.getAddress())) {
             StorageService.getInstance().addAccountToWatchAccounts(account);
             watchAcountsListView.getItems().add(new AccountItem(account.getUsername(), account.getAddress()));
         }
@@ -223,6 +229,15 @@ public class FXMLAccountsViewMenuController implements Initializable {
         myAcountsListView.getSelectionModel().select(-1);
 
     }
+    
+    public void selectAccountItem(Account account){
+        myAcountsListView.requestFocus();
+        myAcountsListView.getSelectionModel().select(new AccountItem(account.getUsername(), account.getAddress()));
+        //myAcountsListView.getSelectionModel().select(0);
+        myAcountsListView.refresh();
+        myAcountsListView.setPrefHeight(myAcountsListView.getItems().size() * 40);
+        watchAcountsListView.getSelectionModel().select(-1);
+    }
 
     @FXML
     private void handleWatchAccountMouseClick(MouseEvent event) {
@@ -234,7 +249,7 @@ public class FXMLAccountsViewMenuController implements Initializable {
 
         System.out.println(watchAcountsListView.getSelectionModel().getSelectedItem().getAddress());
         String address = watchAcountsListView.getSelectionModel().getSelectedItem().getAddress();
-        Account account = StorageService.getInstance().getWatchAccounts().get(address);
+        Account account = StorageService.getInstance().getWallet().getWatchAccounts().get(address);
         accountViewController.selectAccount(account);
     }
 
@@ -266,9 +281,22 @@ public class FXMLAccountsViewMenuController implements Initializable {
             System.out.println(myAcountsListView.getSelectionModel().getSelectedItem().getAddress());
         }
         String address = myAcountsListView.getSelectionModel().getSelectedItem().getAddress();
-        Account account = StorageService.getInstance().getUserAccounts().get(address);
+        Account account = StorageService.getInstance().getWallet().getUserAccounts().get(address);
         accountViewController.selectAccount(account);
 
+    }
+
+    public void addToUserAccountsMenu(Account account) {
+        myAcountsListView.getItems().add(new AccountItem(account.getUsername(), account.getAddress()));
+        
+    }
+    public void addToWatchAccountsMenu(Account account) {
+        watchAcountsListView.getItems().add(new AccountItem(account.getUsername(), account.getAddress()));
+        
+    }
+
+    void clearAccountsMenu() {
+       myAcountsListView.getItems().clear();
     }
 
     class AccountItem extends RecursiveTreeObject<AccountItem> {

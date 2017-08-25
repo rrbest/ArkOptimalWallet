@@ -5,7 +5,10 @@
  */
 package ark.optimal.wallet.pojo;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -19,6 +22,26 @@ public class Account {
     private Double balance;
 
     private List<Transaction> transactions;
+    private List<Delegate> votedDelegates;
+
+    private Map<String, Account> subAccounts;
+    
+    public List<Delegate> getVotedDelegates() {
+        return votedDelegates;
+    }
+
+    public void setSubAccounts(Map<String, Account> subAccounts) {
+        this.subAccounts = subAccounts;
+    }
+
+    public Map<String, Account> getSubAccounts() {
+        return subAccounts;
+    }
+
+    public void setVotedDelegates(List<Delegate> votedDelegates) {
+        this.votedDelegates = votedDelegates;
+    }
+   
 
     public List<Transaction> getTransactions() {
         return transactions;
@@ -33,6 +56,8 @@ public class Account {
         this.address = address;
         this.publicKey = publicKey;
         this.balance = balance;
+        subAccounts = new HashMap<String, Account>();
+        votedDelegates = new ArrayList<Delegate>();
     }
 
     public String getUsername() {

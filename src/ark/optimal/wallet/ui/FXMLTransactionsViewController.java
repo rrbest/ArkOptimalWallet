@@ -1,0 +1,264 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package ark.optimal.wallet.ui;
+
+import ark.optimal.wallet.pojo.Account;
+import ark.optimal.wallet.pojo.Transaction;
+import ark.optimal.wallet.services.storageservices.StorageService;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.Callback;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
+/**
+ * FXML Controller class
+ *
+ * @author Mastadon
+ */
+public class FXMLTransactionsViewController implements Initializable {
+
+    @FXML
+    private TableView<TransactionItem> transactionsTable;
+    @FXML
+    private TableColumn<TransactionItem, Hyperlink> _transactionid;
+    @FXML
+    private TableColumn<TransactionItem, Integer> _transactionconfirmations;
+    @FXML
+    private TableColumn<TransactionItem, DateTime> _transactiondate;
+    @FXML
+    private TableColumn<TransactionItem, String> _transactiontype;
+    @FXML
+    private TableColumn<TransactionItem, Double> __transactiontotal;
+    @FXML
+    private TableColumn<TransactionItem, String> __transactionfrom;
+    @FXML
+    private TableColumn<TransactionItem, String> __transactionto;
+    @FXML
+    private TableColumn<TransactionItem, String> __transactionSmartBridge;
+
+    private FXMLAccountViewController accountViewController;
+    /**
+     * Initializes the controller class.
+     */
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        // TODO
+
+        _transactionid.setCellValueFactory(new PropertyValueFactory<TransactionItem, Hyperlink>("id_link"));
+        _transactionid.setCellFactory(new FXMLTransactionsViewController.HyperlinkCell());
+
+        _transactionconfirmations.setCellValueFactory(new PropertyValueFactory<TransactionItem, Integer>("confirmations"));
+        _transactionconfirmations.setCellFactory(new FXMLTransactionsViewController.ColumnFormatter<TransactionItem, Integer>());
+
+        _transactiondate.setCellValueFactory(new PropertyValueFactory<TransactionItem, DateTime>("date"));
+        _transactiondate.setCellFactory(new FXMLTransactionsViewController.ColumnFormatter<TransactionItem, DateTime>());
+
+        _transactiontype.setCellValueFactory(new PropertyValueFactory<TransactionItem, String>("type"));
+        _transactiontype.setCellFactory(new FXMLTransactionsViewController.ColumnFormatter<TransactionItem, String>());
+
+        __transactiontotal.setCellValueFactory(new PropertyValueFactory<TransactionItem, Double>("amount"));
+        __transactiontotal.setCellFactory(new FXMLTransactionsViewController.ColumnFormatter<TransactionItem, Double>());
+
+        __transactionfrom.setCellValueFactory(new PropertyValueFactory<TransactionItem, String>("from"));
+        __transactionfrom.setCellFactory(new FXMLTransactionsViewController.ColumnFormatter<TransactionItem, String>());
+
+        __transactionto.setCellValueFactory(new PropertyValueFactory<TransactionItem, String>("to"));
+        __transactionto.setCellFactory(new FXMLTransactionsViewController.ColumnFormatter<TransactionItem, String>());
+
+        __transactionSmartBridge.setCellValueFactory(new PropertyValueFactory<TransactionItem, String>("smartBridge"));
+        __transactionSmartBridge.setCellFactory(new FXMLTransactionsViewController.ColumnFormatter<TransactionItem, String>());
+
+    }
+
+    public void setAccountsViewController(FXMLAccountViewController accountViewController) {
+        this.accountViewController = accountViewController;
+    }
+    
+    
+    public void updateTransactionsTable(List<Transaction> transactions) {
+
+        if (transactions == null) {
+            return;
+        }
+        transactionsTable.getItems().clear();
+
+        for (Transaction t : transactions) {
+            System.out.println(t.getId());
+            System.out.println(t.getAmount());
+            System.out.println(formatTransactionTimeStamp((long) t.getTimestamp()));
+            DateTime dt = ConvertTransactionTimeStampToLocal(t.getTimestamp());
+            Double amount = t.getAmount().doubleValue() / 100000000.0;
+            String type = "";
+            if (t.getType() == 0) {
+                type = "Receive Ark";
+            } else if (t.getType() == 3) {
+                type = "Vote";
+                amount = -1 * t.getFee().doubleValue() / 100000000.0;
+
+            } else if (t.getType() == 2) {
+                type = "Delegate Registration";
+                amount = -1 * t.getFee().doubleValue() / 100000000.0;
+            } else {
+                type = "Send Ark";
+                amount = -1 * amount;
+            }
+            String smartbridge = t.getVendorField();
+            String from = t.getFrom();
+            if (t.getSenderId() != null) {
+                Account account = StorageService.getInstance().getWallet().getUserAccounts().get(t.getSenderId());
+                if (account != null) {
+                    from = account.getUsername();
+                } else {
+                    account = StorageService.getInstance().getWallet().getWatchAccounts().get(t.getSenderId());
+                    if (account != null) {
+                        from = account.getUsername();
+                    }
+                }
+
+            }
+
+            String to = t.getTo();
+            if (t.getRecipientId() != null) {
+                Account account = StorageService.getInstance().getWallet().getUserAccounts().get(t.getRecipientId());
+                if (account != null) {
+                    to = account.getUsername();
+                } else {
+                    account = StorageService.getInstance().getWallet().getWatchAccounts().get(t.getRecipientId());
+                    if (account != null) {
+                        to = account.getUsername();
+                    }
+                }
+
+            }
+
+            TransactionItem ti = new TransactionItem(t.getId(), t.getConfirmations(), dt, type, amount, from, to, smartbridge);
+            transactionsTable.getItems().add(ti);
+
+        }
+
+        if (transactionsTable.getItems().size() * 40 > 450) {
+            transactionsTable.setPrefHeight(transactionsTable.getItems().size() * 40);
+        }
+    }
+
+    private String formatTransactionTimeStamp(long timestamp) {
+
+        DateTime d = new DateTime(2017, 3, 21, 13, 0, 0, 0);
+        long start = d.getMillis() / 1000;
+        Timestamp date = new Timestamp((long) (timestamp + start) * 1000);
+        System.out.println(date.toString());
+
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("MM/dd/yy HH:mm:ss");
+        String timestr = fmt.print((long) (timestamp + start) * 1000);
+        System.out.println(timestr);
+
+        return timestr;
+    }
+
+    private DateTime ConvertTransactionTimeStampToLocal(long timestamp) {
+
+        DateTime d = new DateTime(2017, 3, 21, 13, 0, 0, 0);
+        long start = d.getMillis() / 1000;
+        Timestamp date = new Timestamp((long) (timestamp + start) * 1000);
+        System.out.println(date.toString());
+        DateTime dt = new LocalDateTime(date.getTime()).toDateTime(DateTimeZone.UTC);
+
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("MM/dd/yy HH:mm:ss");
+        String timestr = fmt.print((long) (timestamp + start) * 1000);
+        System.out.println(timestr);
+
+        return dt;
+    }
+    
+    private class HyperlinkCell implements Callback<TableColumn<TransactionItem, Hyperlink>, TableCell<TransactionItem, Hyperlink>> {
+
+        @Override
+        public TableCell<TransactionItem, Hyperlink> call(TableColumn<TransactionItem, Hyperlink> arg) {
+            TableCell<TransactionItem, Hyperlink> cell = new TableCell<TransactionItem, Hyperlink>() {
+                @Override
+                protected void updateItem(Hyperlink item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item == null || empty) {
+                        setGraphic(null);
+                    } else {
+
+                        setGraphic(item);
+
+                        item.setOnAction(t -> {
+                            URI u;
+                            try {
+                                u = new URI("https://explorer.ark.io/tx/" + item.getText());
+                                java.awt.Desktop.getDesktop().browse(u);
+                            } catch (URISyntaxException ex) {
+                                Logger.getLogger(FXMLAccountViewController.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (IOException ex) {
+                                Logger.getLogger(FXMLAccountViewController.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+
+                        });
+                    }
+
+                }
+            };
+            return cell;
+        }
+    }
+
+    private class ColumnFormatter<S, T> implements Callback<TableColumn<S, T>, TableCell<S, T>> {
+
+        private final DateTimeFormatter formatter = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm");
+
+        public ColumnFormatter() {
+            super();
+        }
+
+        @Override
+        public TableCell<S, T> call(TableColumn<S, T> arg0) {
+            return new TableCell<S, T>() {
+                @Override
+                protected void updateItem(T item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item == null || empty) {
+                        setGraphic(null);
+                    } else {
+                        String val = item.toString();
+                        if (item instanceof DateTime) {
+                            DateTime ld = (DateTime) item;
+                            val = formatter.print(ld);
+
+                        }
+                        if (item instanceof Hyperlink) {
+
+                        }
+                        setGraphic(new Label(val));
+                        setAlignment(Pos.CENTER);
+                    }
+                }
+            };
+        }
+    }
+
+}
