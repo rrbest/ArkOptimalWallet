@@ -257,6 +257,7 @@ public class NetworkService {
     
     public static String postToPeer3(String api, String generatedJSONString) {
 
+        String resp = null;
         String peer_ip = getRandomSeed(Mainnet);
         String urlString = "http://" + peer_ip + api;
         CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -279,10 +280,13 @@ public class NetworkService {
             in = new Scanner(entity2.getContent());
             while (in.hasNext())
             {
-                System.out.println(in.next());
+                resp = in.next();
+                System.out.println(resp);
+                
 
             }
             EntityUtils.consume(entity2);
+            return resp;
             
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(NetworkService.class.getName()).log(Level.SEVERE, null, ex);

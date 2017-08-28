@@ -9,13 +9,22 @@ import ark.optimal.wallet.pojo.Account;
 import ark.optimal.wallet.pojo.Delegate;
 import ark.optimal.wallet.services.accountservices.AccountService;
 import ark.optimal.wallet.services.storageservices.StorageService;
+import cern.colt.matrix.tdouble.DoubleMatrix1D;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
+import com.joptimizer.exception.JOptimizerException;
+import com.joptimizer.functions.LinearMultivariateRealFunction;
+import com.joptimizer.optimizers.JOptimizer;
+import com.joptimizer.optimizers.LPOptimizationRequest;
+import com.joptimizer.optimizers.LPPrimalDualMethod;
 import io.ark.core.Transaction;
 import io.ark.core.TransactionService;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -313,6 +322,36 @@ public class FXMLDelegatesViewController implements Initializable {
         for (Delegate d : selectedDelegates) {
             if (!subAccounts.containsKey(d.getUsername())) {
                 Account a = AccountService.createAccount(passphrase + " " + d.getUsername());
+                if (a.getVotedDelegates().size() == 0) {
+                    Transaction tx = TransactionService.createTransaction(account.getAddress(), a.getAddress(), 2, "send to sub wallet to vote", passphrase);
+                    String response = TransactionService.PostTransaction(tx);
+
+                    ObjectMapper mapper = new ObjectMapper();
+                    Map<String, Object> respMap = new HashMap<String, Object>();
+
+                    try {
+                        // convert JSON string to Map
+                        respMap = mapper.readValue(response, new TypeReference<Map<String, Object>>() {
+                        });
+                        if ((Boolean) respMap.get("success")) {
+                            tx = TransactionService.createVote(a.getAddress(), d.getUsername(), passphrase + " " + d.getUsername(), false);
+                            response = TransactionService.PostTransaction(tx);
+                            respMap = mapper.readValue(response, new TypeReference<Map<String, Object>>() {
+                            });
+                            if ((Boolean) respMap.get("success")) {
+
+                                a.getVotedDelegates().add(d);
+                            }
+
+                        }
+                    } catch (IOException ex) {
+                        Logger.getLogger(FXMLDelegatesViewController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    //Gson g = new Gson();
+
+                    // change this - use json parsing
+                    // if (response.contains("\"success\":true"))
+                }
                 subAccounts.put(d.getUsername(), a);
             }
             System.out.println(d.getUsername());
@@ -321,44 +360,89 @@ public class FXMLDelegatesViewController implements Initializable {
 
     private void runOptimization(Account account, String passphrase) {
         Double walletsVotes = 0.0;
+        List<Delegate> delegates = new ArrayList<Delegate>();
         for (String delegateName : account.getSubAccounts().keySet()) {
+            delegates.add(delegatesMap.get(delegateName));
             Account subaccount = account.getSubAccounts().get(delegateName);
             Double walletVotes = subaccount.getBalance();
             if (walletVotes != null && walletVotes > 2) {
                 Transaction tx = TransactionService.createTransaction(subaccount.getAddress(), account.getAddress(), walletVotes.longValue() - 2, "send to master wallet", passphrase + " " + delegateName);
                 TransactionService.PostTransaction(tx);
-                walletsVotes += walletVotes - 2;
+                walletsVotes += walletVotes;
             }
-
-        }
-        // change 
-        double votes = account.getBalance() + walletsVotes - account.getBalance() * 0.1;
-        Double vote = votes / account.getSubAccounts().size();
-        for (String delegateName : account.getSubAccounts().keySet()) {
-            Account subaccount = account.getSubAccounts().get(delegateName);
-            Transaction tx = TransactionService.createTransaction(account.getAddress(), subaccount.getAddress(), vote.longValue(), "send to sub wallet", passphrase);
-            TransactionService.PostTransaction(tx);
 
         }
         try {
-            TimeUnit.SECONDS.sleep(10);
+            TimeUnit.SECONDS.sleep(2);
+            Account acc = AccountService.getAccount(account.getAddress());
+            while (acc.getBalance() < walletsVotes) {
+                System.out.println("Wait for Confirmation of transactions");
+                acc = AccountService.getAccount(passphrase);
+
+            }
+            walletsVotes = acc.getBalance();
+            Map<String, Double> votes = createLP(walletsVotes, delegates);
+            for (String delegateName : account.getSubAccounts().keySet()) {
+                Account subaccount = account.getSubAccounts().get(delegateName);
+                Double vote = votes.get(delegateName);
+                Transaction tx = TransactionService.createTransaction(account.getAddress(), subaccount.getAddress(), vote.longValue(), "send to sub wallet", passphrase);
+                TransactionService.PostTransaction(tx);
+
+            }
+
         } catch (InterruptedException ex) {
             Logger.getLogger(FXMLDelegatesViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        for (String delegateName : account.getSubAccounts().keySet()) {
-            Account subaccount = account.getSubAccounts().get(delegateName);
-            Transaction tx = TransactionService.createVote(subaccount.getAddress(), delegateName, passphrase + " " + delegateName, false);
-            String response = TransactionService.PostTransaction(tx);
-            // change this - use json parsing
-           // if (response.contains("\"success\":true"))
-            {
-                Delegate d = AccountService.getDelegateByUsername(delegateName);
-                subaccount.getVotedDelegates().add(d);
+        // change 
+
+    }
+
+    private Map<String, Double> createLP(double totalVotes, List<Delegate> delegates) {
+
+        try {
+            //100000000
+            double[] c = new double[delegates.size()];
+            for (int i = 0; i < delegates.size(); i++) {
+                Delegate d = delegates.get(i);
+                c[i] = -1.0 * d.getPayoutPercentage() / d.getVote();
             }
+
+            //Inequalities constraints
+            double[][] A = new double[1][delegates.size()];
+            Arrays.fill(A[0], 1);
+            //Bounds on variables
+            double[] b = new double[1];
+            b[0] = totalVotes;
+            double[] lb = new double[delegates.size()];
+            Arrays.fill(lb, 0);
+
+            //optimization problem
+            LPOptimizationRequest or = new LPOptimizationRequest();
+            or.setC(c);
+            //or.setG(G);
+            //or.setH(h);
+            or.setB(b);
+            or.setA(A);
+            or.setLb(lb);
+            or.setDumpProblem(true);
+
+            //optimization
+            LPPrimalDualMethod opt = new LPPrimalDualMethod();
+
+            opt.setLPOptimizationRequest(or);
+            opt.optimize();
+            double[] sol = opt.getOptimizationResponse().getSolution();
+
+            Map<String, Double> map = new HashMap<String, Double>();
+            for (int i = 0; i < delegates.size(); i++) {
+                map.put(delegates.get(i).getUsername(), sol[i]);
+            }
+            return map;
+
+        } catch (JOptimizerException ex) {
+            Logger.getLogger(FXMLDelegatesViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        
-
+        return null;
     }
 
 }
