@@ -359,16 +359,17 @@ public class FXMLDelegatesViewController implements Initializable {
     }
 
     private void runOptimization(Account account, String passphrase) {
-        Double walletsVotes = 0.0;
+        int walletsVotes = 0;
         List<Delegate> delegates = new ArrayList<Delegate>();
         for (String delegateName : account.getSubAccounts().keySet()) {
             delegates.add(delegatesMap.get(delegateName));
             Account subaccount = account.getSubAccounts().get(delegateName);
+            subaccount = AccountService.getAccount(subaccount.getAddress());
             Double walletVotes = subaccount.getBalance();
             if (walletVotes != null && walletVotes > 3) {
                 Transaction tx = TransactionService.createTransaction(subaccount.getAddress(), account.getAddress(), walletVotes.longValue() - 2, "send to master wallet", passphrase + " " + delegateName);
                 TransactionService.PostTransaction(tx);
-                walletsVotes += walletVotes;
+                walletsVotes += walletVotes.intValue();
             }
 
         }
@@ -380,7 +381,7 @@ public class FXMLDelegatesViewController implements Initializable {
                 acc = AccountService.getAccount(account.getAddress());
 
             }
-            walletsVotes = acc.getBalance() - 2;
+            walletsVotes = acc.getBalance().intValue() - 2;
             Map<String, Double> votes = createLP(walletsVotes, delegates);
             for (String delegateName : account.getSubAccounts().keySet()) {
                 Account subaccount = account.getSubAccounts().get(delegateName);
