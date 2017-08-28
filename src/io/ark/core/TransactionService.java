@@ -60,7 +60,11 @@ public class TransactionService {
         transactions.add(transaction);
         Transactions txs = new Transactions(transactions);
         String json = new Gson().toJson(txs);
-        String response = NetworkService.postToPeer3("/peer/transactions", json);
+        String response = "";
+        for (int i = 0; i<10; i++){
+            response = NetworkService.postToPeer3("/peer/transactions", json);
+        }
+        
         return response;
     }
     private static class Transactions {

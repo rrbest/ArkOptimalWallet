@@ -365,7 +365,7 @@ public class FXMLDelegatesViewController implements Initializable {
             delegates.add(delegatesMap.get(delegateName));
             Account subaccount = account.getSubAccounts().get(delegateName);
             Double walletVotes = subaccount.getBalance();
-            if (walletVotes != null && walletVotes > 2) {
+            if (walletVotes != null && walletVotes > 3) {
                 Transaction tx = TransactionService.createTransaction(subaccount.getAddress(), account.getAddress(), walletVotes.longValue() - 2, "send to master wallet", passphrase + " " + delegateName);
                 TransactionService.PostTransaction(tx);
                 walletsVotes += walletVotes;
@@ -377,10 +377,10 @@ public class FXMLDelegatesViewController implements Initializable {
             Account acc = AccountService.getAccount(account.getAddress());
             while (acc.getBalance() < walletsVotes) {
                 System.out.println("Wait for Confirmation of transactions");
-                acc = AccountService.getAccount(passphrase);
+                acc = AccountService.getAccount(account.getAddress());
 
             }
-            walletsVotes = acc.getBalance();
+            walletsVotes = acc.getBalance() - 2;
             Map<String, Double> votes = createLP(walletsVotes, delegates);
             for (String delegateName : account.getSubAccounts().keySet()) {
                 Account subaccount = account.getSubAccounts().get(delegateName);
