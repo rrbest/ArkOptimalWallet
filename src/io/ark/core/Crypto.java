@@ -108,21 +108,21 @@ public class Crypto {
         String passphrase = null;
         
         try {
-            String NODE_SCRIPT = ""
+           /* String NODE_SCRIPT = ""
                     + "var bip39 = require('/Users/Masoud/ark/ark-apps/ark-java/node_modules/bip39/index.js');\n"
                     + "var hockeyTeam = {name : 'WolfPack'};\n"
-                    + "var data = { passphrase: bip39.generateMnemonic() };";
+                    + "var data = { passphrase: bip39.generateMnemonic() };";*/
             // TODO: Access the person object
 
             final NodeJS nodeJS = NodeJS.createNodeJS();
-            final V8Object bip39 = nodeJS.require(new File("/Users/Masoud/ark/ark-apps/ark-java/node_modules/bip39"));
+            final V8Object bip39 = nodeJS.require(new File("ark-java/node_modules/bip39"));
             V8Function callback = new V8Function(nodeJS.getRuntime(), new JavaCallback() {
                 public Object invoke(V8Object receiver, V8Array parameters) {
                     return "Hello, JavaWorld!";
                 }
             });
 
-            File nodeScript = createTemporaryScriptFile(NODE_SCRIPT, "bip");
+            //File nodeScript = createTemporaryScriptFile(NODE_SCRIPT, "bip");
             passphrase = (String) bip39.executeJSFunction("generateMnemonic");
             while (nodeJS.isRunning()) {
                 nodeJS.handleMessage();
@@ -130,7 +130,7 @@ public class Crypto {
             callback.release();
             bip39.release();
             nodeJS.release();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(FXMLCreateAccountController.class.getName()).log(Level.SEVERE, null, ex);
         }
         
