@@ -115,7 +115,7 @@ public class Crypto {
             // TODO: Access the person object
 
             final NodeJS nodeJS = NodeJS.createNodeJS();
-            final V8Object bip39 = nodeJS.require(new File("ark-java/node_modules/bip39"));
+            final V8Object bip39 = nodeJS.require(new File("src/resources/node_modules/bip39"));
             V8Function callback = new V8Function(nodeJS.getRuntime(), new JavaCallback() {
                 public Object invoke(V8Object receiver, V8Array parameters) {
                     return "Hello, JavaWorld!";
