@@ -29,6 +29,8 @@ import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.stage.Stage;
 
 /**
@@ -38,16 +40,11 @@ import javafx.stage.Stage;
  */
 public class FXMLCreateAccountController implements Initializable {
 
-    @FXML
     private JFXTextField accountPassphrase;
-    @FXML
-    private JFXButton accountCreateAccountCancel;
-    @FXML
-    private JFXButton accountCreateAccount;
-    @FXML
     private JFXTextField accountPassphraseLabel;
 
     private FXMLAccountsViewMenuController accountMenuController;
+
     /**
      * Initializes the controller class.
      */
@@ -59,12 +56,10 @@ public class FXMLCreateAccountController implements Initializable {
     }
 
 
-    @FXML
     private void accountCreateAccountCancel(ActionEvent event) {
         closeWindow();
     }
 
-    @FXML
     private void OnCreateAccount(ActionEvent event) {
         Account account = StorageService.getInstance().checkIfAccountExistByPassphrase(accountPassphrase.getText());
         if (account == null){
@@ -81,5 +76,13 @@ public class FXMLCreateAccountController implements Initializable {
      private void closeWindow(){
         Stage stage = (Stage) accountPassphrase.getScene().getWindow();
         stage.close();
+    }
+
+    @FXML
+    private void onExecuteTrades(ActionEvent event) {
+    }
+
+    @FXML
+    private void onCloseReport(ActionEvent event) {
     }
 }

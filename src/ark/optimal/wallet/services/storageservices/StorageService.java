@@ -84,7 +84,7 @@ public class StorageService {
                 }
             };
 
-            executor2.scheduleAtFixedRate(periodicTask2, 5 , 20, TimeUnit.SECONDS);
+           executor2.scheduleAtFixedRate(periodicTask2, 0 , 5, TimeUnit.MINUTES);
         }
         return instance;
     }
@@ -134,7 +134,7 @@ public class StorageService {
     }
 
     public void addDelegate(Delegate d) {
-        this.wallet.getDelegates().put(d.getAddress(), d);
+        this.wallet.getDelegates().put(d.getUsername(), d);
     }
 
     public void saveWallet() {
@@ -189,6 +189,9 @@ public class StorageService {
             account.setUsername(accountName);
             this.wallet.getWatchAccounts().put(address, account);
 
+        }
+        for (String delegateAddr : this.wallet.getDelegates().keySet()){
+            
         }
 
     }

@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 
 <AnchorPane id="AnchorPane" prefHeight="468.0" prefWidth="1077.0" style="-fx-border-width: 0 0 0 0;;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ark.optimal.wallet.ui.FXMLVotesViewController">
     <children>
-        <TreeView fx:id="accountsTree" prefHeight="468.0" prefWidth="1077.0" style="-fx-border-width: 0 0 0 0px;" />
+      <TableView fx:id="votedDelegatesTable" layoutX="3.0" prefHeight="468.0" prefWidth="1039.0" styleClass="transactions-table-view" stylesheets="@main/custom.css">
+         <columns>
+            <TableColumn fx:id="delegateName" prefWidth="121.0" text="Delegate" />
+            <TableColumn fx:id="delegateRank" prefWidth="60.0" text="Rank" />
+            <TableColumn fx:id="subwalletAddress" prefWidth="249.0" text="SubWallet" />
+            <TableColumn fx:id="votes" prefWidth="105.0" text="Votes" />
+            <TableColumn fx:id="payoutpercentage" prefWidth="114.0" text="Payout %" />
+            <TableColumn fx:id="minpayout" prefWidth="114.0" text="Min Payout" />
+         </columns>
+      </TableView>
 
     </children>
 </AnchorPane>

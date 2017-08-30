@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="602.0" prefWidth="659.0" style="-fx-background-radius: 10;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ark.optimal.wallet.ui.FXMLOptimizationReportViewController">
+   <children>
+      <Label fx:id="optReportTitle" prefHeight="52.0" prefWidth="662.0" style="-fx-alignment: CENTER; -fx-background-radius: 5;" styleClass="toolbar" stylesheets="@main/custom.css" text="Optimization Report" textAlignment="CENTER" textFill="#fffdfd">
+         <font>
+            <Font name="System Bold" size="22.0" />
+         </font>
+      </Label>
+      <JFXButton fx:id="executeTrades" layoutX="120.0" layoutY="550.0" onAction="#onExecuteTrades" prefHeight="38.0" prefWidth="197.0" text="Execute Trades" textFill="#634eda">
+         <font>
+            <Font size="19.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
+      <JFXButton fx:id="closeReport" layoutX="324.0" layoutY="551.0" onAction="#onCloseReport" prefHeight="35.0" prefWidth="197.0" text="Nah! Not Now." textFill="#634eda">
+         <font>
+            <Font size="18.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
+      <TableView fx:id="votedDelegatesTable" layoutX="8.0" layoutY="60.0" prefHeight="482.0" prefWidth="647.0" styleClass="transactions-table-view" stylesheets="@main/custom.css">
+         <columns>
+            <TableColumn fx:id="delegateName" prefWidth="121.0" text="Delegate" />
+            <TableColumn fx:id="delegateRank" prefWidth="60.0" text="Rank" />
+            <TableColumn fx:id="subwalletAddress" prefWidth="249.0" text="SubWallet" />
+            <TableColumn fx:id="votes" prefWidth="105.0" text="Votes" />
+            <TableColumn fx:id="payout" prefWidth="105.0" text="Payout" />
+         </columns>
+      </TableView>
+   </children>
+</AnchorPane>
