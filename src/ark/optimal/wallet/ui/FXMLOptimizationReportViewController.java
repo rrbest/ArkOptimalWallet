@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -61,7 +62,11 @@ public class FXMLOptimizationReportViewController implements Initializable {
     private FXMLDelegatesViewController delegateViewController;
     @FXML
     private Label optReportTitle;
-
+    
+    private Account account;
+    private String passphrase;
+    private Map<String, Double> optVotes;
+    
     /**
      * Initializes the controller class.
      */
@@ -87,6 +92,9 @@ public class FXMLOptimizationReportViewController implements Initializable {
 
     @FXML
     private void onExecuteTrades(ActionEvent event) {
+       List<OptimizationReportItem> trades = votedDelegatesTable.getItems();
+       delegateViewController.executeOptimizationTrades(account, passphrase, optVotes);
+       closeWindow();
     }
 
     @FXML
@@ -104,7 +112,10 @@ public class FXMLOptimizationReportViewController implements Initializable {
         this.delegateViewController = delegateViewController;
     }
 
-    public void updateReport(Account account, Map<String, Double> votes) {
+    public void updateReport(Account account,String passphrase ,Map<String, Double> votes) {
+        this.passphrase = passphrase;
+        this.optVotes = votes;
+        this.account = account;
         double balance = votes.values().stream().mapToDouble(Double::doubleValue).sum();
         optReportTitle.setText("Optimization Report - "+ account.getUsername() + " / Ѧ" + balance);
         votedDelegatesTable.getItems().clear();

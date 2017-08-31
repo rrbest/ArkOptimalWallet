@@ -28,7 +28,7 @@
                           <AnchorPane prefHeight="166.0" prefWidth="1035.0">
                               <children>
                                   <ImageView fx:id="qrcodeImageView" fitHeight="130.0" fitWidth="130.0" layoutX="21.0" layoutY="19.0" pickOnBounds="true" preserveRatio="true" />
-                                  <Label fx:id="accountName" layoutX="166.0" layoutY="20.0" prefHeight="17.0" prefWidth="161.0">
+                                  <Label fx:id="accountName" layoutX="166.0" layoutY="20.0" prefHeight="37.0" prefWidth="348.0">
                                       <font>
                                           <Font size="30.0" />
                                       </font>

@@ -26,6 +26,7 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -159,23 +160,30 @@ public class FXMLAccountViewController implements Initializable {
     }
 
     public void selectAccount(Account account) {
+        Map<String, Account> subs = account.getSubAccounts();
+        String name = account.getUsername();
+        account = AccountService.getFullAccount(account.getAddress());
+        account.setSubAccounts(subs);
+        account.setUsername(name);
         this.account = account;
         accountName.setText(account.getUsername());
         accountAddress.setText(account.getAddress());
         accountBalance.setText(accountBalance.getText().charAt(0) + account.getBalance().toString());
         accountBalanceExchangeValue.setText(NumberFormat.getCurrencyInstance().format(new Double(account.getBalance() * XChangeServices.getPrice("usd"))));
-        transactionsViewController.updateTransactionsTable(account.getTransactions());
+        transactionsViewController.updateTransactionsTable(account);
         addQRCode(account.getAddress());
         btnTransactions.requestFocus();
         setNode(transactionsView);
         menuController.selectAccountItem(account);
+        StorageService.getInstance().addAccountToUserAccounts(account);
         
     }
 
     @FXML
     private void onFetchTransactions(ActionEvent event) {
-        List<Transaction> transactions = AccountService.getTransactions(accountAddress.getText(), 50);
-        transactionsViewController.updateTransactionsTable(transactions);
+        Account account = AccountService.getFullAccount(accountAddress.getText());
+        //List<Transaction> transactions = AccountService.getTransactions(accountAddress.getText(), 50);
+        transactionsViewController.updateTransactionsTable(account);
         btnTransactions.requestFocus();
         setNode(transactionsView);
 

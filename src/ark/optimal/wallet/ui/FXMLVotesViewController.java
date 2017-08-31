@@ -96,47 +96,23 @@ public class FXMLVotesViewController implements Initializable {
 
     public void viewVotes(Account account) {
         votedDelegatesTable.getItems().clear();
-        /*TreeItem<AccountVotedDelegateTreeItem> root = new TreeItem<AccountVotedDelegateTreeItem>(new AccountVotedDelegateTreeItem(new Label(account.getUsername() + " - Master Wallet")));
-        TreeItem<AccountVotedDelegateTreeItem> node = new TreeItem<AccountVotedDelegateTreeItem>(new AccountVotedDelegateTreeItem(account));
-        root.getChildren().add(node);
-
+       
         for (String delegateName : account.getSubAccounts().keySet()) {
+            Delegate d = AccountService.getDelegateByUsername(delegateName);
             Account sub = account.getSubAccounts().get(delegateName);
-            sub.setUsername(account.getUsername() + "(" + delegateName + ")");
-            if (sub.getVotedDelegates().size() > 0) {
-                sub.getVotedDelegates().get(0).setChecked(Boolean.TRUE);
-
+            if (sub.getVotedDelegates().size()  == 0)
+            {   
+                sub = AccountService.getFullAccount(sub.getAddress());
             }
-            TreeItem<AccountVotedDelegateTreeItem> root2 = new TreeItem<AccountVotedDelegateTreeItem>(new AccountVotedDelegateTreeItem(new Label(sub.getUsername() + " - Sub Wallet")));
-            TreeItem<AccountVotedDelegateTreeItem> node2 = new TreeItem<AccountVotedDelegateTreeItem>(new AccountVotedDelegateTreeItem(sub));
-            root2.getChildren().add(node2);
-            root.getChildren().add(root2);
-
-        }
-
-        /*Account child1 = new Account("mastadon (natalie)", "AQ9JFb5CdUsQt5KiAUTsyx5ZNFiiXpmBFe", "", 100.0);
-        Delegate d = new Delegate("natalie", "AG78yF1fZRcj43yTXmePHvHQrsWWDDokNk", "", 977900, 0, 0, 40, 0.76, 99.98);
-        d.setChecked(Boolean.TRUE);
-        List<Delegate> ds = new ArrayList<Delegate>();
-        ds.add(d);
-        child1.setVotedDelegates(ds);
-        TreeItem<AccountVotedDelegateTreeItem> root2 = new TreeItem<AccountVotedDelegateTreeItem>(new AccountVotedDelegateTreeItem(new Label(child1.getUsername() + " - Sub Wallet")));
-        TreeItem<AccountVotedDelegateTreeItem> node2 = new TreeItem<AccountVotedDelegateTreeItem>(new AccountVotedDelegateTreeItem(child1));
-        root2.getChildren().add(node2);
-        root.getChildren().add(root2);
-
-        accountsTree.setRoot(root);*/
-        for (String delegateName : account.getSubAccounts().keySet()) {
-            Account sub = account.getSubAccounts().get(delegateName);
             sub.setUsername(account.getUsername() + "(" + delegateName + ")");
-            if (sub.getVotedDelegates().size() > 0) {
-                //Delegate d = sub.getVotedDelegates().get(0);
-                Delegate d = AccountService.getDelegateByUsername(delegateName);
-                d.setChecked(Boolean.TRUE);
+            
+            d.setChecked(Boolean.TRUE);
+            if (sub.getVotedDelegates().size()  > 0)
                 sub.getVotedDelegates().set(0, d);
-                VoteItem vi = new VoteItem(delegateName, d.getRate(), sub.getUsername(), sub.getBalance().intValue(), 80.0, 100.0);
-                votedDelegatesTable.getItems().add(vi);
-            }
+            VoteItem vi = new VoteItem(delegateName, d.getRate(), sub.getUsername(), sub.getBalance().intValue(), 80.0, 100.0);
+            votedDelegatesTable.getItems().add(vi);
+            
+            
             
         }
     }

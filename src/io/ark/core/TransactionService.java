@@ -61,8 +61,10 @@ public class TransactionService {
         Transactions txs = new Transactions(transactions);
         String json = new Gson().toJson(txs);
         String response = "";
-        for (int i = 0; i<10; i++){
-            response = NetworkService.postToPeer3("/peer/transactions", json);
+        for (int i = 0; i<5; i++){
+            String resp = NetworkService.postToPeer3("/peer/transactions", json);
+            if (resp.contains("success"))
+                response = resp;
         }
         
         return response;

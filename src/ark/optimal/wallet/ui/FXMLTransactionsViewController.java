@@ -98,8 +98,9 @@ public class FXMLTransactionsViewController implements Initializable {
     }
     
     
-    public void updateTransactionsTable(List<Transaction> transactions) {
+    public void updateTransactionsTable(Account account) {
 
+        List<Transaction> transactions = account.getTransactions();
         if (transactions == null) {
             return;
         }
@@ -113,7 +114,10 @@ public class FXMLTransactionsViewController implements Initializable {
             Double amount = t.getAmount().doubleValue() / 100000000.0;
             String type = "";
             if (t.getType() == 0) {
-                type = "Receive Ark";
+                if (account.getAddress().equals(t.getSenderId()))
+                   type = "Send Ark"; 
+                else
+                    type = "Receive Ark";
             } else if (t.getType() == 3) {
                 type = "Vote";
                 amount = -1 * t.getFee().doubleValue() / 100000000.0;
@@ -128,13 +132,13 @@ public class FXMLTransactionsViewController implements Initializable {
             String smartbridge = t.getVendorField();
             String from = t.getFrom();
             if (t.getSenderId() != null) {
-                Account account = StorageService.getInstance().getWallet().getUserAccounts().get(t.getSenderId());
-                if (account != null) {
-                    from = account.getUsername();
+                Account acc = StorageService.getInstance().getWallet().getUserAccounts().get(t.getSenderId());
+                if (acc != null) {
+                    from = acc.getUsername();
                 } else {
-                    account = StorageService.getInstance().getWallet().getWatchAccounts().get(t.getSenderId());
-                    if (account != null) {
-                        from = account.getUsername();
+                    acc = StorageService.getInstance().getWallet().getWatchAccounts().get(t.getSenderId());
+                    if (acc != null) {
+                        from = acc.getUsername();
                     }
                 }
 
@@ -142,13 +146,13 @@ public class FXMLTransactionsViewController implements Initializable {
 
             String to = t.getTo();
             if (t.getRecipientId() != null) {
-                Account account = StorageService.getInstance().getWallet().getUserAccounts().get(t.getRecipientId());
-                if (account != null) {
-                    to = account.getUsername();
+                Account acc = StorageService.getInstance().getWallet().getUserAccounts().get(t.getRecipientId());
+                if (acc != null) {
+                    to = acc.getUsername();
                 } else {
-                    account = StorageService.getInstance().getWallet().getWatchAccounts().get(t.getRecipientId());
-                    if (account != null) {
-                        to = account.getUsername();
+                    acc = StorageService.getInstance().getWallet().getWatchAccounts().get(t.getRecipientId());
+                    if (acc != null) {
+                        to = acc.getUsername();
                     }
                 }
 
