@@ -125,14 +125,21 @@ public class FXMLAccountsViewMenuController implements Initializable {
         });
 
         watchAcountsListView.setPrefHeight(watchAcountsListView.getItems().size() * 40);
-        
-        
 
     }
 
-    public void runImportAccount(){
+    public void runCreateAccount() {
+        onCreateAccount(null);
+    }
+
+    public void runWatchAccount() {
+        onWatchAccount(null);
+    }
+
+    public void runImportAccount() {
         onImportAccount(null);
     }
+
     @FXML
     private void onImportAccount(ActionEvent event) {
 
@@ -192,8 +199,9 @@ public class FXMLAccountsViewMenuController implements Initializable {
         addToMyAccounts(account);
         accountViewController.selectAccount(account);
     }
-    public void updateAccountInfo(Account account){
-        
+
+    public void updateAccountInfo(Account account) {
+
     }
 
     public void updateWatchAccounts(Account account) {
@@ -229,8 +237,8 @@ public class FXMLAccountsViewMenuController implements Initializable {
         myAcountsListView.getSelectionModel().select(-1);
 
     }
-    
-    public void selectAccountItem(Account account){
+
+    public void selectAccountItem(Account account) {
         myAcountsListView.requestFocus();
         myAcountsListView.getSelectionModel().select(new AccountItem(account.getUsername(), account.getAddress()));
         //myAcountsListView.getSelectionModel().select(0);
@@ -288,15 +296,16 @@ public class FXMLAccountsViewMenuController implements Initializable {
 
     public void addToUserAccountsMenu(Account account) {
         myAcountsListView.getItems().add(new AccountItem(account.getUsername(), account.getAddress()));
-        
+
     }
+
     public void addToWatchAccountsMenu(Account account) {
         watchAcountsListView.getItems().add(new AccountItem(account.getUsername(), account.getAddress()));
-        
+
     }
 
     void clearAccountsMenu() {
-       myAcountsListView.getItems().clear();
+        myAcountsListView.getItems().clear();
     }
 
     class AccountItem extends RecursiveTreeObject<AccountItem> {

@@ -270,6 +270,14 @@ public class FXMLAccountViewController implements Initializable {
         menuController.runImportAccount();
         
     }
+     public void runCreateAccount(){
+        menuController.runCreateAccount();
+        
+    }
+      public void runWatchAccount(){
+        menuController.runWatchAccount();
+        
+    }
 
     public void addToUserAccountsMenu(Account account) {
        menuController.addToUserAccountsMenu(account); 

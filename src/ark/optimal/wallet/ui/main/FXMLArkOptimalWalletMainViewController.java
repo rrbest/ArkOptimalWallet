@@ -157,6 +157,12 @@ public class FXMLArkOptimalWalletMainViewController implements Initializable {
     public void runImportAccount(){
         accountViewController.runImportAccount();
     }
+    public void runCreateAccount(){
+        accountViewController.runCreateAccount();
+    }
+    public void runWatchAccount(){
+        accountViewController.runWatchAccount();
+    }
 
     public void selectAccount(Account account) {
         accountViewController.selectAccount(account);

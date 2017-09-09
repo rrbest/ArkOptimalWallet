@@ -145,6 +145,8 @@ public class FXMLHomeViewController implements Initializable {
     
     @FXML
     private void onCreateAccount(ActionEvent event) {
+        mainController.runCreateAccount();
+        this.arkWalletApp.view(mainview);
 
     }
 
@@ -156,6 +158,8 @@ public class FXMLHomeViewController implements Initializable {
 
     @FXML
     private void onWatchAccount(ActionEvent event) {
+        mainController.runWatchAccount();
+        this.arkWalletApp.view(mainview);
     }
 
     public void viewHome() {
