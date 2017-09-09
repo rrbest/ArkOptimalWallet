@@ -40,10 +40,16 @@ import javafx.stage.Stage;
  */
 public class FXMLCreateAccountController implements Initializable {
 
+    @FXML
     private JFXTextField accountPassphrase;
+    @FXML
     private JFXTextField accountPassphraseLabel;
 
     private FXMLAccountsViewMenuController accountMenuController;
+    @FXML
+    private JFXButton accountCreateAccount;
+    @FXML
+    private JFXButton accountCreateAccountCancel;
 
     /**
      * Initializes the controller class.
@@ -56,17 +62,13 @@ public class FXMLCreateAccountController implements Initializable {
     }
 
 
+    @FXML
     private void accountCreateAccountCancel(ActionEvent event) {
         closeWindow();
     }
 
     private void OnCreateAccount(ActionEvent event) {
-        Account account = StorageService.getInstance().checkIfAccountExistByPassphrase(accountPassphrase.getText());
-        if (account == null){
-            account = AccountService.createAccount(accountPassphrase.getText());
-        }
-        accountMenuController.updateMyAccounts(account);
-        closeWindow();
+        
     }
 
     public void setAccountMenuController(FXMLAccountsViewMenuController accountMenuController) {
@@ -79,10 +81,13 @@ public class FXMLCreateAccountController implements Initializable {
     }
 
     @FXML
-    private void onExecuteTrades(ActionEvent event) {
+    private void onCreateAccount(ActionEvent event) {
+        Account account = StorageService.getInstance().checkIfAccountExistByPassphrase(accountPassphrase.getText());
+        if (account == null){
+            account = AccountService.createAccount(accountPassphrase.getText());
+        }
+        accountMenuController.updateMyAccounts(account);
+        closeWindow();
     }
 
-    @FXML
-    private void onCloseReport(ActionEvent event) {
-    }
 }
