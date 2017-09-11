@@ -17,11 +17,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.SecureRandom;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.crypto.MnemonicCode;
 import org.spongycastle.crypto.digests.RIPEMD160Digest;
 
 /**
@@ -31,6 +34,7 @@ import org.spongycastle.crypto.digests.RIPEMD160Digest;
 public class Crypto {
 
     private static int networkVersion = 0x17;
+    private static final int WORDS_SIZE = 16;
 
     public static ECKey.ECDSASignature sign(Transaction t, String passphrase) {
         byte[] txbytes = getBytes(t, true, true);
@@ -92,8 +96,8 @@ public class Crypto {
         //Address address = new Address(MainNetParams.get(), networkVersion, out);
         return toBase58(networkVersion, out);
     }
-    
-    private static String toBase58(int version, byte [] bytes) {
+
+    private static String toBase58(int version, byte[] bytes) {
         // A stringified buffer is:
         //   1 byte version + data bytes + 4 bytes check code (a truncated hash)
         byte[] addressBytes = new byte[1 + bytes.length + 4];
@@ -103,40 +107,27 @@ public class Crypto {
         System.arraycopy(checksum, 0, addressBytes, bytes.length + 1, 4);
         return Base58.encode(addressBytes);
     }
-    
-    public static String generatePassphrase(){
+
+    public static String generatePassphrase() {
         String passphrase = null;
-        
+
         try {
-           /* String NODE_SCRIPT = ""
-                    + "var bip39 = require('/Users/Masoud/ark/ark-apps/ark-java/node_modules/bip39/index.js');\n"
-                    + "var hockeyTeam = {name : 'WolfPack'};\n"
-                    + "var data = { passphrase: bip39.generateMnemonic() };";*/
             // TODO: Access the person object
-
-            final NodeJS nodeJS = NodeJS.createNodeJS();
-            final V8Object bip39 = nodeJS.require(new File("src/resources/node_modules/bip39"));
-            V8Function callback = new V8Function(nodeJS.getRuntime(), new JavaCallback() {
-                public Object invoke(V8Object receiver, V8Array parameters) {
-                    return "Hello, JavaWorld!";
-                }
-            });
-
-            //File nodeScript = createTemporaryScriptFile(NODE_SCRIPT, "bip");
-            passphrase = (String) bip39.executeJSFunction("generateMnemonic");
-            while (nodeJS.isRunning()) {
-                nodeJS.handleMessage();
-            }
-            callback.release();
-            bip39.release();
-            nodeJS.release();
+            MnemonicCode mnc = new MnemonicCode();
+            System.out.println(mnc.toString());
+            SecureRandom secureRandom = new SecureRandom();
+            byte[] entropy = secureRandom.generateSeed(WORDS_SIZE);
+            //secureRandom.nextBytes(entropy);
+            List<String> l = mnc.toMnemonic(entropy);
+            passphrase = String.join(" ", l);
+            
         } catch (Exception ex) {
             Logger.getLogger(FXMLCreateAccountController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return passphrase;
     }
-    
+
     private static String readFileAsString(String filePath) throws java.io.IOException {
         StringBuffer fileData = new StringBuffer(1000);
         BufferedReader reader = new BufferedReader(
