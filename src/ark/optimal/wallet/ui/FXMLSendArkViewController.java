@@ -5,7 +5,6 @@
  */
 package ark.optimal.wallet.ui;
 
-import ark.optimal.wallet.services.networkservices.NetworkService;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import io.ark.core.Transaction;

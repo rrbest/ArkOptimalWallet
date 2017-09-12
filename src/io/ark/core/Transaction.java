@@ -11,8 +11,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Map;
 import org.bitcoinj.core.Base58;
-import com.google.common.base.Joiner;
-import java.util.HashMap;
 
 /**
  *

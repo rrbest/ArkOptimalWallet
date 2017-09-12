@@ -5,16 +5,11 @@
  */
 package ark.optimal.wallet.services.networkservices;
 
-import ark.optimal.wallet.services.networkservices.Network;
-import com.google.gson.Gson;
-import io.ark.core.Transaction;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -22,7 +17,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.logging.Level;

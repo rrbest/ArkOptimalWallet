@@ -10,8 +10,6 @@ import ark.optimal.wallet.services.storageservices.StorageService;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
-import io.ark.core.Transaction;
-import io.ark.core.TransactionService;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;

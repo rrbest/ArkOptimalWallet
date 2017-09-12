@@ -6,12 +6,10 @@
 package ark.optimal.wallet.ui;
 
 import ark.optimal.wallet.pojo.Account;
-import ark.optimal.wallet.pojo.Delegate;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;

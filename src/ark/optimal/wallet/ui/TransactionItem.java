@@ -7,7 +7,6 @@ package ark.optimal.wallet.ui;
 
 import javafx.scene.control.Hyperlink;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDateTime;
 
 /**
  *

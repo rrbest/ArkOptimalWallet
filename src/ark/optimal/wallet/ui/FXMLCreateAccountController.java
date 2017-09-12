@@ -8,29 +8,14 @@ package ark.optimal.wallet.ui;
 import ark.optimal.wallet.pojo.Account;
 import ark.optimal.wallet.services.accountservices.AccountService;
 import ark.optimal.wallet.services.storageservices.StorageService;
-import com.eclipsesource.v8.JavaCallback;
-import com.eclipsesource.v8.NodeJS;
-import com.eclipsesource.v8.V8;
-import com.eclipsesource.v8.V8Array;
-import com.eclipsesource.v8.V8Function;
-import com.eclipsesource.v8.V8Object;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import io.ark.core.Crypto;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.stage.Stage;
 
 /**
@@ -65,10 +50,6 @@ public class FXMLCreateAccountController implements Initializable {
     @FXML
     private void accountCreateAccountCancel(ActionEvent event) {
         closeWindow();
-    }
-
-    private void OnCreateAccount(ActionEvent event) {
-        
     }
 
     public void setAccountMenuController(FXMLAccountsViewMenuController accountMenuController) {

@@ -5,12 +5,8 @@
  */
 package io.ark.core;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.TimeZone;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;

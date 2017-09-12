@@ -6,17 +6,7 @@
 package io.ark.core;
 
 import ark.optimal.wallet.ui.FXMLCreateAccountController;
-import com.eclipsesource.v8.JavaCallback;
-import com.eclipsesource.v8.NodeJS;
-import com.eclipsesource.v8.V8Array;
-import com.eclipsesource.v8.V8Function;
-import com.eclipsesource.v8.V8Object;
 import com.google.common.io.BaseEncoding;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.logging.Level;

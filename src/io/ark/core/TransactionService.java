@@ -8,7 +8,6 @@ package io.ark.core;
 import ark.optimal.wallet.pojo.Delegate;
 import ark.optimal.wallet.services.accountservices.AccountService;
 import ark.optimal.wallet.services.networkservices.NetworkService;
-import com.google.common.io.BaseEncoding;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Arrays;

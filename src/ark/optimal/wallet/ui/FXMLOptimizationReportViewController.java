@@ -7,7 +7,6 @@ package ark.optimal.wallet.ui;
 
 import ark.optimal.wallet.pojo.Account;
 import ark.optimal.wallet.pojo.Delegate;
-import ark.optimal.wallet.services.accountservices.AccountService;
 import ark.optimal.wallet.services.storageservices.StorageService;
 import com.jfoenix.controls.JFXButton;
 import java.io.IOException;

@@ -5,7 +5,6 @@
  */
 package ark.optimal.wallet.ui;
 
-import ark.optimal.wallet.pojo.Delegate;
 import com.jfoenix.controls.JFXButton;
 import java.io.IOException;
 import java.net.URI;

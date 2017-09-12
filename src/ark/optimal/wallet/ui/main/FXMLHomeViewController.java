@@ -6,10 +6,8 @@
 package ark.optimal.wallet.ui.main;
 
 import ark.optimal.wallet.pojo.Account;
-import ark.optimal.wallet.services.accountservices.AccountService;
 import ark.optimal.wallet.services.storageservices.StorageService;
 import ark.optimal.wallet.services.storageservices.Wallet;
-import ark.optimal.wallet.ui.FXMLTransactionsViewController;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXListCell;
 import com.jfoenix.controls.JFXListView;

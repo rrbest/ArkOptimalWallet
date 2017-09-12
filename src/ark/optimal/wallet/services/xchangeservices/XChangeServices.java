@@ -5,7 +5,6 @@
  */
 package ark.optimal.wallet.services.xchangeservices;
 
-import ark.optimal.wallet.pojo.Delegate;
 import ark.optimal.wallet.services.accountservices.AccountService;
 import ark.optimal.wallet.services.networkservices.NetworkService;
 import com.fasterxml.jackson.core.type.TypeReference;
