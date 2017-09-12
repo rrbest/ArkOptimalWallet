@@ -26,13 +26,14 @@ public class ArkOptimalWallet extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 
+        HostServicesProvider.getInstance().init(getHostServices());
         //Parent root = FXMLLoader.load(getClass().getResource("FXMLArkOptimalWalletMainView.fxml"));
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLHomeView.fxml"));
         homeview = fxmlLoader.load();
         homeViewController = (FXMLHomeViewController) fxmlLoader.getController();
         homeViewController.setAppController(this);
         homeViewController.setHomeview(homeview);
-
+        
         Scene scene = new Scene(homeview);
         stage.setScene(scene);
         stage.show();

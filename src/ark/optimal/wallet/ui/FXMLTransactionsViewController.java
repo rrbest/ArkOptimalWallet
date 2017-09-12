@@ -8,6 +8,7 @@ package ark.optimal.wallet.ui;
 import ark.optimal.wallet.pojo.Account;
 import ark.optimal.wallet.pojo.Transaction;
 import ark.optimal.wallet.services.storageservices.StorageService;
+import ark.optimal.wallet.ui.main.HostServicesProvider;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -211,13 +212,11 @@ public class FXMLTransactionsViewController implements Initializable {
                         setGraphic(item);
 
                         item.setOnAction(t -> {
-                            URI u;
                             try {
-                                u = new URI("https://explorer.ark.io/tx/" + item.getText());
-                                java.awt.Desktop.getDesktop().browse(u);
-                            } catch (URISyntaxException ex) {
-                                Logger.getLogger(FXMLAccountViewController.class.getName()).log(Level.SEVERE, null, ex);
-                            } catch (IOException ex) {
+                                HostServicesProvider.getInstance().getHostServices().showDocument("https://explorer.ark.io/tx/" + item.getText());
+                                //u = new URI("https://explorer.ark.io/tx/" + item.getText());
+                                //java.awt.Desktop.getDesktop().browse(u);
+                            } catch (Exception ex) {
                                 Logger.getLogger(FXMLAccountViewController.class.getName()).log(Level.SEVERE, null, ex);
                             }
 
