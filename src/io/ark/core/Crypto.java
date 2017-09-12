@@ -128,30 +128,5 @@ public class Crypto {
         return passphrase;
     }
 
-    private static String readFileAsString(String filePath) throws java.io.IOException {
-        StringBuffer fileData = new StringBuffer(1000);
-        BufferedReader reader = new BufferedReader(
-                new FileReader(filePath));
-        char[] buf = new char[1024];
-        int numRead = 0;
-        while ((numRead = reader.read(buf)) != -1) {
-            String readData = String.valueOf(buf, 0, numRead);
-            fileData.append(readData);
-            buf = new char[1024];
-        }
-        reader.close();
-        return fileData.toString();
-    }
-
-    private static File createTemporaryScriptFile(final String script, final String name) throws IOException {
-        File tempFile = File.createTempFile(name, ".js.tmp");
-        PrintWriter writer = new PrintWriter(tempFile, "UTF-8");
-        try {
-            writer.print(script);
-        } finally {
-            writer.close();
-        }
-        return tempFile;
-    }
-
+    
 }
