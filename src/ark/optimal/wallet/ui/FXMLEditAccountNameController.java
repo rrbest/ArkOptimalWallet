@@ -50,7 +50,12 @@ public class FXMLEditAccountNameController implements Initializable {
         Account account = StorageService.getInstance().checkIfAccountExistByAddress(this.account.getAddress());
         account.setUsername(accountLabel.getText());
         this.account.setUsername(accountLabel.getText());
-        accountMenuController.updateMyAccounts(account);
+        if(StorageService.getInstance().getWallet().getUserAccounts().get(account.getAddress()) != null){
+            accountMenuController.updateMyAccounts(account);
+        } else {
+            accountMenuController.updateWatchAccounts(account);
+        }
+        
         closeWindow();
     }
 

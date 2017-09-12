@@ -241,13 +241,26 @@ public class FXMLAccountsViewMenuController implements Initializable {
 
     @FXML
     private void handleWatchAccountMouseClick(MouseEvent event) {
-        if (event.getClickCount() == 2) {
-            //Use ListView's getSelected Item
-            System.out.println("YO YO YO");
-            //use this to do whatever you want to. Open Link etc.
+        if (event.isControlDown()) {
+            myAcountsListView.edit(myAcountsListView.getEditingIndex());
+
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLEditAccountName.fxml"));
+                Parent root1 = (Parent) fxmlLoader.load();
+                FXMLEditAccountNameController editctrlr = (FXMLEditAccountNameController) fxmlLoader.getController();
+                editctrlr.setAccountMenuController(this);
+                editctrlr.setAccount(watchAcountsListView.getSelectionModel().getSelectedItem());
+                Stage stage = new Stage();
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.initStyle(StageStyle.UNDECORATED);
+                stage.setTitle("C");
+                stage.setScene(new Scene(root1));
+                stage.show();
+            } catch (IOException ex) {
+                Logger.getLogger(FXMLAccountsViewMenuController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
-        System.out.println(watchAcountsListView.getSelectionModel().getSelectedItem().getAddress());
         String address = watchAcountsListView.getSelectionModel().getSelectedItem().getAddress();
         Account account = StorageService.getInstance().getWallet().getWatchAccounts().get(address);
         accountViewController.selectAccount(account);
@@ -257,8 +270,6 @@ public class FXMLAccountsViewMenuController implements Initializable {
     private void handleUserAccountMouseClick(MouseEvent event) {
 
         if (event.isControlDown()) {
-            //Use ListView's getSelected Item
-            System.out.println("YO YO YO");
             myAcountsListView.edit(myAcountsListView.getEditingIndex());
 
             try {
@@ -276,9 +287,6 @@ public class FXMLAccountsViewMenuController implements Initializable {
             } catch (IOException ex) {
                 Logger.getLogger(FXMLAccountsViewMenuController.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-        if (event.isControlDown()) {
-            System.out.println(myAcountsListView.getSelectionModel().getSelectedItem().getAddress());
         }
         String address = myAcountsListView.getSelectionModel().getSelectedItem().getAddress();
         Account account = StorageService.getInstance().getWallet().getUserAccounts().get(address);
