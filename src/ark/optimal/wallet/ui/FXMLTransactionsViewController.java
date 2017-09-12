@@ -163,9 +163,9 @@ public class FXMLTransactionsViewController implements Initializable {
 
         }
 
-        if (transactionsTable.getItems().size() * 40 > 450) {
+       /* if (transactionsTable.getItems().size() * 40 > 450) {
             transactionsTable.setPrefHeight(transactionsTable.getItems().size() * 40);
-        }
+        }*/
     }
 
     private String formatTransactionTimeStamp(long timestamp) {

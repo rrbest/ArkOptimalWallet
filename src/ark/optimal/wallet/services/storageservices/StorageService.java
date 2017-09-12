@@ -64,7 +64,7 @@ public class StorageService {
                 }
             };
 
-            executor.scheduleAtFixedRate(periodicTask, 2, 5, TimeUnit.MINUTES);
+            executor.scheduleAtFixedRate(periodicTask, 1, 5, TimeUnit.MINUTES);
 
             ScheduledExecutorService executor2
                     = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
@@ -188,8 +188,9 @@ public class StorageService {
             this.wallet.getWatchAccounts().put(address, account);
 
         }
-        for (String delegateAddr : this.wallet.getDelegates().keySet()){
-            
+        for (String delegateName : this.wallet.getDelegates().keySet()){
+            Delegate delegate = AccountService.getDelegateByUsername(delegateName);
+            this.wallet.getDelegates().put(delegateName, delegate);
         }
 
     }

@@ -71,6 +71,8 @@ public class FXMLHomeViewController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
+            
+            Wallet wallet = StorageService.getInstance().loadWallet();
             // TODO
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLArkOptimalWalletMainView.fxml"));
             mainview = fxmlLoader.load();
@@ -97,8 +99,6 @@ public class FXMLHomeViewController implements Initializable {
                 }
 
             });
-
-            Wallet wallet = StorageService.getInstance().loadWallet();
             if (wallet != null) {
                 for (String address : wallet.getUserAccounts().keySet()) {
                     // Account account = AccountService.getFullAccount(address);
@@ -112,7 +112,7 @@ public class FXMLHomeViewController implements Initializable {
                     //wallet.getUserAccounts().put(address, account);
                     addToWatchAccounts(account);
                 }
-                StorageService.getInstance().updateWallet();
+                //StorageService.getInstance().updateWallet();
 
             }
             homeAccounts.setPrefHeight(homeAccounts.getItems().size() * 40);

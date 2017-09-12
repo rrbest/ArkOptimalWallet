@@ -35,6 +35,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
@@ -118,6 +119,8 @@ public class FXMLDelegatesViewController implements Initializable {
     private List<Delegate> selectedDelegates;
     @FXML
     private JFXButton optimizationBtn;
+    @FXML
+    private JFXButton removeSelectedDelegate;
 
     /**
      * Initializes the controller class.
@@ -199,6 +202,13 @@ public class FXMLDelegatesViewController implements Initializable {
         });
 
         _delegateChecked.setEditable(true);
+        
+        // intialize from storage 
+        
+        for(Delegate delegate : StorageService.getInstance().getWallet().getDelegates().values()){
+            _delegatestable.getItems().add(delegate);
+        }
+        _delegatestable.refresh();
 
     }
 
@@ -408,43 +418,6 @@ public class FXMLDelegatesViewController implements Initializable {
         Map<String, Double> votes = OptimizationService.runConvexOptimizattion(walletsVotes, selectedDelegates);
         runOptimizationReport(account, passphrase, votes);
         return;
-
-        /*int walletsVotes = 0;
-        for (String delegateName : account.getSubAccounts().keySet()) {
-            Account subaccount = account.getSubAccounts().get(delegateName);
-            subaccount = AccountService.getAccount(subaccount.getAddress());
-            Double walletVotes = subaccount.getBalance();
-            if (walletVotes != null && walletVotes > 3) {
-                Transaction tx = TransactionService.createTransaction(subaccount.getAddress(), account.getAddress(), walletVotes.longValue() - 2, "send to master wallet", passphrase + " " + delegateName);
-                TransactionService.PostTransaction(tx);
-                walletsVotes += walletVotes.intValue();
-            }
-
-        }
-        try {
-            TimeUnit.SECONDS.sleep(2);
-            Account acc = AccountService.getAccount(account.getAddress());
-            while (acc.getBalance() < walletsVotes) {
-                System.out.println("Wait for Confirmation of transactions");
-                acc = AccountService.getAccount(account.getAddress());
-
-            }
-            walletsVotes = acc.getBalance().intValue() - 2;
-            walletsVotes = 162786;
-            //Map<String, Double> votes = createLP(walletsVotes, delegates);
-            Map<String, Double> votes = createJOModel(walletsVotes, selectedDelegates);
-            for (Delegate delegate : selectedDelegates) {
-                Account subaccount = account.getSubAccounts().get(delegate.getUsername());
-                Double vote = votes.get(delegate.getUsername());
-                Transaction tx = TransactionService.createTransaction(account.getAddress(), subaccount.getAddress(), vote.longValue(), "send to sub wallet", passphrase);
-                TransactionService.PostTransaction(tx);
-
-            }
-
-        } catch (InterruptedException ex) {
-            Logger.getLogger(FXMLDelegatesViewController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-         */
     }
 
     private void runOptimizationReport(Account account, String passphrase, Map<String, Double> votes) {
@@ -487,6 +460,19 @@ public class FXMLDelegatesViewController implements Initializable {
             Logger.getLogger(FXMLAccountsViewMenuController.class
                     .getName()).log(Level.SEVERE, null, ex);
         }
+
+    }
+
+    @FXML
+    private void onRemoveSelectedDelegate(ActionEvent event) {
+        event.consume();
+        for (Delegate delegate : selectedDelegates) {
+            delegatesMap.remove(delegate);
+            _delegatestable.getItems().remove(delegate);
+            StorageService.getInstance().getWallet().getDelegates().remove(delegate.getUsername());
+
+        }
+        _delegatestable.refresh();
 
     }
 
