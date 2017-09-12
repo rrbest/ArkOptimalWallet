@@ -214,9 +214,7 @@ public class FXMLTransactionsViewController implements Initializable {
                         item.setOnAction(t -> {
                             try {
                                 HostServicesProvider.getInstance().getHostServices().showDocument("https://explorer.ark.io/tx/" + item.getText());
-                                //u = new URI("https://explorer.ark.io/tx/" + item.getText());
-                                //java.awt.Desktop.getDesktop().browse(u);
-                            } catch (Exception ex) {
+                             } catch (Exception ex) {
                                 Logger.getLogger(FXMLAccountViewController.class.getName()).log(Level.SEVERE, null, ex);
                             }
 

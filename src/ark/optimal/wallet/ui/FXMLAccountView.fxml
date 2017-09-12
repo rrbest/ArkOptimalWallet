@@ -63,6 +63,11 @@
                               </ImageView>
                            </graphic>
                         </JFXButton>
+                        <Label fx:id="copyToCliboardLabel" layoutX="542.0" layoutY="66.0" prefHeight="37.0" prefWidth="161.0" style="-fx-background-color: #636466;" text="Copied to clipboard" textFill="WHITE" visible="false">
+                           <padding>
+                              <Insets left="20.0" />
+                           </padding>
+                        </Label>
                               </children>
                           </AnchorPane>
                       </children>

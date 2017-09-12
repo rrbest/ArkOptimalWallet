@@ -23,6 +23,7 @@ import java.net.URL;
 import java.text.NumberFormat;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.FadeTransition;
@@ -52,6 +53,8 @@ import javafx.util.Duration;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 
 /**
  * FXML Controller class
@@ -98,6 +101,8 @@ public class FXMLAccountViewController implements Initializable {
     private FXMLAccountsViewMenuController menuController;
 
     private Account account;
+    @FXML
+    private Label copyToCliboardLabel;
 
     /**
      * Initializes the controller class.
@@ -141,6 +146,28 @@ public class FXMLAccountViewController implements Initializable {
 
     @FXML
     private void onCopyAddress(ActionEvent event) {
+        try {
+            final Clipboard clipboard = Clipboard.getSystemClipboard();
+            final ClipboardContent content = new ClipboardContent();
+            content.putString(accountAddress.getText());
+            clipboard.setContent(content);
+            copyToCliboardLabel.setVisible(true);
+            
+            FadeTransition fadeOut = new FadeTransition(Duration.millis(2000));
+            fadeOut.setNode(copyToCliboardLabel);
+            fadeOut.setFromValue(1.0);
+            fadeOut.setToValue(0.0);
+            fadeOut.setCycleCount(1);
+            fadeOut.setAutoReverse(false);
+            //copyToCliboardLabel.setVisible(false);
+            fadeOut.playFromStart();
+            
+            //TimeUnit.SECONDS.sleep(10);
+            //copyToCliboardLabel.setVisible(false);
+        } catch (Exception ex) {
+            Logger.getLogger(FXMLAccountViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     @FXML
@@ -164,7 +191,7 @@ public class FXMLAccountViewController implements Initializable {
         setNode(transactionsView);
         menuController.selectAccountItem(account);
         StorageService.getInstance().addAccountToUserAccounts(account);
-        
+
     }
 
     @FXML
@@ -254,31 +281,33 @@ public class FXMLAccountViewController implements Initializable {
 
     }
 
-    public void runImportAccount(){
+    public void runImportAccount() {
         menuController.runImportAccount();
-        
+
     }
-     public void runCreateAccount(){
+
+    public void runCreateAccount() {
         menuController.runCreateAccount();
-        
+
     }
-      public void runWatchAccount(){
+
+    public void runWatchAccount() {
         menuController.runWatchAccount();
-        
+
     }
 
     public void addToUserAccountsMenu(Account account) {
-       menuController.addToUserAccountsMenu(account); 
+        menuController.addToUserAccountsMenu(account);
     }
-    
+
     public void addToWatchAccountsMenu(Account account) {
-       menuController.addToWatchAccountsMenu(account); 
+        menuController.addToWatchAccountsMenu(account);
     }
 
     public void clearAccountsMenu() {
         menuController.clearAccountsMenu();
     }
-    
+
     private class HyperlinkCell implements Callback<TableColumn<TransactionItem, Hyperlink>, TableCell<TransactionItem, Hyperlink>> {
 
         @Override
