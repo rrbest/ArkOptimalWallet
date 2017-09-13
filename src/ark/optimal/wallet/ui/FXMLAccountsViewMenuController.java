@@ -14,6 +14,8 @@ import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,13 +45,11 @@ public class FXMLAccountsViewMenuController implements Initializable {
     @FXML
     private JFXButton btnImportAccount;
     @FXML
-    private JFXButton btnWatchAccount;
-    @FXML
     private JFXButton btnCreateAccount;
     @FXML
     private JFXListView<AccountItem> myAcountsListView;
     @FXML
-    private JFXListView<AccountItem> watchAcountsListView;
+    private JFXListView<AccountItem> subAcountsListView;
 
     @FXML
     private Tooltip delegateAddressTooltip1;
@@ -57,6 +57,8 @@ public class FXMLAccountsViewMenuController implements Initializable {
     private Tooltip delegateAddressTooltip;
     @FXML
     private Tooltip delegateAddressTooltip2;
+    @FXML
+    private JFXButton btnManageSubWallets;
 
     public void setAccountViewController(FXMLAccountViewController accountViewController) {
         this.accountViewController = accountViewController;
@@ -64,13 +66,14 @@ public class FXMLAccountsViewMenuController implements Initializable {
 
     private FXMLAccountViewController accountViewController;
 
+    private Map<String, Account> subAccounts;
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-
+        subAccounts = new HashMap<String, Account>();
         myAcountsListView.setEditable(true);
         myAcountsListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         myAcountsListView.setCellFactory(myAcountsListView -> new JFXListCell<AccountItem>() {
@@ -94,9 +97,9 @@ public class FXMLAccountsViewMenuController implements Initializable {
 
         myAcountsListView.setPrefHeight(myAcountsListView.getItems().size() * 40);
 
-        watchAcountsListView.setEditable(true);
-        watchAcountsListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        watchAcountsListView.setCellFactory(watchAcountsListView -> new JFXListCell<AccountItem>() {
+        subAcountsListView.setEditable(true);
+        subAcountsListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        subAcountsListView.setCellFactory(watchAcountsListView -> new JFXListCell<AccountItem>() {
             public void updateItem(AccountItem account, boolean empty) {
                 super.updateItem(account, empty);
                 if (empty) {
@@ -116,7 +119,7 @@ public class FXMLAccountsViewMenuController implements Initializable {
 
         });
 
-        watchAcountsListView.setPrefHeight(watchAcountsListView.getItems().size() * 40);
+        subAcountsListView.setPrefHeight(subAcountsListView.getItems().size() * 40);
 
     }
 
@@ -150,7 +153,6 @@ public class FXMLAccountsViewMenuController implements Initializable {
         }
     }
 
-    @FXML
     private void onWatchAccount(ActionEvent event) {
 
         try {
@@ -212,19 +214,29 @@ public class FXMLAccountsViewMenuController implements Initializable {
         //myAcountsListView.getSelectionModel().select(0);
         myAcountsListView.refresh();
         myAcountsListView.setPrefHeight(myAcountsListView.getItems().size() * 40);
-        watchAcountsListView.getSelectionModel().select(-1);
+        subAcountsListView.getSelectionModel().select(-1);
+    }
+    private void viewSubAccounts(Account account){
+        subAcountsListView.getItems().clear();
+        for (String delegateName: account.getSubAccounts().keySet()){
+            Account sub = account.getSubAccounts().get(delegateName);
+            sub.setUsername(account.getUsername() + " ("+delegateName+")");
+            subAcountsListView.getItems().add(new AccountItem(sub.getUsername(), sub.getAddress()));
+            subAccounts.put(sub.getAddress(), sub);
+        }
+        subAcountsListView.setPrefHeight(subAcountsListView.getItems().size() * 40);
     }
 
     private void addToWatchAccounts(Account account) {
         if (!StorageService.getInstance().getWallet().getWatchAccounts().containsKey(account.getAddress())) {
             StorageService.getInstance().addAccountToWatchAccounts(account);
-            watchAcountsListView.getItems().add(new AccountItem(account.getUsername(), account.getAddress()));
+            subAcountsListView.getItems().add(new AccountItem(account.getUsername(), account.getAddress()));
         }
 
-        watchAcountsListView.requestFocus();
-        watchAcountsListView.getSelectionModel().select(new AccountItem(account.getUsername(), account.getAddress()));
+        subAcountsListView.requestFocus();
+        subAcountsListView.getSelectionModel().select(new AccountItem(account.getUsername(), account.getAddress()));
         //myAcountsListView.getSelectionModel().select(0);
-        watchAcountsListView.setPrefHeight(watchAcountsListView.getItems().size() * 40);
+        subAcountsListView.setPrefHeight(subAcountsListView.getItems().size() * 40);
 
         myAcountsListView.getSelectionModel().select(-1);
 
@@ -236,20 +248,29 @@ public class FXMLAccountsViewMenuController implements Initializable {
         //myAcountsListView.getSelectionModel().select(0);
         myAcountsListView.refresh();
         myAcountsListView.setPrefHeight(myAcountsListView.getItems().size() * 40);
-        watchAcountsListView.getSelectionModel().select(-1);
+        viewSubAccounts(account);
+        subAcountsListView.getSelectionModel().select(-1);
+    }
+    
+    public void selectSubAccountItem(Account account) {
+        subAcountsListView.requestFocus();
+        subAcountsListView.getSelectionModel().select(new AccountItem(account.getUsername(), account.getAddress()));
+        //myAcountsListView.getSelectionModel().select(0);
+        subAcountsListView.refresh();
+        subAcountsListView.setPrefHeight(subAcountsListView.getItems().size() * 40);
+        myAcountsListView.getSelectionModel().select(-1);
     }
 
-    @FXML
     private void handleWatchAccountMouseClick(MouseEvent event) {
         if (event.isControlDown()) {
-            myAcountsListView.edit(myAcountsListView.getEditingIndex());
+            subAcountsListView.edit(subAcountsListView.getEditingIndex());
 
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLEditAccountName.fxml"));
                 Parent root1 = (Parent) fxmlLoader.load();
                 FXMLEditAccountNameController editctrlr = (FXMLEditAccountNameController) fxmlLoader.getController();
                 editctrlr.setAccountMenuController(this);
-                editctrlr.setAccount(watchAcountsListView.getSelectionModel().getSelectedItem());
+                editctrlr.setAccount(subAcountsListView.getSelectionModel().getSelectedItem());
                 Stage stage = new Stage();
                 stage.initModality(Modality.APPLICATION_MODAL);
                 stage.initStyle(StageStyle.UNDECORATED);
@@ -261,7 +282,7 @@ public class FXMLAccountsViewMenuController implements Initializable {
             }
         }
 
-        String address = watchAcountsListView.getSelectionModel().getSelectedItem().getAddress();
+        String address = subAcountsListView.getSelectionModel().getSelectedItem().getAddress();
         Account account = StorageService.getInstance().getWallet().getWatchAccounts().get(address);
         accountViewController.selectAccount(account);
     }
@@ -300,12 +321,38 @@ public class FXMLAccountsViewMenuController implements Initializable {
     }
 
     public void addToWatchAccountsMenu(Account account) {
-        watchAcountsListView.getItems().add(new AccountItem(account.getUsername(), account.getAddress()));
+        subAcountsListView.getItems().add(new AccountItem(account.getUsername(), account.getAddress()));
 
     }
 
     void clearAccountsMenu() {
         myAcountsListView.getItems().clear();
+    }
+
+    @FXML
+    private void onManageSubWallets(ActionEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLSubWalletManagerView.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            ((FXMLSubWalletManagerViewController) fxmlLoader.getController()).setAccountMenuController(this);
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.setTitle("C");
+            stage.setScene(new Scene(root1));
+            stage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLAccountsViewMenuController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+
+    @FXML
+    private void handleSubAccountMouseClick(MouseEvent event) {
+        String address = subAcountsListView.getSelectionModel().getSelectedItem().getAddress();
+        Account subAccount = subAccounts.get(address);
+        accountViewController.selectSubAccount(subAccount);
+  
     }
 
     class AccountItem extends RecursiveTreeObject<AccountItem> {

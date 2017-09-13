@@ -24,27 +24,26 @@ public class Delegate {
     private Double payoutFrequency;
     private Double minPayout;
     private Double payoutPercentage;
+    private Double exlcudedPercentage;
+
+    private final Double PAYOUTPERCENTAGE = 80.0;
+    private final Double PAYOUTFREQUENCY = 0.25;
+    private final Double POOLPERCENTAGE = 90.0;
+    private final Double MINPAYOUT = 100.0;
+    private final Double EXCLUDEDPERCENTAGE = 0.0;
+ 
+    
+    public Double getExlcudedPercentage() {
+        return exlcudedPercentage;
+    }
+
+    public void setExlcudedPercentage(Double exlcudedPercentage) {
+        this.exlcudedPercentage = exlcudedPercentage;
+    }
     
     private Boolean checked;
 
-    public Delegate(String username, String address, String publicKey, Integer vote, Integer producedblocks, Integer missedblocks, Integer rate, Double approval, Double productivity, Double poolPercentage, Double payoutFrequency, Double minPayout, Double payoutPercentage) {
-        this.username = username;
-        this.address = address;
-        this.publicKey = publicKey;
-        this.vote = vote;
-        this.producedblocks = producedblocks;
-        this.missedblocks = missedblocks;
-        this.rate = rate;
-        this.approval = approval;
-        this.productivity = productivity;
-        this.poolPercentage = poolPercentage;
-        this.payoutFrequency = payoutFrequency;
-        this.minPayout = minPayout;
-        this.payoutPercentage = payoutPercentage;
-        this.checked = false;
-
-    }
-
+    
     public Boolean getChecked() {
         return checked;
     }
@@ -133,6 +132,11 @@ public class Delegate {
         this.approval = approval;
         this.productivity = productivity;
         this.checked = false;
+        this.payoutFrequency = PAYOUTFREQUENCY;
+        this.poolPercentage = POOLPERCENTAGE;
+        this.minPayout = MINPAYOUT;
+        this.payoutPercentage = PAYOUTPERCENTAGE;
+        this.exlcudedPercentage = EXCLUDEDPERCENTAGE;
     }
     
     

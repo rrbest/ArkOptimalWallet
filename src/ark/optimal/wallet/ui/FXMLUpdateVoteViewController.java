@@ -102,7 +102,7 @@ public class FXMLUpdateVoteViewController implements Initializable {
     @FXML
     private void onAccountVoteNext(ActionEvent event) {
         Account account = accounts.getSelectionModel().getSelectedItem();
-        delegateViewController.optimize(account, passphrase.getText());
+        //delegateViewController.optimize(account, passphrase.getText());
         //Transaction tx = TransactionService.createVote(accounts.getSelectionModel().getSelectedItem().getAddress(),votedDelegateName.getText(), passphrase.getText(), false );
         //TransactionService.PostTransaction(tx);
         closeWindow();

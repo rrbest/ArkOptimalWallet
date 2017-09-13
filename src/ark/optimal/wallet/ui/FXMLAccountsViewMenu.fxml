@@ -58,7 +58,7 @@
                               </ImageView>
                            </graphic>
                         </JFXButton>
-                        <JFXButton fx:id="btnWatchAccount" alignment="BASELINE_LEFT" onAction="#onWatchAccount" prefHeight="42.0" prefWidth="286.0" style="-fx-text-align: left;" text="Watch Account" textFill="#757575" textOverrun="CLIP">
+                        <JFXButton fx:id="btnManageSubWallets" alignment="BASELINE_LEFT" onAction="#onManageSubWallets" prefHeight="42.0" prefWidth="286.0" style="-fx-text-align: left;" text="Create/Import Subwallet(s)" textFill="#757575" textOverrun="CLIP">
                            <padding>
                               <Insets right="5.0" />
                            </padding>
@@ -83,7 +83,7 @@
          </children>
       </AnchorPane>
       <Separator prefWidth="200.0" />
-      <Label prefHeight="68.0" prefWidth="294.0" text="My Accounts">
+      <Label prefHeight="68.0" prefWidth="294.0" text="Master-Accounts">
          <font>
             <Font name="Arial Bold" size="20.0" />
          </font>
@@ -95,7 +95,7 @@
          <VBox.margin>
             <Insets />
          </VBox.margin></JFXListView>
-      <Label prefHeight="64.0" prefWidth="294.0" text="Watch-Only Addresses">
+      <Label prefHeight="64.0" prefWidth="294.0" text="Sub-Accounts">
          <font>
             <Font name="Arial Bold" size="20.0" />
          </font>
@@ -103,7 +103,7 @@
             <Insets left="10.0" />
          </padding>
       </Label>
-      <JFXListView fx:id="watchAcountsListView" editable="true" onMouseClicked="#handleWatchAccountMouseClick" prefHeight="392.0" prefWidth="296.0" stylesheets="@main/custom.css" />
+      <JFXListView fx:id="subAcountsListView" editable="true" onMouseClicked="#handleSubAccountMouseClick" prefHeight="392.0" prefWidth="296.0" stylesheets="@main/custom.css" />
    </children>
    <effect>
       <DropShadow height="10.0" offsetY="1.0" radius="4.5" width="10.0" />

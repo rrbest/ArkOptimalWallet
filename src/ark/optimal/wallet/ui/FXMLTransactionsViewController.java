@@ -111,13 +111,16 @@ public class FXMLTransactionsViewController implements Initializable {
             System.out.println(t.getAmount());
             System.out.println(formatTransactionTimeStamp((long) t.getTimestamp()));
             DateTime dt = ConvertTransactionTimeStampToLocal(t.getTimestamp());
+            Double fee = t.getFee().doubleValue() /100000000.0;
             Double amount = t.getAmount().doubleValue() / 100000000.0;
             String type = "";
             if (t.getType() == 0) {
-                if (account.getAddress().equals(t.getSenderId()))
-                   type = "Send Ark"; 
-                else
+                if (account.getAddress().equals(t.getSenderId())){
+                   type = "Send Ark";
+                    amount = -1 * (amount+fee);
+                }else{
                     type = "Receive Ark";
+                }
             } else if (t.getType() == 3) {
                 type = "Vote";
                 amount = -1 * t.getFee().doubleValue() / 100000000.0;
@@ -125,10 +128,8 @@ public class FXMLTransactionsViewController implements Initializable {
             } else if (t.getType() == 2) {
                 type = "Delegate Registration";
                 amount = -1 * t.getFee().doubleValue() / 100000000.0;
-            } else {
-                type = "Send Ark";
-                amount = -1 * amount;
             }
+            
             String smartbridge = t.getVendorField();
             String from = t.getFrom();
             if (t.getSenderId() != null) {

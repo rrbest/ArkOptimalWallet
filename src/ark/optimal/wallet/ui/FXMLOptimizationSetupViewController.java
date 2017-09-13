@@ -40,7 +40,9 @@ public class FXMLOptimizationSetupViewController implements Initializable {
     private JFXComboBox<Account> accounts;
 
     private FXMLDelegatesViewController delegateViewController;
-
+    @FXML
+    private JFXTextField masterPercentageOptimization;
+    
     public void setDelegateViewController(FXMLDelegatesViewController delegateViewController) {
         this.delegateViewController = delegateViewController;
     }
@@ -54,8 +56,6 @@ public class FXMLOptimizationSetupViewController implements Initializable {
         ObservableList<Account> userAccounts = FXCollections.observableArrayList();
          userAccounts.addAll(StorageService.getInstance().getWallet().getUserAccounts().values());
          accounts.setItems(userAccounts);
-         //accounts.getSelectionModel().selectFirst();
-         
          
          accounts.setCellFactory(new Callback<ListView<Account>,ListCell<Account>>(){
             public ListCell<Account> call(ListView<Account> l){
@@ -92,10 +92,12 @@ public class FXMLOptimizationSetupViewController implements Initializable {
 
     @FXML
     private void onOptimize(ActionEvent event) {
-         Account account = accounts.getSelectionModel().getSelectedItem();
-        delegateViewController.optimize(account, passphrase.getText());
-        //Transaction tx = TransactionService.createVote(accounts.getSelectionModel().getSelectedItem().getAddress(),votedDelegateName.getText(), passphrase.getText(), false );
-        //TransactionService.PostTransaction(tx);
+        Account account = accounts.getSelectionModel().getSelectedItem();
+        if (account == null || masterPercentageOptimization.getText() == null){
+            new AlertController().alertUser("Please complete optimization form");
+            return;
+        }
+        delegateViewController.optimize(account, passphrase.getText(), new Double(masterPercentageOptimization.getText()));
         closeWindow();
     }
 

@@ -193,6 +193,22 @@ public class FXMLAccountViewController implements Initializable {
         StorageService.getInstance().addAccountToUserAccounts(account);
 
     }
+    
+    public void selectSubAccount(Account subAccount) {
+        String name = subAccount.getUsername();
+        subAccount = AccountService.getFullAccount(subAccount.getAddress());
+        subAccount.setUsername(name);
+        this.account = subAccount;
+        accountName.setText(subAccount.getUsername());
+        accountAddress.setText(subAccount.getAddress());
+        accountBalance.setText(accountBalance.getText().charAt(0) + subAccount.getBalance().toString());
+        accountBalanceExchangeValue.setText(NumberFormat.getCurrencyInstance().format(new Double(subAccount.getBalance() * XChangeServices.getPrice("usd"))));
+        transactionsViewController.updateTransactionsTable(subAccount);
+        addQRCode(subAccount.getAddress());
+        btnTransactions.requestFocus();
+        setNode(transactionsView);
+        menuController.selectSubAccountItem(subAccount);
+    }
 
     @FXML
     private void onFetchTransactions(ActionEvent event) {

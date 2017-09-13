@@ -47,7 +47,7 @@ public class OptimizationService {
                     double obj = 0.0;
                     for (int i = 0; i < delegates.size(); i++) {
                         double x = dmd.getQuick(i);
-                        double v = delegates.get(i).getVote();
+                        double v = delegates.get(i).getVote() * (1 - (delegates.get(i).getExlcudedPercentage()/100.0));
                         double p = delegates.get(i).getPayoutPercentage();
                         //double h = Math.pow(p * v,2) / (v + x);
                         double h = p * v / (v + x);
@@ -62,7 +62,7 @@ public class OptimizationService {
                     double[] ret = new double[delegates.size()];
                     for (int i = 0; i < delegates.size(); i++) {
                         double x = dmd.getQuick(i);
-                        double v = delegates.get(i).getVote();
+                        double v = delegates.get(i).getVote() * (1 - (delegates.get(i).getExlcudedPercentage()/100.0));
                         double p = delegates.get(i).getPayoutPercentage();
                         //double h = (p * x) / (v + x);
                         double h = -(p * v) / Math.pow(v+x, 2);
@@ -77,7 +77,7 @@ public class OptimizationService {
                     for (int i = 0; i < delegates.size(); i++) {
                         Arrays.fill(ret[i], 0);
                         double x = dmd.getQuick(i);
-                        double v = delegates.get(i).getVote();
+                        double v = delegates.get(i).getVote() * (1 - (delegates.get(i).getExlcudedPercentage()/100.0));
                         double p = delegates.get(i).getPayoutPercentage();
                         //double h = (p * x) / (v + x);
                         double h = 2*p* v / Math.pow(v+x, 3);

@@ -55,6 +55,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
+import org.spongycastle.jcajce.provider.asymmetric.dsa.DSASigner;
 
 /**
  * FXML Controller class
@@ -84,8 +85,6 @@ public class FXMLDelegatesViewController implements Initializable {
     @FXML
     private Label lbl_delegateproductivity;
     @FXML
-    private Label lbl_delegatepoolpercentage;
-    @FXML
     private JFXButton _votefordelegate;
     @FXML
     private JFXButton _delegatesearch;
@@ -97,12 +96,7 @@ public class FXMLDelegatesViewController implements Initializable {
     private Label lbl_delegatemissedblocks;
 
     private Map<String, Delegate> delegatesMap;
-    @FXML
-    private Label lbl_delegatepayoutfrequency;
-    @FXML
-    private Label lbl_delegateminpayout;
-    @FXML
-    private Label lbl_delegatepayoutpercentage;
+
     @FXML
     private JFXTextField delegateNameOrPublicKey;
     @FXML
@@ -121,7 +115,17 @@ public class FXMLDelegatesViewController implements Initializable {
     private JFXButton optimizationBtn;
     @FXML
     private JFXButton removeSelectedDelegate;
-
+    @FXML
+    private JFXTextField delegatePoolPercentage;
+    @FXML
+    private JFXTextField delegatePayoutFrequency;
+    @FXML
+    private JFXTextField delegateMinPayout;
+    @FXML
+    private JFXTextField delegatePayoutPercentage;
+    @FXML
+    private JFXTextField delegateExcludedPercentage;
+    
     /**
      * Initializes the controller class.
      */
@@ -202,11 +206,11 @@ public class FXMLDelegatesViewController implements Initializable {
         });
 
         _delegateChecked.setEditable(true);
-        
+
         // intialize from storage 
-        
-        for(Delegate delegate : StorageService.getInstance().getWallet().getDelegates().values()){
+        for (Delegate delegate : StorageService.getInstance().getWallet().getDelegates().values()) {
             _delegatestable.getItems().add(delegate);
+            delegatesMap.put(delegate.getUsername(), delegate);
         }
         _delegatestable.refresh();
 
@@ -224,10 +228,6 @@ public class FXMLDelegatesViewController implements Initializable {
             if (d == null) {
                 return;
             }
-            d.setMinPayout(100.0);
-            d.setPayoutFrequency(0.25);
-            d.setPayoutPercentage(80.0);
-            d.setPoolPercentage(90.0);
             _delegatestable.getItems().add(d);
             delegatesMap.put(d.getUsername(), d);
             StorageService.getInstance().addDelegate(d);
@@ -247,11 +247,11 @@ public class FXMLDelegatesViewController implements Initializable {
         lbl_delegateproductivity.setText(String.format("%.2f%%", d.getProductivity()) + " Productivity");
         lbl_delegateproducedblocks.setText(d.getProducedblocks().toString() + " Blocks");
         lbl_delegatemissedblocks.setText(d.getMissedblocks().toString() + " Blocks");
-        lbl_delegatepoolpercentage.setText(String.format("%.0f%%", d.getPoolPercentage()));
-        lbl_delegatepayoutfrequency.setText(d.getPayoutFrequency().toString());
-        lbl_delegateminpayout.setText(d.getMinPayout().toString());
-        lbl_delegatepayoutpercentage.setText(d.getPayoutPercentage().toString());
-
+        delegatePoolPercentage.setText(d.getPoolPercentage().toString());
+        delegatePayoutFrequency.setText(d.getPayoutFrequency().toString());
+        delegateMinPayout.setText(d.getMinPayout().toString());
+        delegatePayoutPercentage.setText(d.getPayoutPercentage().toString());
+        delegateExcludedPercentage.setText(d.getExlcudedPercentage().toString());
         delegateAddress.setText(d.getAddress());
         delegateAddressTooltip.setText(d.getAddress());
         delegatepublickey.setText(d.getPublicKey());
@@ -357,8 +357,8 @@ public class FXMLDelegatesViewController implements Initializable {
 
     }
 
-    public void optimize(Account account, String passphrase) {
-        runOptimization(account, passphrase);
+    public void optimize(Account account, String passphrase, Double masterWalletPercentage) {
+        runOptimization(account, passphrase, masterWalletPercentage);
     }
 
     // creates subwallets and vote for corresponding delegates
@@ -399,7 +399,7 @@ public class FXMLDelegatesViewController implements Initializable {
         }
     }
 
-    private void runOptimization(Account account, String passphrase) {
+    private void runOptimization(Account account, String passphrase, Double masterWalletPercentage) {
         int walletsVotes = 0;
         for (String delegateName : account.getSubAccounts().keySet()) {
             Account subaccount = account.getSubAccounts().get(delegateName);
@@ -412,9 +412,9 @@ public class FXMLDelegatesViewController implements Initializable {
         }
         Account acc = AccountService.getAccount(account.getAddress());
         walletsVotes += acc.getBalance().intValue();
-
+        walletsVotes = new Double((masterWalletPercentage/100.0) * walletsVotes).intValue();
         // test
-        //walletsVotes = 2000000;
+        walletsVotes = 2000000;
         Map<String, Double> votes = OptimizationService.runConvexOptimizattion(walletsVotes, selectedDelegates);
         runOptimizationReport(account, passphrase, votes);
         return;
@@ -474,6 +474,47 @@ public class FXMLDelegatesViewController implements Initializable {
         }
         _delegatestable.refresh();
 
+    }
+
+    @FXML
+    private void poolPercentageKeyReleased(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            Delegate d = _delegatestable.getSelectionModel().getSelectedItem();
+            d.setPoolPercentage(new Double(delegatePoolPercentage.getText()));
+        }
+    }
+
+    @FXML
+    private void PayoutFrequencyKeyReleased(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            Delegate d = _delegatestable.getSelectionModel().getSelectedItem();
+            d.setPayoutFrequency(new Double(delegatePayoutFrequency.getText()));
+        }
+    }
+
+    @FXML
+    private void MinPayoutKeyReleased(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            Delegate d = _delegatestable.getSelectionModel().getSelectedItem();
+            d.setMinPayout(new Double(delegateMinPayout.getText()));
+        }
+    }
+
+    @FXML
+    private void PayoutPrecentageReleased(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            Delegate d = _delegatestable.getSelectionModel().getSelectedItem();
+            d.setPayoutPercentage(new Double(delegatePayoutPercentage.getText()));
+        }
+
+    }
+
+    @FXML
+    private void excludedPercentageKeyReleased(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            Delegate d = _delegatestable.getSelectionModel().getSelectedItem();
+            d.setExlcudedPercentage(new Double(delegateExcludedPercentage.getText()));
+        }
     }
 
 }
