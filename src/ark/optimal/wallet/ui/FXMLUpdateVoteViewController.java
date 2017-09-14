@@ -10,6 +10,8 @@ import ark.optimal.wallet.services.storageservices.StorageService;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
+import io.ark.core.Transaction;
+import io.ark.core.TransactionService;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
@@ -17,6 +19,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
@@ -36,24 +39,24 @@ public class FXMLUpdateVoteViewController implements Initializable {
     private JFXButton accountVoteNext;
     @FXML
     private JFXButton accountVoteCancel;
-    private JFXTextField votedDelegateName;
 
     private FXMLDelegatesViewController delegateViewController;
-    private String delegateName;
+    @FXML
+    private JFXTextField delegateName;
 
     @FXML
     private JFXComboBox<Account> accounts;
+    @FXML
+    private Label voteForLabel;
 
     public void setDelegateViewController(FXMLDelegatesViewController delegateViewController) {
         this.delegateViewController = delegateViewController;
     }
 
-    public void setDelegateName(String delegateName) {
-        this.delegateName = delegateName;
-        votedDelegateName.setText(delegateName);
+    public void setDelegateName(String dName) {
+        delegateName.setText(dName);
 
     }
-
     /**
      * Initializes the controller class.
      */
@@ -62,9 +65,7 @@ public class FXMLUpdateVoteViewController implements Initializable {
         // TODO
          ObservableList<Account> userAccounts = FXCollections.observableArrayList();
          userAccounts.addAll(StorageService.getInstance().getWallet().getUserAccounts().values());
-         accounts.setItems(userAccounts);
-         //accounts.getSelectionModel().selectFirst();
-         
+         accounts.setItems(userAccounts);         
          
          accounts.setCellFactory(new Callback<ListView<Account>,ListCell<Account>>(){
             public ListCell<Account> call(ListView<Account> l){
@@ -103,8 +104,8 @@ public class FXMLUpdateVoteViewController implements Initializable {
     private void onAccountVoteNext(ActionEvent event) {
         Account account = accounts.getSelectionModel().getSelectedItem();
         //delegateViewController.optimize(account, passphrase.getText());
-        //Transaction tx = TransactionService.createVote(accounts.getSelectionModel().getSelectedItem().getAddress(),votedDelegateName.getText(), passphrase.getText(), false );
-        //TransactionService.PostTransaction(tx);
+        Transaction tx = TransactionService.createVote(account.getAddress(),delegateName.getText(), passphrase.getText(), false );
+        TransactionService.PostTransaction(tx);
         closeWindow();
     }
 

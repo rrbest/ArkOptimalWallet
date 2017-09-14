@@ -102,6 +102,9 @@ public class FXMLTransactionsViewController implements Initializable {
     public void updateTransactionsTable(Account account) {
 
         transactionsTable.getItems().clear();
+        if (account == null){
+            return;
+        }
         List<Transaction> transactions = account.getTransactions();
         if (transactions == null) {
             return;

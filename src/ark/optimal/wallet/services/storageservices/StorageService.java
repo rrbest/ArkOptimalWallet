@@ -82,7 +82,7 @@ public class StorageService {
                 }
             };
 
-           executor2.scheduleAtFixedRate(periodicTask2, 0 , 5, TimeUnit.MINUTES);
+           executor2.scheduleAtFixedRate(periodicTask2, 1 , 20, TimeUnit.SECONDS);
         }
         return instance;
     }
@@ -125,6 +125,9 @@ public class StorageService {
 
     public void addAccountToUserAccounts(Account account) {
         this.wallet.getUserAccounts().put(account.getAddress(), account);
+    }
+    public void addAccountToSubAccounts(Account account) {
+        this.wallet.getSubAccounts().put(account.getAddress(), account);
     }
 
     public void addAccountToWatchAccounts(Account account) {
@@ -175,6 +178,7 @@ public class StorageService {
             for (Map.Entry<String, Account> entry : subAccounts.entrySet()) {
                 Account subAccount = AccountService.getFullAccount(entry.getValue().getAddress());
                 account.getSubAccounts().put(entry.getKey(), subAccount);
+                this.wallet.getSubAccounts().put(subAccount.getAddress(), subAccount);
 
             }
             this.wallet.getUserAccounts().put(address, account);
@@ -189,8 +193,14 @@ public class StorageService {
 
         }
         for (String delegateName : this.wallet.getDelegates().keySet()){
-            Delegate delegate = AccountService.getDelegateByUsername(delegateName);
-            this.wallet.getDelegates().put(delegateName, delegate);
+            Delegate delegate = this.wallet.getDelegates().get(delegateName);
+            Delegate newDelegate = AccountService.getDelegateByUsername(delegateName);
+            newDelegate.setExlcudedPercentage(delegate.getExlcudedPercentage());
+            newDelegate.setPayoutFrequency(delegate.getPayoutFrequency());
+            newDelegate.setPayoutPercentage(delegate.getPayoutPercentage());
+            newDelegate.setPoolPercentage(delegate.getPoolPercentage());
+            newDelegate.setMinPayout(delegate.getMinPayout());
+            this.wallet.getDelegates().put(delegateName, newDelegate);
         }
 
     }

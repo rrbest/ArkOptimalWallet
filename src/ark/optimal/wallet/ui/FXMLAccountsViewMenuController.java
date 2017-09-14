@@ -59,6 +59,8 @@ public class FXMLAccountsViewMenuController implements Initializable {
     private Tooltip delegateAddressTooltip2;
     @FXML
     private JFXButton btnManageSubWallets;
+    @FXML
+    private JFXButton sendToMaster;
 
     public void setAccountViewController(FXMLAccountViewController accountViewController) {
         this.accountViewController = accountViewController;
@@ -66,14 +68,12 @@ public class FXMLAccountsViewMenuController implements Initializable {
 
     private FXMLAccountViewController accountViewController;
 
-    private Map<String, Account> subAccounts;
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-        subAccounts = new HashMap<String, Account>();
         myAcountsListView.setEditable(true);
         myAcountsListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         myAcountsListView.setCellFactory(myAcountsListView -> new JFXListCell<AccountItem>() {
@@ -222,7 +222,6 @@ public class FXMLAccountsViewMenuController implements Initializable {
             Account sub = account.getSubAccounts().get(delegateName);
             sub.setUsername(account.getUsername() + " ("+delegateName+")");
             subAcountsListView.getItems().add(new AccountItem(sub.getUsername(), sub.getAddress()));
-            subAccounts.put(sub.getAddress(), sub);
         }
         subAcountsListView.setPrefHeight(subAcountsListView.getItems().size() * 40);
     }
@@ -350,9 +349,14 @@ public class FXMLAccountsViewMenuController implements Initializable {
     @FXML
     private void handleSubAccountMouseClick(MouseEvent event) {
         String address = subAcountsListView.getSelectionModel().getSelectedItem().getAddress();
-        Account subAccount = subAccounts.get(address);
+        Account subAccount = StorageService.getInstance().getWallet().getSubAccounts().get(address);
         accountViewController.selectSubAccount(subAccount);
   
+    }
+
+    @FXML
+    private void onSendToMaster(ActionEvent event) {
+        
     }
 
     class AccountItem extends RecursiveTreeObject<AccountItem> {

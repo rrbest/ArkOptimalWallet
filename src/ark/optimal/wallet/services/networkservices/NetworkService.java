@@ -5,6 +5,7 @@
  */
 package ark.optimal.wallet.services.networkservices;
 
+import io.ark.core.Slot;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -14,6 +15,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +33,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-
 
 /**
  *
@@ -59,7 +60,7 @@ public class NetworkService {
                             "5.39.9.252:4001",
                             "5.39.9.253:4001",
                             "5.39.9.254:4001",
-                            "5.39.9.255:4001",
+                           // "5.39.9.255:4001",
                             "5.39.53.48:4001",
                             "5.39.53.49:4001",
                             "5.39.53.50:4001",
@@ -113,11 +114,13 @@ public class NetworkService {
 
     public static String getFromPeer(String api) {
         String peer_ip = getRandomSeed(Mainnet);
+        System.out.println(peer_ip);
         String urlString = "http://" + peer_ip + api;
-
+        HttpURLConnection con = null;
         try {
             URL url = new URL(urlString);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con = (HttpURLConnection) url.openConnection();
+            con.setConnectTimeout(2000);
             con.setRequestMethod("GET");
 
             int responseCode = con.getResponseCode();
@@ -143,6 +146,10 @@ public class NetworkService {
             Logger.getLogger(NetworkService.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(NetworkService.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            if (con != null) {
+                con.disconnect();
+            }
         }
         return null;
     }
@@ -199,23 +206,21 @@ public class NetworkService {
         post.setHeader("version", "0.1.0");
         post.setHeader("port", "1");
         post.setHeader("nethash", Mainnet.getNethash());
-        
+
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("task", "savemodel"));
         params.add(new BasicNameValuePair("code", generatedJSONString));
-        
+
         System.out.println(generatedJSONString);
         CloseableHttpResponse response = null;
         Scanner in = null;
-        try
-        {
-            post.setEntity(new UrlEncodedFormEntity(params ,"UTF-8"));
+        try {
+            post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
             response = httpClient.execute(post);
             // System.out.println(response.getStatusLine());
             HttpEntity entity = response.getEntity();
             in = new Scanner(entity.getContent());
-            while (in.hasNext())
-            {
+            while (in.hasNext()) {
                 System.out.println(in.next());
 
             }
@@ -224,8 +229,7 @@ public class NetworkService {
             Logger.getLogger(NetworkService.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(NetworkService.class.getName()).log(Level.SEVERE, null, ex);
-        } finally
-        {
+        } finally {
             in.close();
             try {
                 response.close();
@@ -248,7 +252,7 @@ public class NetworkService {
         client.close();*/
         return null;
     }
-    
+
     public static String postToPeer3(String api, String generatedJSONString) {
 
         String resp = null;
@@ -263,34 +267,29 @@ public class NetworkService {
         post.setHeader("nethash", Mainnet.getNethash());
         Scanner in = null;
         String json = "{\"id\":1,\"name\":\"John\"}";
-        try
-        {
+        try {
             StringEntity entity = new StringEntity(generatedJSONString);
             post.setEntity(entity);
             CloseableHttpResponse response = httpClient.execute(post);
             System.out.println(response.getStatusLine().getStatusCode());
-            
+
             HttpEntity entity2 = response.getEntity();
             in = new Scanner(entity2.getContent());
-            while (in.hasNext())
-            {
+            while (in.hasNext()) {
                 resp = in.next();
                 System.out.println(resp);
-                
 
             }
             EntityUtils.consume(entity2);
             return resp;
-            
+
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(NetworkService.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(NetworkService.class.getName()).log(Level.SEVERE, null, ex);
-        } 
+        }
         return null;
     }
-    
-    
 
     private static String getRandomSeed(Network network) {
         int random = randInt(0, network.getPeerseed().size() - 1);
@@ -300,6 +299,8 @@ public class NetworkService {
     private static int randInt(int min, int max) {
 
         Random rand = new Random();
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        rand.setSeed(timestamp.getTime());
         int randomNum = rand.nextInt((max - min) + 1) + min;
         return randomNum;
     }

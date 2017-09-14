@@ -182,8 +182,8 @@ public class FXMLHomeViewController implements Initializable {
     private void handleUserAccountMouseClick(MouseEvent event) {
         String address = homeAccounts.getSelectionModel().getSelectedItem().getAddress();
         Account account = StorageService.getInstance().getWallet().getUserAccounts().get(address);
-        mainController.selectAccount(account);
         this.arkWalletApp.view(mainview);
+        mainController.selectAccount(account);
     }
 
     class AccountItem extends RecursiveTreeObject<AccountItem> {

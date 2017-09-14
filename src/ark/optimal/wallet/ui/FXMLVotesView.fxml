@@ -1,21 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="468.0" prefWidth="1077.0" style="-fx-border-width: 0 0 0 0;;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ark.optimal.wallet.ui.FXMLVotesViewController">
+<AnchorPane id="AnchorPane" prefHeight="502.0" prefWidth="805.0" style="-fx-border-width: 0 0 0 0;;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ark.optimal.wallet.ui.FXMLVotesViewController">
     <children>
-      <TableView fx:id="votedDelegatesTable" layoutX="3.0" prefHeight="468.0" prefWidth="1039.0" styleClass="transactions-table-view" stylesheets="@main/custom.css">
-         <columns>
-            <TableColumn fx:id="delegateName" prefWidth="121.0" text="Delegate" />
-            <TableColumn fx:id="delegateRank" prefWidth="60.0" text="Rank" />
-            <TableColumn fx:id="subwalletAddress" prefWidth="249.0" text="SubWallet" />
-            <TableColumn fx:id="votes" prefWidth="105.0" text="Votes" />
-            <TableColumn fx:id="payoutpercentage" prefWidth="114.0" text="Payout %" />
-            <TableColumn fx:id="minpayout" prefWidth="114.0" text="Min Payout" />
-         </columns>
-      </TableView>
+      <VBox prefHeight="490.0" prefWidth="801.0">
+         <children>
+            <Label prefHeight="44.0" prefWidth="800.0" text="Master Wallet">
+               <font>
+                  <Font name="Arial Black" size="20.0" />
+               </font>
+               <padding>
+                  <Insets left="20.0" />
+               </padding>
+            </Label>
+            <TableView fx:id="masterVotedDelegateTable" prefHeight="106.0" prefWidth="801.0" styleClass="transactions-table-view" stylesheets="@main/custom.css">
+               <columns>
+                  <TableColumn fx:id="masterDelegateName" prefWidth="121.0" text="Delegate" />
+                  <TableColumn fx:id="masterDelegateRank" prefWidth="60.0" text="Rank" />
+                  <TableColumn fx:id="masterAddress" prefWidth="249.0" text="Address" />
+                  <TableColumn fx:id="masterVotes" prefWidth="105.0" text="Votes" />
+                  <TableColumn fx:id="masterPayoutPercentage" prefWidth="114.0" text="Payout %" />
+                  <TableColumn fx:id="masterMinPayout" prefWidth="114.0" text="Min Payout" />
+               </columns>
+            </TableView>
+            <Separator prefWidth="200.0" />
+            <Label prefHeight="44.0" prefWidth="800.0" text="Sub-Wallet(s)">
+               <font>
+                  <Font name="Arial Black" size="20.0" />
+               </font>
+               <padding>
+                  <Insets left="20.0" />
+               </padding>
+            </Label>
+            <TableView fx:id="SubWalletsVotedDelegateTable" prefHeight="331.0" prefWidth="801.0" styleClass="transactions-table-view" stylesheets="@main/custom.css">
+               <columns>
+                  <TableColumn fx:id="subWalletDelegateName" prefWidth="121.0" text="Delegate" />
+                  <TableColumn fx:id="subWalletDelegateRank" prefWidth="60.0" text="Rank" />
+                  <TableColumn fx:id="subWalletAddress" prefWidth="249.0" text="SubWallet" />
+                  <TableColumn fx:id="subWalletVotes" prefWidth="105.0" text="Votes" />
+                  <TableColumn fx:id="subWalletPayoutPercentage" prefWidth="114.0" text="Payout %" />
+                  <TableColumn fx:id="subWalletMinPayout" prefWidth="114.0" text="Min Payout" />
+               </columns>
+            </TableView>
+         </children>
+      </VBox>
 
     </children>
 </AnchorPane>

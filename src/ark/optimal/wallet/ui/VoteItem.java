@@ -16,28 +16,28 @@ public class VoteItem {
     
     private String delegateName;
     private Integer delegateRank;
-    private String subwalletAddress;
-    private Hyperlink subwalletAddress_link;
+    private String address;
+    private Hyperlink address_link;
     private Integer votes;
     private Double payoutpercentage;
     private  Double minpayout;
 
-    public VoteItem(String delegateName, Integer delegateRank, String subwalletAddress, Integer votes, Double payoutpercentage, Double minpayout) {
+    public VoteItem(String delegateName, Integer delegateRank, String address, Integer votes, Double payoutpercentage, Double minpayout) {
         this.delegateName = delegateName;
         this.delegateRank = delegateRank;
-        this.subwalletAddress = subwalletAddress;
-        this.subwalletAddress_link = new Hyperlink(subwalletAddress);
+        this.address = address;
+        this.address_link = new Hyperlink(address);
         this.votes = votes;
         this.payoutpercentage = payoutpercentage;
         this.minpayout = minpayout;
     }
 
-    public Hyperlink getSubwalletAddress_link() {
-        return subwalletAddress_link;
+    public Hyperlink getAddress_link() {
+        return address_link;
     }
 
-    public void setSubwalletAddress_link(Hyperlink subwalletAddress_link) {
-        this.subwalletAddress_link = subwalletAddress_link;
+    public void setAddress_link(Hyperlink address_link) {
+        this.address_link = address_link;
     }
 
     public String getDelegateName() {
@@ -56,12 +56,12 @@ public class VoteItem {
         this.delegateRank = delegateRank;
     }
 
-    public String getSubwalletAddress() {
-        return subwalletAddress;
+    public String getAddress() {
+        return address;
     }
 
-    public void setSubwalletAddress(String subwalletAddress) {
-        this.subwalletAddress = subwalletAddress;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public Integer getVotes() {

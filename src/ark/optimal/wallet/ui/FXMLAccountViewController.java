@@ -175,11 +175,11 @@ public class FXMLAccountViewController implements Initializable {
     }
 
     public void selectAccount(Account account) {
-        Map<String, Account> subs = account.getSubAccounts();
-        String name = account.getUsername();
-        account = AccountService.getFullAccount(account.getAddress());
-        account.setSubAccounts(subs);
-        account.setUsername(name);
+        //Map<String, Account> subs = account.getSubAccounts();
+        //String name = account.getUsername();
+        //account = AccountService.getFullAccount(account.getAddress());
+        //account.setSubAccounts(subs);
+        //account.setUsername(name);
         this.account = account;
         accountName.setText(account.getUsername());
         accountAddress.setText(account.getAddress());
@@ -187,17 +187,17 @@ public class FXMLAccountViewController implements Initializable {
         accountBalanceExchangeValue.setText(NumberFormat.getCurrencyInstance().format(new Double(account.getBalance() * XChangeServices.getPrice("usd"))));
         transactionsViewController.updateTransactionsTable(account);
         addQRCode(account.getAddress());
-        btnTransactions.requestFocus();
         setNode(transactionsView);
         menuController.selectAccountItem(account);
         StorageService.getInstance().addAccountToUserAccounts(account);
+        btnTransactions.requestFocus();
 
     }
     
     public void selectSubAccount(Account subAccount) {
-        String name = subAccount.getUsername();
-        subAccount = AccountService.getFullAccount(subAccount.getAddress());
-        subAccount.setUsername(name);
+        //String name = subAccount.getUsername();
+        //subAccount = AccountService.getFullAccount(subAccount.getAddress());
+        //subAccount.setUsername(name);
         this.account = subAccount;
         accountName.setText(subAccount.getUsername());
         accountAddress.setText(subAccount.getAddress());
@@ -205,15 +205,22 @@ public class FXMLAccountViewController implements Initializable {
         accountBalanceExchangeValue.setText(NumberFormat.getCurrencyInstance().format(new Double(subAccount.getBalance() * XChangeServices.getPrice("usd"))));
         transactionsViewController.updateTransactionsTable(subAccount);
         addQRCode(subAccount.getAddress());
-        btnTransactions.requestFocus();
         setNode(transactionsView);
         menuController.selectSubAccountItem(subAccount);
+        btnTransactions.requestFocus();
     }
 
     @FXML
     private void onFetchTransactions(ActionEvent event) {
-        Account account = AccountService.getFullAccount(accountAddress.getText());
+        //Account account = AccountService.getFullAccount(accountAddress.getText());
         //List<Transaction> transactions = AccountService.getTransactions(accountAddress.getText(), 50);
+        Account account = StorageService.getInstance().getWallet().getUserAccounts().get(accountAddress.getText());
+        if (account == null){
+            account = StorageService.getInstance().getWallet().getSubAccounts().get(accountAddress.getText());
+        }
+        if(account == null){
+            account = AccountService.getFullAccount(accountAddress.getText());
+        }
         transactionsViewController.updateTransactionsTable(account);
         btnTransactions.requestFocus();
         setNode(transactionsView);

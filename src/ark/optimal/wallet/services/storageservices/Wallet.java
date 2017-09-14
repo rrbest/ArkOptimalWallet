@@ -18,11 +18,21 @@ public class Wallet {
 
     private Map <String, Account> userAccounts;
     private Map <String, Account> watchAccounts;
+    private Map <String, Account> subAccounts;
     private Map <String, Delegate> delegates;
     public Wallet() {
         userAccounts = new HashMap<String, Account>();
         watchAccounts = new HashMap<String, Account>();
+        subAccounts = new HashMap<String, Account>(); 
         delegates = new HashMap<String, Delegate>();
+    }
+
+    public Map<String, Account> getSubAccounts() {
+        return subAccounts;
+    }
+
+    public void setSubAccounts(Map<String, Account> subAccounts) {
+        this.subAccounts = subAccounts;
     }
     
    

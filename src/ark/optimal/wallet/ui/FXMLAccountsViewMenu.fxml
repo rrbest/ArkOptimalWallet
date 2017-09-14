@@ -71,7 +71,7 @@
                            <graphic>
                               <ImageView fitHeight="27.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../../../resources/watch-account.png" />
+                                    <Image url="@../../../../resources/subaccounts.png" />
                                  </image>
                               </ImageView>
                            </graphic>
@@ -104,6 +104,14 @@
          </padding>
       </Label>
       <JFXListView fx:id="subAcountsListView" editable="true" onMouseClicked="#handleSubAccountMouseClick" prefHeight="392.0" prefWidth="296.0" stylesheets="@main/custom.css" />
+      <JFXButton fx:id="sendToMaster" onAction="#onSendToMaster" prefHeight="34.0" prefWidth="183.0" style="-fx-background-color: #1E88E5;" text="Send to Master" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="17.0" />
+         </font>
+         <VBox.margin>
+            <Insets left="50.0" />
+         </VBox.margin>
+      </JFXButton>
    </children>
    <effect>
       <DropShadow height="10.0" offsetY="1.0" radius="4.5" width="10.0" />

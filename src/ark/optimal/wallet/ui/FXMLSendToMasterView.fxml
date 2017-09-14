@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="711.0" prefWidth="608.0" style="-fx-background-radius: 10;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ark.optimal.wallet.ui.FXMLSendToMasterViewController">
+   <children>
+      <Label fx:id="sendToMasteLabel" prefHeight="52.0" prefWidth="613.0" style="-fx-alignment: LEFT_CENTER; -fx-background-radius: 5;" styleClass="toolbar" stylesheets="@main/custom.css" text="Send to Master - " textFill="#fffdfd">
+         <font>
+            <Font name="System Bold" size="22.0" />
+         </font>
+         <padding>
+            <Insets left="10.0" />
+         </padding>
+      </Label>
+      <JFXButton fx:id="sendToMaster" layoutX="86.0" layoutY="644.0" onAction="#onSendToMaster" prefHeight="38.0" prefWidth="173.0" text="Send" textFill="#634eda">
+         <font>
+            <Font size="19.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
+      <JFXButton fx:id="sendToMasterCancel" layoutX="274.0" layoutY="645.0" onAction="#onSendToMasterCancel" prefHeight="35.0" prefWidth="140.0" text="Cancel" textFill="#634eda">
+         <font>
+            <Font size="18.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
+      <TableView fx:id="subwalletsTable" layoutX="14.0" layoutY="78.0" prefHeight="455.0" prefWidth="594.0" styleClass="transactions-table-view" stylesheets="@main/custom.css">
+         <columns>
+            <TableColumn fx:id="subwalletAddress" prefWidth="249.0" text="SubWallet" />
+            <TableColumn fx:id="votes" prefWidth="170.0" text="Votes" />
+         </columns>
+      </TableView>
+      <JFXTextField fx:id="passphrase" focusColor="#cd2e2c" labelFloat="true" layoutX="12.0" layoutY="574.0" maxWidth="657.0" minWidth="214.0" prefHeight="36.0" prefWidth="601.0" promptText="Passphrase *" unFocusColor="#f8f4f4">
+         <font>
+            <Font name="Roboto Black" size="13.0" />
+         </font>
+      </JFXTextField>
+   </children>
+</AnchorPane>

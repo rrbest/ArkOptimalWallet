@@ -209,6 +209,7 @@ public class FXMLDelegatesViewController implements Initializable {
 
         // intialize from storage 
         for (Delegate delegate : StorageService.getInstance().getWallet().getDelegates().values()) {
+            delegate.setChecked(Boolean.FALSE);
             _delegatestable.getItems().add(delegate);
             delegatesMap.put(delegate.getUsername(), delegate);
         }
@@ -286,7 +287,7 @@ public class FXMLDelegatesViewController implements Initializable {
             Parent root1 = (Parent) fxmlLoader.load();
             FXMLUpdateVoteViewController updateVoteController = (FXMLUpdateVoteViewController) fxmlLoader.getController();
             updateVoteController.setDelegateViewController(this);
-            //updateVoteController.setDelegateName(_delegatestable.getSelectionModel().getSelectedItem().getUsername());
+            updateVoteController.setDelegateName(_delegatestable.getSelectionModel().getSelectedItem().getUsername());
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.initStyle(StageStyle.UNDECORATED);
@@ -392,7 +393,7 @@ public class FXMLDelegatesViewController implements Initializable {
                     }
                 }
                 subAccounts.put(d.getUsername(), a);
-                StorageService.getInstance().addAccountToUserAccounts(a);
+                StorageService.getInstance().addAccountToSubAccounts(a);
 
             }
             System.out.println(d.getUsername());
@@ -414,7 +415,7 @@ public class FXMLDelegatesViewController implements Initializable {
         walletsVotes += acc.getBalance().intValue();
         walletsVotes = new Double((masterWalletPercentage/100.0) * walletsVotes).intValue();
         // test
-        walletsVotes = 2000000;
+        //walletsVotes = 2000000;
         Map<String, Double> votes = OptimizationService.runConvexOptimizattion(walletsVotes, selectedDelegates);
         runOptimizationReport(account, passphrase, votes);
         return;
