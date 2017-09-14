@@ -176,7 +176,11 @@ public class StorageService {
             account = AccountService.getFullAccount(address);
             account.setUsername(accountName);
             for (Map.Entry<String, Account> entry : subAccounts.entrySet()) {
+                String subAccountName = entry.getValue().getUsername();
+                Account masterAccount = entry.getValue().getMasterAccount();
                 Account subAccount = AccountService.getFullAccount(entry.getValue().getAddress());
+                subAccount.setUsername(subAccountName);
+                subAccount.setMasterAccount(masterAccount);
                 account.getSubAccounts().put(entry.getKey(), subAccount);
                 this.wallet.getSubAccounts().put(subAccount.getAddress(), subAccount);
 

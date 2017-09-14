@@ -14,8 +14,6 @@ import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -216,12 +214,19 @@ public class FXMLAccountsViewMenuController implements Initializable {
         myAcountsListView.setPrefHeight(myAcountsListView.getItems().size() * 40);
         subAcountsListView.getSelectionModel().select(-1);
     }
-    private void viewSubAccounts(Account account){
+
+    private void viewSubAccounts(Account account) {
         subAcountsListView.getItems().clear();
-        for (String delegateName: account.getSubAccounts().keySet()){
-            Account sub = account.getSubAccounts().get(delegateName);
-            sub.setUsername(account.getUsername() + " ("+delegateName+")");
-            subAcountsListView.getItems().add(new AccountItem(sub.getUsername(), sub.getAddress()));
+        if (account.getSubAccounts().size() == 0) {
+            sendToMaster.setVisible(false);
+        } else {
+            for (String delegateName : account.getSubAccounts().keySet()) {
+                Account sub = account.getSubAccounts().get(delegateName);
+                sub.setUsername(account.getUsername() + " (" + delegateName + ")");
+                subAcountsListView.getItems().add(new AccountItem(sub.getUsername(), sub.getAddress()));
+                StorageService.getInstance().addAccountToSubAccounts(sub);
+            }
+            sendToMaster.setVisible(true);
         }
         subAcountsListView.setPrefHeight(subAcountsListView.getItems().size() * 40);
     }
@@ -250,7 +255,7 @@ public class FXMLAccountsViewMenuController implements Initializable {
         viewSubAccounts(account);
         subAcountsListView.getSelectionModel().select(-1);
     }
-    
+
     public void selectSubAccountItem(Account account) {
         subAcountsListView.requestFocus();
         subAcountsListView.getSelectionModel().select(new AccountItem(account.getUsername(), account.getAddress()));
@@ -343,7 +348,7 @@ public class FXMLAccountsViewMenuController implements Initializable {
         } catch (IOException ex) {
             Logger.getLogger(FXMLAccountsViewMenuController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
 
     @FXML
@@ -351,12 +356,40 @@ public class FXMLAccountsViewMenuController implements Initializable {
         String address = subAcountsListView.getSelectionModel().getSelectedItem().getAddress();
         Account subAccount = StorageService.getInstance().getWallet().getSubAccounts().get(address);
         accountViewController.selectSubAccount(subAccount);
-  
+
     }
 
     @FXML
     private void onSendToMaster(ActionEvent event) {
-        
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLSendToMasterView.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            FXMLSendToMasterViewController sendController = ((FXMLSendToMasterViewController) fxmlLoader.getController());
+            sendController.setAccountViewMenuController(this);
+            String address = null;
+            Account account = null;
+            AccountItem accountItem = myAcountsListView.getSelectionModel().getSelectedItem();
+            if (accountItem != null){
+               address = accountItem.getAddress();
+               account = StorageService.getInstance().getWallet().getUserAccounts().get(address);
+            }else{
+                accountItem = subAcountsListView.getSelectionModel().getSelectedItem();
+                address = accountItem.getAddress();
+                account = StorageService.getInstance().getWallet().getSubAccounts().get(address);
+                account = account.getMasterAccount();
+            }
+            
+            sendController.updateSubWalletsTable(account);
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.setTitle("C");
+            stage.setScene(new Scene(root1));
+            stage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLAccountsViewMenuController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     class AccountItem extends RecursiveTreeObject<AccountItem> {

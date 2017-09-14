@@ -7,13 +7,17 @@ package ark.optimal.wallet.ui;
 
 import ark.optimal.wallet.pojo.Account;
 import ark.optimal.wallet.pojo.Delegate;
+import ark.optimal.wallet.services.accountservices.AccountService;
 import ark.optimal.wallet.services.storageservices.StorageService;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
+import io.ark.core.Transaction;
+import io.ark.core.TransactionService;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,7 +65,7 @@ public class FXMLSendToMasterViewController implements Initializable {
     public void setAccountViewMenuController(FXMLAccountsViewMenuController accountViewMenuController) {
         this.accountViewMenuController = accountViewMenuController;
     }
-    
+
     /**
      * Initializes the controller class.
      */
@@ -74,10 +78,11 @@ public class FXMLSendToMasterViewController implements Initializable {
         subwalletAddress.setCellValueFactory(new PropertyValueFactory<SendToMasterItem, Hyperlink>("subwalletAddress_link"));
         subwalletAddress.setCellFactory(new FXMLSendToMasterViewController.HyperlinkCell());
 
-    }    
+    }
 
-    public void updateSubWalletsTable(Account account){
-        sendToMasteLabel.setText("Send To Master - "+ account.getUsername());
+    public void updateSubWalletsTable(Account account) {
+        sendToMasteLabel.setText("Send To Master - " + account.getUsername());
+        this.account = account;
         subwalletsTable.getItems().clear();
         for (Account sub : account.getSubAccounts().values()) {
             String subUsername = sub.getUsername();
@@ -86,22 +91,32 @@ public class FXMLSendToMasterViewController implements Initializable {
             subwalletsTable.getItems().add(oi);
         }
     }
+
     @FXML
     private void onSendToMaster(ActionEvent event) {
+        for (Map.Entry<String, Account> entry : this.account.getSubAccounts().entrySet()) {
+            Account subAccount = entry.getValue();
+            Delegate d = subAccount.getVotedDelegates().get(0);
+            account.getSubAccounts().put(entry.getKey(), subAccount);
+            if (subAccount.getBalance() > 1.2) {
+                Transaction tx = TransactionService.createTransaction(subAccount.getAddress(), account.getAddress(), new Long(subAccount.getBalance().intValue() - 1), "User sent SubWallet to Master", passphrase.getText() + " " + d.getUsername());
+                TransactionService.PostTransaction(tx);
+            }
+        }
         closeWindow();
     }
 
+    @FXML
     private void onSendToMasterCancel(ActionEvent event) {
         closeWindow();
-        
+
     }
-    
-     private void closeWindow() {
+
+    private void closeWindow() {
         Stage stage = (Stage) sendToMaster.getScene().getWindow();
         stage.close();
     }
 
-    
     private class HyperlinkCell implements Callback<TableColumn<SendToMasterItem, Hyperlink>, TableCell<SendToMasterItem, Hyperlink>> {
 
         @Override
@@ -169,7 +184,5 @@ public class FXMLSendToMasterViewController implements Initializable {
             };
         }
     }
-    
-    
-    
+
 }

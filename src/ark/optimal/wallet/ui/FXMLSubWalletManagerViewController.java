@@ -218,12 +218,14 @@ public class FXMLSubWalletManagerViewController implements Initializable {
                 } else {
                     
                 }
+                a.setMasterAccount(account);
                 subAccounts.put(d.getUsername(), a);
                 StorageService.getInstance().addAccountToSubAccounts(a);
 
             }
             System.out.println(d.getUsername());
         }
+        StorageService.getInstance().addAccountToUserAccounts(account);
         this.accountsViewMenuController.selectAccountItem(account);
         closeWindow();
     }

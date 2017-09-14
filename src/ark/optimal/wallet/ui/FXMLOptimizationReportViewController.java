@@ -121,7 +121,8 @@ public class FXMLOptimizationReportViewController implements Initializable {
         for (String delegateName : votes.keySet()) {
             String subUsername = account.getUsername() + "(" + delegateName + ")";
             Delegate d = StorageService.getInstance().getWallet().getDelegates().get(delegateName);
-            double payout = 422 * d.getPayoutPercentage() * votes.get(delegateName) / (100 * d.getVote());
+            double includedvotes = 100 * ( d.getVote() * (1 - d.getExlcudedPercentage()/100.0));
+            double payout = 422 * d.getPayoutPercentage() * votes.get(delegateName) / (includedvotes);
             OptimizationReportItem oi = new OptimizationReportItem(delegateName, d.getRate(), subUsername, votes.get(delegateName).intValue(), payout);
             votedDelegatesTable.getItems().add(oi);
         }

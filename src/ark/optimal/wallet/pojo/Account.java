@@ -24,7 +24,16 @@ public class Account {
     private List<Transaction> transactions;
     private List<Delegate> votedDelegates;
 
+    public Account getMasterAccount() {
+        return masterAccount;
+    }
+
+    public void setMasterAccount(Account masterAccount) {
+        this.masterAccount = masterAccount;
+    }
+
     private Map<String, Account> subAccounts;
+    private Account masterAccount;
     
     public List<Delegate> getVotedDelegates() {
         return votedDelegates;

@@ -392,12 +392,14 @@ public class FXMLDelegatesViewController implements Initializable {
                         Logger.getLogger(FXMLDelegatesViewController.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
+                a.setMasterAccount(account);
                 subAccounts.put(d.getUsername(), a);
                 StorageService.getInstance().addAccountToSubAccounts(a);
 
             }
             System.out.println(d.getUsername());
         }
+        StorageService.getInstance().addAccountToUserAccounts(account);
     }
 
     private void runOptimization(Account account, String passphrase, Double masterWalletPercentage) {
@@ -415,7 +417,7 @@ public class FXMLDelegatesViewController implements Initializable {
         walletsVotes += acc.getBalance().intValue();
         walletsVotes = new Double((masterWalletPercentage/100.0) * walletsVotes).intValue();
         // test
-        //walletsVotes = 2000000;
+        //walletsVotes = 150000;
         Map<String, Double> votes = OptimizationService.runConvexOptimizattion(walletsVotes, selectedDelegates);
         runOptimizationReport(account, passphrase, votes);
         return;
