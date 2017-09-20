@@ -12,6 +12,8 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  *
@@ -19,8 +21,8 @@ import java.util.List;
  */
 public class TransactionService {
 
-    public static Transaction createTransaction(String senderId, String recipientId, long amount, String vendorField, String passphrase){
-    
+    public static Transaction createTransaction(String senderId, String recipientId, long amount, String vendorField, String passphrase) {
+
         byte type = 0;
         long fee = 10000000;
         amount = amount * 100000000;
@@ -32,7 +34,8 @@ public class TransactionService {
         tx.setId(Crypto.getId(tx));
         return tx;
     }
-    public static Transaction createVote(String senderId, String delegateName, String passphrase, boolean unvote){
+
+    public static Transaction createVote(String senderId, String delegateName, String passphrase, boolean unvote) {
         byte type = 3;
         long fee = 100000000;
         long amount = 0;
@@ -50,30 +53,53 @@ public class TransactionService {
         tx.setId(Crypto.getId(tx));
         return tx;
     }
-    public static void sign(Transaction t,String passphrase){
+
+    public static void sign(Transaction t, String passphrase) {
         t.sign(passphrase);
     }
-    
-    public static String PostTransaction(Transaction transaction) {
-        List<Transaction> transactions = new ArrayList<Transaction>();
-        transactions.add(transaction);
-        Transactions txs = new Transactions(transactions);
-        String json = new Gson().toJson(txs);
-        String response = "";
-        for (int i = 0; i<5; i++){
-            String resp = NetworkService.postToPeer3("/peer/transactions", json);
-            if (resp.contains("success"))
-                response = resp;
-        }
-        
-        return response;
-    }
-    private static class Transactions {
-        private List<Transaction> transactions;
 
-        public Transactions(List<Transaction> transactions) {
-            this.transactions = transactions;
-        }
-        
+    public static void PostTransaction(Transaction transaction) {
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> {
+            List<Transaction> transactions = new ArrayList<Transaction>();
+            transactions.add(transaction);
+            Transactions txs = new Transactions(transactions);
+            String json = new Gson().toJson(txs);
+            String response = "";
+            for (int i = 0; i < 1; i++) {
+                String resp = NetworkService.postToPeer3("/peer/transactions", json);
+                if (resp.contains("success")) {
+                    response = resp;
+                }
+            }
+
+        });
+
     }
+
+    public static void broadcastTransaction(Transaction transaction) {
+        for (int i = 0; i < 1; i++) {
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            executor.submit(() -> {
+                List<Transaction> transactions = new ArrayList<Transaction>();
+                transactions.add(transaction);
+                Transactions txs = new Transactions(transactions);
+                String json = new Gson().toJson(txs);
+                String resp = NetworkService.postToPeer3("/peer/transactions", json);
+                System.out.println(resp);
+        });
+    }
+
+}
+
+private static class Transactions {
+
+    private List<Transaction> transactions;
+
+    public Transactions(List<Transaction> transactions) {
+        this.transactions = transactions;
+    }
+
+}
 }
