@@ -38,8 +38,12 @@ import org.bitcoinj.core.ECKey;
 public class AccountService {
 
     private static Delegate getDelegate(String api) {
-        String response = NetworkService.getFromPeer(api);
-
+        String response = NetworkService.getFromPeer(api, 1);
+        
+        if (response == null){
+            return null;
+        }
+        
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> respMap = new HashMap<String, Object>();
 
@@ -87,7 +91,7 @@ public class AccountService {
     }
 
     public static Account getAccount(String address) {
-        String response = NetworkService.getFromPeer("/api/accounts?address=" + address);
+        String response = NetworkService.getFromPeer("/api/accounts?address=" + address, 1);
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> respMap = new HashMap<String, Object>();
@@ -121,8 +125,11 @@ public class AccountService {
     }
 
     public static Account getFullAccount(String address) {
-        String response = NetworkService.getFromPeer("/api/accounts?address=" + address);
+        String response = NetworkService.getFromPeer("/api/accounts?address=" + address, 1);
 
+        if(response == null){
+            return null;
+        }
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> respMap = new HashMap<String, Object>();
 
@@ -177,9 +184,11 @@ public class AccountService {
     }
     
     public static List<Delegate> getVotedDelegates(String address){
-        String response = NetworkService.getFromPeer("/api/accounts/delegates/?address="+address);
-        System.out.println(response);
-        
+        String response = NetworkService.getFromPeer("/api/accounts/delegates/?address="+address, 1);
+        //System.out.println(response);
+        if(response == null){
+            return null;
+        }
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> respMap = new HashMap<String, Object>();
         List<Delegate> delegates = new ArrayList<Delegate>();
@@ -212,8 +221,12 @@ public class AccountService {
     }
 
     public static List<Transaction> getTransactions(String address, int limit) {
-        String response = NetworkService.getFromPeer("/api/transactions?orderBy=timestamp:desc&limit=" + limit + "&recipientId=" + address + "&senderId=" + address);
-        System.out.println(response);
+        String response = NetworkService.getFromPeer("/api/transactions?orderBy=timestamp:desc&limit=" + limit + "&recipientId=" + address + "&senderId=" + address, 1);
+        
+        if (response == null){
+            return null;
+        }
+        //System.out.println(response);
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> respMap = new HashMap<String, Object>();
         List<Transaction> transactions = new ArrayList<Transaction>();

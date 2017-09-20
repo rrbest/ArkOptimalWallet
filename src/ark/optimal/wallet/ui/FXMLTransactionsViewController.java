@@ -140,7 +140,7 @@ public class FXMLTransactionsViewController implements Initializable {
                 if (acc != null) {
                     from = acc.getUsername();
                 } else {
-                    acc = StorageService.getInstance().getWallet().getWatchAccounts().get(t.getSenderId());
+                    acc = StorageService.getInstance().getWallet().getSubAccounts().get(t.getSenderId());
                     if (acc != null) {
                         from = acc.getUsername();
                     }
@@ -154,7 +154,7 @@ public class FXMLTransactionsViewController implements Initializable {
                 if (acc != null) {
                     to = acc.getUsername();
                 } else {
-                    acc = StorageService.getInstance().getWallet().getWatchAccounts().get(t.getRecipientId());
+                    acc = StorageService.getInstance().getWallet().getSubAccounts().get(t.getRecipientId());
                     if (acc != null) {
                         to = acc.getUsername();
                     }

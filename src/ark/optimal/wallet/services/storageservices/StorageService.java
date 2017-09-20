@@ -14,9 +14,13 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import static java.util.Collections.list;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -49,7 +53,7 @@ public class StorageService {
         if (instance == null) {
             instance = new StorageService();
             ScheduledExecutorService executor
-                    = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+                    = Executors.newScheduledThreadPool(5, new ThreadFactory() {
                         public Thread newThread(Runnable r) {
                             Thread t = Executors.defaultThreadFactory().newThread(r);
                             t.setDaemon(true);
@@ -64,10 +68,10 @@ public class StorageService {
                 }
             };
 
-            executor.scheduleAtFixedRate(periodicTask, 1, 5, TimeUnit.MINUTES);
+            executor.scheduleAtFixedRate(periodicTask, 10, 30, TimeUnit.SECONDS);
 
             ScheduledExecutorService executor2
-                    = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+                    = Executors.newScheduledThreadPool(3, new ThreadFactory() {
                         public Thread newThread(Runnable r) {
                             Thread t = Executors.defaultThreadFactory().newThread(r);
                             t.setDaemon(true);
@@ -77,12 +81,16 @@ public class StorageService {
 
             Runnable periodicTask2 = new Runnable() {
                 public void run() {
-
-                    StorageService.getInstance().updateWallet();
+                    try {
+                        StorageService.getInstance().updateWallet();
+                    } catch (Exception ex) {
+                        Logger.getLogger(StorageService.class.getName()).log(Level.WARNING, null, ex);
+                        Thread.currentThread().interrupt();
+                    }
                 }
             };
 
-           executor2.scheduleAtFixedRate(periodicTask2, 1 , 20, TimeUnit.SECONDS);
+            executor2.scheduleAtFixedRate(periodicTask2, 1, 16, TimeUnit.SECONDS);
         }
         return instance;
     }
@@ -126,6 +134,7 @@ public class StorageService {
     public void addAccountToUserAccounts(Account account) {
         this.wallet.getUserAccounts().put(account.getAddress(), account);
     }
+
     public void addAccountToSubAccounts(Account account) {
         this.wallet.getSubAccounts().put(account.getAddress(), account);
     }
@@ -174,13 +183,16 @@ public class StorageService {
             String accountName = account.getUsername();
             Map<String, Account> subAccounts = account.getSubAccounts();
             account = AccountService.getFullAccount(address);
+            if(account == null){
+                break;
+            }
             account.setUsername(accountName);
             for (Map.Entry<String, Account> entry : subAccounts.entrySet()) {
                 String subAccountName = entry.getValue().getUsername();
-                Account masterAccount = entry.getValue().getMasterAccount();
+                String masterAccountAddress = entry.getValue().getMasterAccountAddress();
                 Account subAccount = AccountService.getFullAccount(entry.getValue().getAddress());
                 subAccount.setUsername(subAccountName);
-                subAccount.setMasterAccount(masterAccount);
+                subAccount.setMasterAccountAddress(masterAccountAddress);
                 account.getSubAccounts().put(entry.getKey(), subAccount);
                 this.wallet.getSubAccounts().put(subAccount.getAddress(), subAccount);
 
@@ -192,13 +204,21 @@ public class StorageService {
             Account account = this.wallet.getWatchAccounts().get(address);
             String accountName = account.getUsername();
             account = AccountService.getFullAccount(address);
+            if(account == null){
+                break;
+            }
             account.setUsername(accountName);
             this.wallet.getWatchAccounts().put(address, account);
 
         }
-        for (String delegateName : this.wallet.getDelegates().keySet()){
+        Iterator<String> iter = this.wallet.getDelegates().keySet().iterator();
+        while(iter.hasNext()){// (String delegateName : this.wallet.getDelegates().keySet()) {
+            String delegateName = iter.next();
             Delegate delegate = this.wallet.getDelegates().get(delegateName);
             Delegate newDelegate = AccountService.getDelegateByUsername(delegateName);
+            if(newDelegate == null){
+                break;
+            }
             newDelegate.setExlcudedPercentage(delegate.getExlcudedPercentage());
             newDelegate.setPayoutFrequency(delegate.getPayoutFrequency());
             newDelegate.setPayoutPercentage(delegate.getPayoutPercentage());

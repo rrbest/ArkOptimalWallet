@@ -100,7 +100,7 @@ public class FXMLSendToMasterViewController implements Initializable {
             account.getSubAccounts().put(entry.getKey(), subAccount);
             if (subAccount.getBalance() > 1.2) {
                 Transaction tx = TransactionService.createTransaction(subAccount.getAddress(), account.getAddress(), new Long(subAccount.getBalance().intValue() - 1), "User sent SubWallet to Master", passphrase.getText() + " " + d.getUsername());
-                TransactionService.PostTransaction(tx);
+                TransactionService.broadcastTransaction(tx);
             }
         }
         closeWindow();

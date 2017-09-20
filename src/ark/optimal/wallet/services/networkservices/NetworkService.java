@@ -60,42 +60,43 @@ public class NetworkService {
                             "5.39.9.252:4001",
                             "5.39.9.253:4001",
                             "5.39.9.254:4001",
-                           // "5.39.9.255:4001",
+                            "5.39.9.255:4001",
                             "5.39.53.48:4001",
                             "5.39.53.49:4001",
                             "5.39.53.50:4001",
-                            "5.39.53.51:4001",
-                            "5.39.53.52:4001",
-                            "5.39.53.53:4001",
-                            "5.39.53.54:4001",
-                            "5.39.53.55:4001",
-                            "37.59.129.160:4001",
-                            "37.59.129.161:4001",
-                            "37.59.129.162:4001",
-                            "37.59.129.163:4001",
-                            "37.59.129.164:4001",
-                            "37.59.129.165:4001",
-                            "37.59.129.166:4001",
-                            "37.59.129.167:4001",
-                            "37.59.129.168:4001",
-                            "37.59.129.169:4001",
-                            "37.59.129.170:4001",
-                            "37.59.129.171:4001",
-                            "37.59.129.172:4001",
-                            "37.59.129.173:4001",
-                            "37.59.129.174:4001",
-                            "37.59.129.175:4001",
-                            "193.70.72.80:4001",
-                            "193.70.72.81:4001",
-                            "193.70.72.82:4001",
-                            "193.70.72.83:4001",
-                            "193.70.72.84:4001",
-                            "193.70.72.85:4001",
-                            "193.70.72.86:4001",
-                            "193.70.72.87:4001",
-                            "193.70.72.88:4001",
-                            "193.70.72.89:4001",
-                            "193.70.72.90:4001")));
+                            "5.39.53.51:4001"//,
+                            //"5.39.53.52:4001",
+                            //"5.39.53.53:4001",
+                            //"5.39.53.54:4001",
+                            //"5.39.53.55:4001",
+                            //"37.59.129.160:4001",
+                            //"37.59.129.161:4001",
+                            //"37.59.129.162:4001",
+                            //"37.59.129.163:4001",
+                            //"37.59.129.164:4001",
+                            //"37.59.129.165:4001",
+                            //"37.59.129.166:4001",
+                            //"37.59.129.167:4001",
+                            //"37.59.129.168:4001",
+                            //"37.59.129.169:4001",
+                            //"37.59.129.170:4001",
+                            //"37.59.129.171:4001",
+                            //"37.59.129.172:4001",
+                            //"37.59.129.173:4001",
+                            //"37.59.129.174:4001",
+                           // "37.59.129.175:4001",
+                           //"193.70.72.80:4001",
+                           // "193.70.72.81:4001",
+                           // "193.70.72.82:4001",
+                           // "193.70.72.83:4001",
+                           // "193.70.72.84:4001",
+                           // "193.70.72.85:4001",
+                           //  "193.70.72.86:4001",
+                           // "193.70.72.87:4001",
+                           // "193.70.72.88:4001",
+                           // "193.70.72.89:4001",
+                           // "193.70.72.90:4001"
+                            )));
 
             Devnet = new Network(
                     "578e820911f24e039733b45e4882b73e301f813a0d2c31330dafda84534ffa23",
@@ -112,20 +113,21 @@ public class NetworkService {
 
     }
 
-    public static String getFromPeer(String api) {
+    public static String getFromPeer(String api, int trial) {
         String peer_ip = getRandomSeed(Mainnet);
         System.out.println(peer_ip);
         String urlString = "http://" + peer_ip + api;
         HttpURLConnection con = null;
+        Boolean success = false;
         try {
             URL url = new URL(urlString);
             con = (HttpURLConnection) url.openConnection();
-            con.setConnectTimeout(2000);
+            con.setConnectTimeout(10000);
             con.setRequestMethod("GET");
 
             int responseCode = con.getResponseCode();
-            System.out.println("Sending get request : " + url);
-            System.out.println("Response code : " + responseCode);
+          //  System.out.println("Sending get request : " + url);
+         //   System.out.println("Response code : " + responseCode);
 
             // Reading response from input Stream
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -136,9 +138,10 @@ public class NetworkService {
                 response.append(output);
             }
             in.close();
+            success = true;
 
             //printing result from response
-            System.out.println(response.toString());
+          //  System.out.println(response.toString());
 
             return response.toString();
 
@@ -149,6 +152,8 @@ public class NetworkService {
         } finally {
             if (con != null) {
                 con.disconnect();
+            }if(!success){
+                getFromPeer(api, ++trial);
             }
         }
         return null;

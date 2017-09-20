@@ -59,7 +59,7 @@ public class FXMLSendArkViewController implements Initializable {
     @FXML
     private void onSendArkNext(ActionEvent event) {
         Transaction tx = TransactionService.createTransaction(this.senderAddress,destinationAddress.getText(), new Long(amountArk.getText()), smartBridge.getText(), passphrase.getText());
-        TransactionService.PostTransaction(tx);
+        TransactionService.broadcastTransaction(tx);
         closeWindow();
     }
 

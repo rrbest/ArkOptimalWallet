@@ -27,7 +27,7 @@
             <Font name="Roboto Black" size="13.0" />
          </font>
       </JFXTextField>
-      <JFXButton fx:id="createImportSubWallets" layoutX="200.0" layoutY="659.0" onAction="#onCreateImportSubWallets" prefHeight="38.0" prefWidth="173.0" text="Create/Import" textFill="#634eda">
+      <JFXButton fx:id="createImportSubWallets" layoutX="164.0" layoutY="659.0" onAction="#onCreateImportSubWallets" prefHeight="38.0" prefWidth="164.0" text="Create/Import" textFill="#634eda">
          <font>
             <Font size="19.0" />
          </font>
@@ -35,7 +35,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </JFXButton>
-      <JFXButton fx:id="createImportSubWalletsCancel" layoutX="390.0" layoutY="661.0" onAction="#onCreateImportSubWalletsCancel" prefHeight="35.0" prefWidth="140.0" text="Cancel" textFill="#634eda">
+      <JFXButton fx:id="close" layoutX="626.0" layoutY="660.0" onAction="#onClose" prefHeight="35.0" prefWidth="97.0" text="Close" textFill="#634eda">
          <font>
             <Font size="18.0" />
          </font>
@@ -61,15 +61,39 @@
             </JFXButton>
          </children>
       </AnchorPane>
-      <TableView fx:id="delegatesTable" editable="true" layoutX="20.0" layoutY="323.0" prefHeight="327.0" prefWidth="689.0" stylesheets="@main/custom.css">
+      <TableView fx:id="subWalletsTable" editable="true" layoutX="20.0" layoutY="323.0" prefHeight="327.0" prefWidth="689.0" stylesheets="@main/custom.css">
          <columns>
             <TableColumn fx:id="_delegateChecked" prefWidth="36.0" />
             <TableColumn fx:id="_delegatename" prefWidth="106.99996948242188" text="Delegate" />
             <TableColumn fx:id="_rank" prefWidth="77.0" text="Rank" />
-            <TableColumn fx:id="_votes" prefWidth="150.0" text="Votes" />
-            <TableColumn fx:id="_approval" prefWidth="150.0" text="Approval" />
-            <TableColumn fx:id="_productivity" prefWidth="150.0" text="Productivity" />
+            <TableColumn fx:id="_subwallet" prefWidth="257.0" text="SubWallet" />
+            <TableColumn fx:id="_votes" prefWidth="111.0" text="Votes/Arks" />
+            <TableColumn fx:id="_payoutPercentage" prefWidth="93.0" text="Payout %" />
          </columns>
       </TableView>
+      <JFXButton fx:id="selectAll" layoutX="14.0" layoutY="660.0" onAction="#onSelectAll" prefHeight="38.0" prefWidth="137.0" text="Select All" textFill="#634eda">
+         <font>
+            <Font size="19.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
+      <JFXButton fx:id="voteBtn" layoutX="332.0" layoutY="660.0" onAction="#onSubWalletVote" prefHeight="38.0" prefWidth="85.0" text="Vote" textFill="#634eda">
+         <font>
+            <Font size="19.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
+      <JFXButton fx:id="sendToMasterBtn" layoutX="438.0" layoutY="660.0" onAction="#onSendToMaster" prefHeight="38.0" prefWidth="172.0" text="Send to Master" textFill="#634eda">
+         <font>
+            <Font size="19.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
    </children>
 </AnchorPane>

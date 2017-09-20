@@ -9,6 +9,7 @@ import ark.optimal.wallet.pojo.Account;
 import ark.optimal.wallet.pojo.Delegate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -21,13 +22,13 @@ public class Wallet {
     private Map <String, Account> subAccounts;
     private Map <String, Delegate> delegates;
     public Wallet() {
-        userAccounts = new HashMap<String, Account>();
-        watchAccounts = new HashMap<String, Account>();
-        subAccounts = new HashMap<String, Account>(); 
-        delegates = new HashMap<String, Delegate>();
+        userAccounts = new ConcurrentHashMap<String, Account>();
+        watchAccounts = new ConcurrentHashMap<String, Account>();
+        subAccounts = new ConcurrentHashMap<String, Account>(); 
+        delegates = new ConcurrentHashMap<String, Delegate>();
     }
 
-    public Map<String, Account> getSubAccounts() {
+   public Map<String, Account> getSubAccounts() {
         return subAccounts;
     }
 

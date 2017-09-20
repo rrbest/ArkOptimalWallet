@@ -21,6 +21,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
@@ -216,7 +217,20 @@ public class FXMLAccountViewController implements Initializable {
         //List<Transaction> transactions = AccountService.getTransactions(accountAddress.getText(), 50);
         Account account = StorageService.getInstance().getWallet().getUserAccounts().get(accountAddress.getText());
         if (account == null){
-            account = StorageService.getInstance().getWallet().getSubAccounts().get(accountAddress.getText());
+            String masterAccountAddress = this.account.getMasterAccountAddress();
+            if (masterAccountAddress != null){
+             /*   Account masterAccount = StorageService.getInstance().getWallet().getUserAccounts().get(masterAccountAddress);
+                List<Account> subs = (List<Account>) masterAccount.getSubAccounts().values();
+                for (Account sub : subs){
+                    if(sub.getAddress() == this.account.getAddress()){
+                        account = sub;
+                        break;
+                    }
+                        
+                }
+               */
+             account = StorageService.getInstance().getWallet().getSubAccounts().get(accountAddress.getText());
+            }
         }
         if(account == null){
             account = AccountService.getFullAccount(accountAddress.getText());

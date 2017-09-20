@@ -315,44 +315,44 @@ public class FXMLDelegatesViewController implements Initializable {
 
     public void executeOptimizationTrades(Account account, String passphrase, Map<String, Double> votes) {
 
-        // send all subwallets balance to master wallet  
-        int walletsVotes = 0;
-        for (String delegateName : account.getSubAccounts().keySet()) {
-            Account subaccount = account.getSubAccounts().get(delegateName);
-            subaccount = AccountService.getAccount(subaccount.getAddress());
-            Double walletVotes = subaccount.getBalance() - 1;
-            if (walletVotes != null && walletVotes > 0) {
-                Transaction tx = TransactionService.createTransaction(subaccount.getAddress(), account.getAddress(), walletVotes.longValue(), "send to master wallet", passphrase + " " + delegateName);
-                TransactionService.PostTransaction(tx);
-                walletsVotes += walletVotes.intValue();
-            }
-
-        }
-        // create new subwallets
-
-        createSubWallets(account, passphrase);
+//        // send all subwallets balance to master wallet  
+//        int walletsVotes = 0;
+//        for (String delegateName : account.getSubAccounts().keySet()) {
+//            Account subaccount = account.getSubAccounts().get(delegateName);
+//            subaccount = AccountService.getAccount(subaccount.getAddress());
+//            Double walletVotes = subaccount.getBalance() - 1;
+//            if (walletVotes != null && walletVotes > 0) {
+//                Transaction tx = TransactionService.createTransaction(subaccount.getAddress(), account.getAddress(), walletVotes.longValue(), "send to master wallet", passphrase + " " + delegateName);
+//                TransactionService.PostTransaction(tx);
+//                walletsVotes += walletVotes.intValue();
+//            }
+//
+//        }
+//        // create new subwallets
+//
+//        createSubWallets(account, passphrase);
 
         // send new votes to subwallets
         try {
-            TimeUnit.SECONDS.sleep(2);
-            Account acc = AccountService.getAccount(account.getAddress());
-            while (acc.getBalance() < walletsVotes - 2) {
-                System.out.println("Wait for Confirmation of transactions");
-                System.out.println("subwallets votes = " + walletsVotes);
-                System.out.println("master wallet balance  = " + acc.getBalance());
-                acc = AccountService.getAccount(account.getAddress());
-
-            }
+//            TimeUnit.SECONDS.sleep(2);
+//            Account acc = AccountService.getAccount(account.getAddress());
+//            while (acc.getBalance() < walletsVotes - 2) {
+//                System.out.println("Wait for Confirmation of transactions");
+//                System.out.println("subwallets votes = " + walletsVotes);
+//                System.out.println("master wallet balance  = " + acc.getBalance());
+//                acc = AccountService.getAccount(account.getAddress());
+//
+//            }
             for (Delegate delegate : selectedDelegates) {
                 Account subaccount = account.getSubAccounts().get(delegate.getUsername());
                 Double vote = votes.get(delegate.getUsername());
                 if (vote >= 1) {
                     Transaction tx = TransactionService.createTransaction(account.getAddress(), subaccount.getAddress(), vote.longValue(), "send to sub wallet", passphrase);
-                    TransactionService.PostTransaction(tx);
+                    TransactionService.broadcastTransaction(tx);
                 }
             }
 
-        } catch (InterruptedException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(FXMLDelegatesViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -363,44 +363,44 @@ public class FXMLDelegatesViewController implements Initializable {
     }
 
     // creates subwallets and vote for corresponding delegates
-    private void createSubWallets(Account account, String passphrase) {
-
-        Map subAccounts = account.getSubAccounts();
-        for (Delegate d : selectedDelegates) {
-            if (!subAccounts.containsKey(d.getUsername())) {
-                Account a = AccountService.createAccount(passphrase + " " + d.getUsername());
-                if (a.getVotedDelegates().size() == 0) {
-                    Transaction tx = TransactionService.createTransaction(account.getAddress(), a.getAddress(), 2, "send to sub wallet to vote", passphrase);
-                    String response = TransactionService.PostTransaction(tx);
-                    try {
-                        int counter = 0;
-                        while (!response.contains("success") && ++counter <= 10) {
-                            System.out.println("wait for successful transaction");
-                            response = TransactionService.PostTransaction(tx);
-                        }
-
-                        tx = TransactionService.createVote(a.getAddress(), d.getUsername(), passphrase + " " + d.getUsername(), false);
-                        response = TransactionService.PostTransaction(tx);
-                        counter = 0;
-                        while (!response.contains("success") && ++counter <= 10) {
-                            System.out.println("wait for successful transaction");
-                            response = TransactionService.PostTransaction(tx);
-                        }
-                        a.getVotedDelegates().add(d);
-
-                    } catch (Exception ex) {
-                        Logger.getLogger(FXMLDelegatesViewController.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-                a.setMasterAccount(account);
-                subAccounts.put(d.getUsername(), a);
-                StorageService.getInstance().addAccountToSubAccounts(a);
-
-            }
-            System.out.println(d.getUsername());
-        }
-        StorageService.getInstance().addAccountToUserAccounts(account);
-    }
+//    private void createSubWallets(Account account, String passphrase) {
+//
+//        Map subAccounts = account.getSubAccounts();
+//        for (Delegate d : selectedDelegates) {
+//            if (!subAccounts.containsKey(d.getUsername())) {
+//                Account a = AccountService.createAccount(passphrase + " " + d.getUsername());
+//                if (a.getVotedDelegates().size() == 0) {
+//                    Transaction tx = TransactionService.createTransaction(account.getAddress(), a.getAddress(), 2, "send to sub wallet to vote", passphrase);
+//                    String response = TransactionService.PostTransaction(tx);
+//                    try {
+//                        int counter = 0;
+//                        while (!response.contains("success") && ++counter <= 10) {
+//                            System.out.println("wait for successful transaction");
+//                            response = TransactionService.PostTransaction(tx);
+//                        }
+//
+//                        tx = TransactionService.createVote(a.getAddress(), d.getUsername(), passphrase + " " + d.getUsername(), false);
+//                        response = TransactionService.PostTransaction(tx);
+//                        counter = 0;
+//                        while (!response.contains("success") && ++counter <= 10) {
+//                            System.out.println("wait for successful transaction");
+//                            response = TransactionService.PostTransaction(tx);
+//                        }
+//                        a.getVotedDelegates().add(d);
+//
+//                    } catch (Exception ex) {
+//                        Logger.getLogger(FXMLDelegatesViewController.class.getName()).log(Level.SEVERE, null, ex);
+//                    }
+//                }
+//                a.setMasterAccountAddress(account.getAddress());
+//                subAccounts.put(d.getUsername(), a);
+//                StorageService.getInstance().addAccountToSubAccounts(a);
+//
+//            }
+//            System.out.println(d.getUsername());
+//        }
+//        StorageService.getInstance().addAccountToUserAccounts(account);
+//    }
 
     private void runOptimization(Account account, String passphrase, Double masterWalletPercentage) {
         int walletsVotes = 0;

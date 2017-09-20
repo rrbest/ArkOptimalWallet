@@ -53,8 +53,13 @@ public class FXMLImportAccountController implements Initializable {
     @FXML
     private void OnImportAccount(ActionEvent event) {
         Account account = StorageService.getInstance().checkIfAccountExistByPassphrase(accountPassphrase.getText());
-        if (account == null){
+        int counter = 0;
+        while (account == null && ++counter<=10){
             account = AccountService.createAccount(accountPassphrase.getText());
+        }
+        if(account == null){
+            new AlertController().alertUser("Network may be unavailable");
+            return;
         }
         accountMenuController.updateMyAccounts(account);
         closeWindow();

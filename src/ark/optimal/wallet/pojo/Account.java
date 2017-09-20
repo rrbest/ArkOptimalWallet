@@ -9,13 +9,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
  * @author Mastadon
  */
 public class Account {
-    
+
     private String username;
     private String address;
     private String publicKey;
@@ -24,17 +25,17 @@ public class Account {
     private List<Transaction> transactions;
     private List<Delegate> votedDelegates;
 
-    public Account getMasterAccount() {
-        return masterAccount;
-    }
-
-    public void setMasterAccount(Account masterAccount) {
-        this.masterAccount = masterAccount;
-    }
-
     private Map<String, Account> subAccounts;
-    private Account masterAccount;
-    
+    private String masterAccountAddress;
+
+    public String getMasterAccountAddress() {
+        return masterAccountAddress;
+    }
+
+    public void setMasterAccountAddress(String masterAccountAddress) {
+        this.masterAccountAddress = masterAccountAddress;
+    }
+
     public List<Delegate> getVotedDelegates() {
         return votedDelegates;
     }
@@ -50,7 +51,6 @@ public class Account {
     public void setVotedDelegates(List<Delegate> votedDelegates) {
         this.votedDelegates = votedDelegates;
     }
-   
 
     public List<Transaction> getTransactions() {
         return transactions;
@@ -59,13 +59,13 @@ public class Account {
     public void setTransactions(List<Transaction> transactions) {
         this.transactions = transactions;
     }
-    
+
     public Account(String username, String address, String publicKey, Double balance) {
         this.username = username;
         this.address = address;
         this.publicKey = publicKey;
         this.balance = balance;
-        subAccounts = new HashMap<String, Account>();
+        subAccounts = new ConcurrentHashMap<String, Account>();
         votedDelegates = new ArrayList<Delegate>();
     }
 
@@ -100,6 +100,5 @@ public class Account {
     public void setBalance(Double balance) {
         this.balance = balance;
     }
-    
-    
+
 }

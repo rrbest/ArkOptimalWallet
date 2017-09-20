@@ -14,6 +14,8 @@ import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -66,12 +68,18 @@ public class FXMLAccountsViewMenuController implements Initializable {
 
     private FXMLAccountViewController accountViewController;
 
+    private Map<String, Account> masterAccounts;
+    private Map<String, Account> subAccounts;
+
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+        masterAccounts = new HashMap<String, Account>();
+        subAccounts = new HashMap<String, Account>();
+
         myAcountsListView.setEditable(true);
         myAcountsListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         myAcountsListView.setCellFactory(myAcountsListView -> new JFXListCell<AccountItem>() {
@@ -206,7 +214,7 @@ public class FXMLAccountsViewMenuController implements Initializable {
             StorageService.getInstance().addAccountToUserAccounts(account);
             myAcountsListView.getItems().add(new AccountItem(account.getUsername(), account.getAddress()));
         }
-
+        masterAccounts.put(account.getAddress(), account);
         myAcountsListView.requestFocus();
         myAcountsListView.getSelectionModel().select(new AccountItem(account.getUsername(), account.getAddress()));
         //myAcountsListView.getSelectionModel().select(0);
@@ -224,7 +232,8 @@ public class FXMLAccountsViewMenuController implements Initializable {
                 Account sub = account.getSubAccounts().get(delegateName);
                 sub.setUsername(account.getUsername() + " (" + delegateName + ")");
                 subAcountsListView.getItems().add(new AccountItem(sub.getUsername(), sub.getAddress()));
-                StorageService.getInstance().addAccountToSubAccounts(sub);
+                //StorageService.getInstance().addAccountToSubAccounts(sub);
+                subAccounts.put(sub.getAddress(), sub);
             }
             sendToMaster.setVisible(true);
         }
@@ -338,7 +347,11 @@ public class FXMLAccountsViewMenuController implements Initializable {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLSubWalletManagerView.fxml"));
             Parent root1 = (Parent) fxmlLoader.load();
-            ((FXMLSubWalletManagerViewController) fxmlLoader.getController()).setAccountMenuController(this);
+            FXMLSubWalletManagerViewController subwalletManager = ((FXMLSubWalletManagerViewController) fxmlLoader.getController());
+            subwalletManager.setAccountMenuController(this);
+            AccountItem ai = myAcountsListView.getSelectionModel().getSelectedItem();
+            Account account = StorageService.getInstance().getWallet().getUserAccounts().get(ai.getAddress());
+            subwalletManager.selectMasterAccount(account);
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.initStyle(StageStyle.UNDECORATED);
@@ -355,6 +368,7 @@ public class FXMLAccountsViewMenuController implements Initializable {
     private void handleSubAccountMouseClick(MouseEvent event) {
         String address = subAcountsListView.getSelectionModel().getSelectedItem().getAddress();
         Account subAccount = StorageService.getInstance().getWallet().getSubAccounts().get(address);
+        //Account subAccount = subAccounts.get(address);
         accountViewController.selectSubAccount(subAccount);
 
     }
@@ -369,16 +383,18 @@ public class FXMLAccountsViewMenuController implements Initializable {
             String address = null;
             Account account = null;
             AccountItem accountItem = myAcountsListView.getSelectionModel().getSelectedItem();
-            if (accountItem != null){
-               address = accountItem.getAddress();
-               account = StorageService.getInstance().getWallet().getUserAccounts().get(address);
-            }else{
+            if (accountItem != null) {
+                address = accountItem.getAddress();
+                account = StorageService.getInstance().getWallet().getUserAccounts().get(address);
+            } else {
                 accountItem = subAcountsListView.getSelectionModel().getSelectedItem();
                 address = accountItem.getAddress();
-                account = StorageService.getInstance().getWallet().getSubAccounts().get(address);
-                account = account.getMasterAccount();
+                //account = subAccounts.get(address);
+                //account = StorageService.getInstance().getWallet().getUserAccounts().get(account.getMasterAccountAddress());
+                Account sub = StorageService.getInstance().getWallet().getSubAccounts().get(address);
+                account = StorageService.getInstance().getWallet().getUserAccounts().get(sub.getMasterAccountAddress());
             }
-            
+
             sendController.updateSubWalletsTable(account);
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
