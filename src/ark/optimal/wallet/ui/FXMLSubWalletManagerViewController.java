@@ -314,7 +314,7 @@ public class FXMLSubWalletManagerViewController implements Initializable {
             stage.setScene(new Scene(root1));
             stage.show();
         } catch (IOException ex) {
-            Logger.getLogger(FXMLAccountsViewMenuController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FXMLSubWalletManagerViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         //closeWindow();
@@ -381,7 +381,9 @@ public class FXMLSubWalletManagerViewController implements Initializable {
 
     @FXML
     private void onClose(ActionEvent event) {
-        accountsViewMenuController.selectAccountItem(this.selectedAccount);
+        if(this.selectedAccount != null){
+            accountsViewMenuController.selectAccountItem(this.selectedAccount);
+        }
         closeWindow();
     }
 
@@ -463,7 +465,7 @@ public class FXMLSubWalletManagerViewController implements Initializable {
             stage.setScene(new Scene(root1));
             stage.show();
         } catch (IOException ex) {
-            Logger.getLogger(FXMLAccountsViewMenuController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FXMLSubWalletManagerViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
@@ -516,7 +518,7 @@ public class FXMLSubWalletManagerViewController implements Initializable {
             stage.setScene(new Scene(root1));
             stage.show();
         } catch (IOException ex) {
-            Logger.getLogger(FXMLAccountsViewMenuController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FXMLSubWalletManagerViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
@@ -569,7 +571,7 @@ public class FXMLSubWalletManagerViewController implements Initializable {
             runOptimization(selectedAccount, masterPassphrase.getText());
 
         } catch (Exception ex) {
-            Logger.getLogger(FXMLAccountsViewMenuController.class
+            Logger.getLogger(FXMLSubWalletManagerViewController.class
                     .getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -618,7 +620,7 @@ public class FXMLSubWalletManagerViewController implements Initializable {
             stage.show();
 
         } catch (IOException ex) {
-            Logger.getLogger(FXMLAccountsViewMenuController.class
+            Logger.getLogger(FXMLSubWalletManagerViewController.class
                     .getName()).log(Level.SEVERE, null, ex);
         }
     }

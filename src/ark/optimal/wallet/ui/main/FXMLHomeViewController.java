@@ -181,6 +181,7 @@ public class FXMLHomeViewController implements Initializable {
 
     public void viewHome() {
         homeAccounts.getItems().clear();
+        mainController.clearAccountsMenu();
         for (String address : StorageService.getInstance().getWallet().getUserAccounts().keySet()) {
             Account account = StorageService.getInstance().getWallet().getUserAccounts().get(address);
             addToMyAccounts(account);
@@ -259,6 +260,7 @@ public class FXMLHomeViewController implements Initializable {
         File selectedFile = fileChooser.showOpenDialog(arkWalletApp.getMainStage());
         if (selectedFile != null) {
             StorageService.getInstance().loadWallet(selectedFile.getAbsolutePath().toString());
+            viewHome();
         }
     }
 

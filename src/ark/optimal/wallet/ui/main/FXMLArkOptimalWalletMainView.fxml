@@ -36,7 +36,7 @@
                <right>
                   <AnchorPane prefHeight="52.0" prefWidth="425.0" BorderPane.alignment="CENTER">
                      <children>
-                        <JFXButton fx:id="settingsBtn" alignment="CENTER" contentDisplay="CENTER" layoutX="112.0" layoutY="11.0" onAction="#onSettings" prefHeight="31.0" prefWidth="66.0">
+                        <JFXButton fx:id="settingsBtn" alignment="CENTER" contentDisplay="CENTER" layoutX="123.0" layoutY="11.0" onAction="#onSettings" prefHeight="31.0" prefWidth="66.0">
                            <graphic>
                               <FontAwesomeIconView fill="WHITE" glyphName="GEAR" size="20" />
                            </graphic>
@@ -60,7 +60,7 @@
                               </Tooltip>
                            </tooltip>
                         </JFXButton>
-                        <JFXButton fx:id="loadWalletBtn" alignment="CENTER" contentDisplay="CENTER" layoutX="261.0" layoutY="11.0" onAction="#onLoadWallet" prefHeight="31.0" prefWidth="66.0">
+                        <JFXButton fx:id="loadWalletBtn" alignment="CENTER" contentDisplay="CENTER" layoutX="260.0" layoutY="11.0" onAction="#onLoadWallet" prefHeight="31.0" prefWidth="66.0">
                            <graphic>
                               <FontAwesomeIconView fill="WHITE" glyphName="FOLDER_OPEN" size="20" />
                            </graphic>
@@ -72,7 +72,7 @@
                               </Tooltip>
                            </tooltip>
                         </JFXButton>
-                        <JFXButton fx:id="exportWalletBtn" alignment="CENTER" contentDisplay="CENTER" layoutX="335.0" layoutY="11.0" onAction="#onExportWallet" prefHeight="31.0" prefWidth="66.0">
+                        <JFXButton fx:id="exportWalletBtn" alignment="CENTER" contentDisplay="CENTER" layoutX="329.0" layoutY="11.0" onAction="#onExportWallet" prefHeight="31.0" prefWidth="66.0">
                            <graphic>
                               <FontAwesomeIconView fill="WHITE" glyphName="ARROW_CIRCLE_UP" size="20" />
                            </graphic>

@@ -84,7 +84,7 @@
             </ImageView>
          </graphic>
       </JFXButton>
-      <JFXButton fx:id="settingsBtn" alignment="CENTER" contentDisplay="CENTER" layoutX="1083.0" layoutY="11.0" onAction="#onSettings" prefHeight="31.0" prefWidth="66.0">
+      <JFXButton fx:id="settingsBtn" alignment="CENTER" contentDisplay="CENTER" layoutX="1102.0" layoutY="11.0" onAction="#onSettings" prefHeight="31.0" prefWidth="66.0">
          <graphic>
             <FontAwesomeIconView fill="WHITE" glyphName="GEAR" size="20" />
          </graphic>
@@ -96,7 +96,7 @@
             </Tooltip>
          </tooltip>
       </JFXButton>
-      <JFXButton fx:id="saveWalletBtn" alignment="CENTER" contentDisplay="CENTER" layoutX="1165.0" layoutY="11.0" onAction="#onSaveWallet" prefHeight="31.0" prefWidth="66.0">
+      <JFXButton fx:id="saveWalletBtn" alignment="CENTER" contentDisplay="CENTER" layoutX="1171.0" layoutY="11.0" onAction="#onSaveWallet" prefHeight="31.0" prefWidth="66.0">
          <graphic>
             <FontAwesomeIconView fill="WHITE" glyphName="SAVE" size="20" />
          </graphic>

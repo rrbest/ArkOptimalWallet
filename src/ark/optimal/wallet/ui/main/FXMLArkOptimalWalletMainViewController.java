@@ -144,8 +144,10 @@ public class FXMLArkOptimalWalletMainViewController implements Initializable {
 
     @FXML
     private void onHome(ActionEvent event) {
-        accountViewController.clearAccountsMenu();
         homeViewController.viewHome();
+    }
+    public void clearAccountsMenu(){
+        accountViewController.clearAccountsMenu();
     }
 
     public void runImportAccount() {
@@ -174,7 +176,6 @@ public class FXMLArkOptimalWalletMainViewController implements Initializable {
 
     @FXML
     private void onViewHome(ActionEvent event) {
-        accountViewController.clearAccountsMenu();
         homeViewController.viewHome();
     }
 
