@@ -36,23 +36,25 @@ public class FXMLArkOptimalWalletMainViewController implements Initializable {
     @FXML
     private JFXToolbar toolBar;
     @FXML
-    private HBox toolBarRight;
-    @FXML
-    private Label lblMenu;
-    @FXML
     private AnchorPane sideAnchor;
     @FXML
     private JFXButton btnAccounts;
     @FXML
     private JFXButton btnDelegateView;
     @FXML
-    private JFXButton btnProxyVoting;
-    @FXML
-    private JFXButton btnSettings;
-    @FXML
     private AnchorPane holderPane;
 
     private AnchorPane delegatesview, accountsview, proxyvotingview, settingsview;
+    @FXML
+    private JFXButton goHomeBtn;
+    @FXML
+    private JFXButton settingsBtn;
+    @FXML
+    private JFXButton saveWalletBtn;
+    @FXML
+    private JFXButton loadWalletBtn;
+    @FXML
+    private JFXButton exportWalletBtn;
 
     public FXMLAccountViewController getAccountViewController() {
         return accountViewController;
@@ -104,12 +106,10 @@ public class FXMLArkOptimalWalletMainViewController implements Initializable {
         setNode(delegatesview);
     }
 
-    @FXML
-    private void onProxyVotingView(ActionEvent event) {
-    }
 
     @FXML
     private void onSettings(ActionEvent event) {
+        homeViewController.showSettings();
     }
 
     private void createPages() {
@@ -126,10 +126,6 @@ public class FXMLArkOptimalWalletMainViewController implements Initializable {
         } catch (IOException ex) {
             Logger.getLogger(FXMLArkOptimalWalletMainViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-    }
-
-    private void updateDelegateView(String name) {
 
     }
 
@@ -151,13 +147,16 @@ public class FXMLArkOptimalWalletMainViewController implements Initializable {
         accountViewController.clearAccountsMenu();
         homeViewController.viewHome();
     }
-    public void runImportAccount(){
+
+    public void runImportAccount() {
         accountViewController.runImportAccount();
     }
-    public void runCreateAccount(){
+
+    public void runCreateAccount() {
         accountViewController.runCreateAccount();
     }
-    public void runWatchAccount(){
+
+    public void runWatchAccount() {
         accountViewController.runWatchAccount();
     }
 
@@ -168,9 +167,30 @@ public class FXMLArkOptimalWalletMainViewController implements Initializable {
     public void addToUserAccountsMenu(Account account) {
         accountViewController.addToUserAccountsMenu(account);
     }
-    
+
     public void addToWatchAccountsMenu(Account account) {
         accountViewController.addToWatchAccountsMenu(account);
     }
-   
+
+    @FXML
+    private void onViewHome(ActionEvent event) {
+        accountViewController.clearAccountsMenu();
+        homeViewController.viewHome();
+    }
+
+    @FXML
+    private void onSaveWallet(ActionEvent event) {
+        homeViewController.saveWallet();
+    }
+
+    @FXML
+    private void onLoadWallet(ActionEvent event) {
+        homeViewController.loadWallet();
+    }
+
+    @FXML
+    private void onExportWallet(ActionEvent event) {
+        homeViewController.exportWallet();
+    }
+
 }

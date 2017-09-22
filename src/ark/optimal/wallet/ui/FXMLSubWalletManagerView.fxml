@@ -12,9 +12,9 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="711.0" prefWidth="713.0" style="-fx-background-radius: 10;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ark.optimal.wallet.ui.FXMLSubWalletManagerViewController">
+<AnchorPane id="AnchorPane" prefHeight="711.0" prefWidth="919.0" style="-fx-background-radius: 10;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ark.optimal.wallet.ui.FXMLSubWalletManagerViewController">
    <children>
-      <Label prefHeight="52.0" prefWidth="740.0" style="-fx-alignment: LEFT_CENTER; -fx-background-radius: 5;" styleClass="toolbar" stylesheets="@main/custom.css" text="SubWallet Manager" textFill="#fffdfd">
+      <Label prefHeight="52.0" prefWidth="919.0" style="-fx-alignment: CENTER; -fx-background-radius: 5;" styleClass="toolbar" stylesheets="@main/custom.css" text="SubWallet Manager" textAlignment="CENTER" textFill="#fffdfd">
          <font>
             <Font name="System Bold" size="22.0" />
          </font>
@@ -22,12 +22,12 @@
             <Insets left="10.0" />
          </padding>
       </Label>
-      <JFXTextField fx:id="masterPassphrase" focusColor="#2d40eb" labelFloat="true" layoutX="19.0" layoutY="142.0" maxWidth="657.0" minWidth="214.0" prefHeight="36.0" prefWidth="657.0" promptText="Passphrase" unFocusColor="#f8f4f4">
+      <JFXTextField fx:id="masterPassphrase" focusColor="#2d40eb" labelFloat="true" layoutX="19.0" layoutY="142.0" maxWidth="845.0" minWidth="214.0" prefHeight="36.0" prefWidth="845.0" promptText="Passphrase" unFocusColor="#f8f4f4">
          <font>
             <Font name="Roboto Black" size="13.0" />
          </font>
       </JFXTextField>
-      <JFXButton fx:id="createImportSubWallets" layoutX="164.0" layoutY="659.0" onAction="#onCreateImportSubWallets" prefHeight="38.0" prefWidth="164.0" text="Create/Import" textFill="#634eda">
+      <JFXButton fx:id="createImportSubWallets" layoutX="175.0" layoutY="660.0" onAction="#onCreateImportSubWallets" prefHeight="38.0" prefWidth="156.0" text="Create/Import" textFill="#634eda">
          <font>
             <Font size="19.0" />
          </font>
@@ -35,7 +35,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </JFXButton>
-      <JFXButton fx:id="close" layoutX="626.0" layoutY="660.0" onAction="#onClose" prefHeight="35.0" prefWidth="97.0" text="Close" textFill="#634eda">
+      <JFXButton fx:id="close" layoutX="784.0" layoutY="663.0" onAction="#onClose" prefHeight="35.0" prefWidth="97.0" text="Close" textFill="#634eda">
          <font>
             <Font size="18.0" />
          </font>
@@ -43,15 +43,15 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </JFXButton>
-      <JFXComboBox fx:id="accounts" focusColor="#1547dd" layoutX="21.0" layoutY="76.0" prefHeight="36.0" prefWidth="636.0" promptText="Choose Master Wallet" unFocusColor="#f8f4f4" />
-      <AnchorPane layoutX="19.0" layoutY="197.0" prefHeight="106.0" prefWidth="681.0" style="-fx-background-color: rgb(0, 115, 183,0.6); -fx-effect: dropshadow(gaussian, rgb(0.0, 0.0, 0.0, 0.15), 6.0, 0.7, 0.0,1.5); -fx-background-radius: 5;">
+      <JFXComboBox fx:id="accounts" focusColor="#1547dd" layoutX="21.0" layoutY="76.0" prefHeight="36.0" prefWidth="834.0" promptText="Choose Master Wallet" unFocusColor="#f8f4f4" />
+      <AnchorPane layoutX="19.0" layoutY="197.0" prefHeight="106.0" prefWidth="860.0" style="-fx-background-color: rgb(0, 115, 183,0.6); -fx-effect: dropshadow(gaussian, rgb(0.0, 0.0, 0.0, 0.15), 6.0, 0.7, 0.0,1.5); -fx-background-radius: 5;">
          <children>
-            <JFXTextField fx:id="delegateNameOrPublicKey" focusColor="#fcfcfc" labelFloat="true" layoutX="15.0" layoutY="42.0" maxWidth="552.0" minWidth="214.0" prefHeight="31.0" prefWidth="497.0" promptText="Search by name or public key " unFocusColor="WHITE">
+            <JFXTextField fx:id="delegateNameOrPublicKey" focusColor="#fcfcfc" labelFloat="true" layoutX="15.0" layoutY="42.0" maxWidth="693.0" minWidth="214.0" prefHeight="31.0" prefWidth="693.0" promptText="Search by name or public key " unFocusColor="WHITE">
                <font>
                   <Font name="Roboto Black" size="13.0" />
                </font>
             </JFXTextField>
-            <JFXButton fx:id="delegateSearch" buttonType="RAISED" layoutX="560.0" layoutY="53.0" onAction="#onSearch" prefHeight="30.0" prefWidth="85.0" style="-fx-background-color: #0073B7;" text="Search" textFill="#fffefe">
+            <JFXButton fx:id="delegateSearch" buttonType="RAISED" layoutX="736.0" layoutY="43.0" onAction="#onSearch" prefHeight="30.0" prefWidth="85.0" style="-fx-background-color: #0073B7;" text="Search" textFill="#fffefe">
                <font>
                   <Font name="Roboto Black" size="13.0" />
                </font>
@@ -61,17 +61,20 @@
             </JFXButton>
          </children>
       </AnchorPane>
-      <TableView fx:id="subWalletsTable" editable="true" layoutX="20.0" layoutY="323.0" prefHeight="327.0" prefWidth="689.0" stylesheets="@main/custom.css">
+      <TableView fx:id="subWalletsTable" editable="true" layoutX="20.0" layoutY="323.0" prefHeight="327.0" prefWidth="887.0" stylesheets="@main/custom.css">
          <columns>
             <TableColumn fx:id="_delegateChecked" prefWidth="36.0" />
             <TableColumn fx:id="_delegatename" prefWidth="106.99996948242188" text="Delegate" />
-            <TableColumn fx:id="_rank" prefWidth="77.0" text="Rank" />
-            <TableColumn fx:id="_subwallet" prefWidth="257.0" text="SubWallet" />
-            <TableColumn fx:id="_votes" prefWidth="111.0" text="Votes/Arks" />
-            <TableColumn fx:id="_payoutPercentage" prefWidth="93.0" text="Payout %" />
+            <TableColumn fx:id="_rank" prefWidth="57.0" text="Rank" />
+            <TableColumn fx:id="_subwallet" prefWidth="230.0" text="SubWallet" />
+            <TableColumn fx:id="_votes" prefWidth="105.0" text="Votes/Arks" />
+            <TableColumn fx:id="voted" editable="false" prefWidth="59.0" text="Voted" />
+            <TableColumn fx:id="_payoutPercentage" prefWidth="74.0" text="Payout %" />
+            <TableColumn fx:id="_delegateTotalVotes" prefWidth="85.0" text="Total Votes" />
+            <TableColumn fx:id="_delegateExcludedVotes" prefWidth="109.0" text="Excluded Votes" />
          </columns>
       </TableView>
-      <JFXButton fx:id="selectAll" layoutX="14.0" layoutY="660.0" onAction="#onSelectAll" prefHeight="38.0" prefWidth="137.0" text="Select All" textFill="#634eda">
+      <JFXButton fx:id="removeSelected" layoutX="14.0" layoutY="660.0" onAction="#onRemoveSelected" prefHeight="38.0" prefWidth="140.0" text="Remove" textFill="#634eda">
          <font>
             <Font size="19.0" />
          </font>
@@ -79,7 +82,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </JFXButton>
-      <JFXButton fx:id="voteBtn" layoutX="332.0" layoutY="660.0" onAction="#onSubWalletVote" prefHeight="38.0" prefWidth="85.0" text="Vote" textFill="#634eda">
+      <JFXButton fx:id="voteBtn" layoutX="348.0" layoutY="660.0" onAction="#onSubWalletVote" prefHeight="38.0" prefWidth="85.0" text="Vote" textFill="#634eda">
          <font>
             <Font size="19.0" />
          </font>
@@ -87,7 +90,15 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </JFXButton>
-      <JFXButton fx:id="sendToMasterBtn" layoutX="438.0" layoutY="660.0" onAction="#onSendToMaster" prefHeight="38.0" prefWidth="172.0" text="Send to Master" textFill="#634eda">
+      <JFXButton fx:id="sendToMasterBtn" layoutX="449.0" layoutY="662.0" onAction="#onSendToMaster" prefHeight="38.0" prefWidth="169.0" text="Send to Master" textFill="#634eda">
+         <font>
+            <Font size="19.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
+      <JFXButton fx:id="optimizeBtn" layoutX="631.0" layoutY="663.0" onAction="#onOptimize" prefHeight="30.0" prefWidth="156.0" style="-fx-background-color: #1E88E5;" text="Optimize" textFill="WHITE">
          <font>
             <Font size="19.0" />
          </font>

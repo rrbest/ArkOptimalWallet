@@ -9,7 +9,9 @@ import ark.optimal.wallet.pojo.Account;
 import ark.optimal.wallet.pojo.Delegate;
 import ark.optimal.wallet.services.accountservices.AccountService;
 import ark.optimal.wallet.services.networkservices.NetworkService;
+import ark.optimal.wallet.services.optimizationservices.OptimizationService;
 import ark.optimal.wallet.services.storageservices.StorageService;
+import ark.optimal.wallet.ui.main.HostServicesProvider;
 import com.google.gson.Gson;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
@@ -29,16 +31,23 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableCell;
@@ -48,7 +57,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
@@ -87,7 +98,6 @@ public class FXMLSubWalletManagerViewController implements Initializable {
     private JFXButton close;
     @FXML
     private TableColumn<SubWalletItem, Hyperlink> _subwallet;
-    @FXML
     private JFXButton selectAll;
     @FXML
     private JFXButton voteBtn;
@@ -99,6 +109,16 @@ public class FXMLSubWalletManagerViewController implements Initializable {
 
     private Map<String, SubWalletItem> subWalletsMap;
     private Account selectedAccount;
+    @FXML
+    private TableColumn<SubWalletItem, Boolean> voted;
+    @FXML
+    private TableColumn<SubWalletItem, Integer> _delegateTotalVotes;
+    @FXML
+    private TableColumn<SubWalletItem, Integer> _delegateExcludedVotes;
+    @FXML
+    private JFXButton optimizeBtn;
+    @FXML
+    private JFXButton removeSelected;
 
     /**
      * Initializes the controller class.
@@ -106,6 +126,7 @@ public class FXMLSubWalletManagerViewController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
+        subWalletsTable.setPlaceholder(new Label("Master Wallet has no Sub Wallets"));
         subWalletsMap = new HashMap<String, SubWalletItem>();
         selectedSubWallets = new ArrayList<SubWalletItem>();
         ObservableList<Account> userAccounts = FXCollections.observableArrayList();
@@ -126,6 +147,14 @@ public class FXMLSubWalletManagerViewController implements Initializable {
                         }
                     }
                 };
+            }
+        });
+
+        accounts.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
+            @Override
+            public void changed(ObservableValue observableValue, Object oldAccount, Object newAccount) {
+                //newAccount = (Account)newAccount;
+                selectMasterAccount((Account) newAccount);
             }
         });
         //selected value showed in combo box
@@ -153,7 +182,6 @@ public class FXMLSubWalletManagerViewController implements Initializable {
         _subwallet.setCellFactory(new FXMLSubWalletManagerViewController.HyperlinkCell());
 
         _delegateChecked.setCellValueFactory(new PropertyValueFactory<SubWalletItem, Boolean>("checked"));
-
         _delegateChecked.setCellFactory(p -> {
             CheckBox checkBox = new CheckBox();
             TableCell<SubWalletItem, Boolean> tableCell = new TableCell<SubWalletItem, Boolean>() {
@@ -188,14 +216,41 @@ public class FXMLSubWalletManagerViewController implements Initializable {
 
         _delegateChecked.setEditable(true);
 
-        // intialize from storage 
-//        for (Delegate delegate : StorageService.getInstance().getWallet().getDelegates().values()) {
-//            SubWalletItem si = new SubWalletItem(delegate.getUsername(), delegate.getRate(), "", null, delegate.getPayoutPercentage());
-//            subWalletsTable.getItems().add(si);
-//            subWalletsMap.put(delegate.getUsername(), si);
-//
-//        }
-//        subWalletsTable.refresh();
+        CheckBox selectAllCB = new CheckBox();
+        selectAllCB.setUserData(this._delegateChecked);
+        selectAllCB.setOnAction(handleSelectAllCheckbox());
+        this._delegateChecked.setGraphic(selectAllCB);
+
+        voted.setCellValueFactory(new PropertyValueFactory<SubWalletItem, Boolean>("voted"));
+        voted.setCellFactory(p -> {
+            CheckBox checkBox = new CheckBox();
+            TableCell<SubWalletItem, Boolean> tableCell = new TableCell<SubWalletItem, Boolean>() {
+
+                @Override
+                protected void updateItem(Boolean item, boolean empty) {
+
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setGraphic(null);
+                    } else {
+                        setGraphic(checkBox);
+                        checkBox.setSelected(item);
+                        checkBox.setDisable(true);
+                    }
+                }
+            };
+
+            tableCell.setAlignment(Pos.CENTER);
+            tableCell.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+            return tableCell;
+        });
+
+        voted.setEditable(false);
+
+        _delegateTotalVotes.setCellValueFactory(new PropertyValueFactory<SubWalletItem, Integer>("delegateTotalVotes"));
+        _delegateExcludedVotes.setCellValueFactory(new PropertyValueFactory<SubWalletItem, Integer>("delegateExcludedVotes"));
+
     }
 
     void setAccountMenuController(FXMLAccountsViewMenuController accountsViewMenuController) {
@@ -215,70 +270,62 @@ public class FXMLSubWalletManagerViewController implements Initializable {
             return;
         }
 
+        List<Transaction> transactions = new ArrayList<Transaction>();
+        List<TransactionItem> transactionItems = new ArrayList<TransactionItem>();
+
         Account account = accounts.getValue();
         Map subAccounts = account.getSubAccounts();
         for (SubWalletItem si : selectedSubWallets) {
-            if (!subAccounts.containsKey(si.getDelegateName())) {
-                Account sub = AccountService.createAccount(masterPassphrase.getText() + " " + si.getDelegateName());
-                Delegate delegate = StorageService.getInstance().getWallet().getDelegates().get(si.getDelegateName());
-                if (sub.getVotedDelegates().size() == 0) {
-                    sendToSubwallet(account, sub, delegate);
-                }
-                sub.setMasterAccountAddress(account.getAddress());
-                subAccounts.put(delegate.getUsername(), sub);
-                StorageService.getInstance().addAccountToUserAccounts(account);
+            TransactionItem ti = new TransactionItem("---", account.getUsername(), account.getUsername() + "(" + si.getDelegateName() + ")", 0.0, 0.0, "SubWallet created/imported");
 
-                StorageService.getInstance().addAccountToSubAccounts(sub);
-
+            // if (!subAccounts.containsKey(si.getDelegateName())) {
+            Account sub = AccountService.createAccount(masterPassphrase.getText() + " " + si.getDelegateName());
+            sub.setUsername(account.getUsername() + "(" + si.getDelegateName() + ")");
+            Delegate delegate = StorageService.getInstance().getWallet().getDelegates().get(si.getDelegateName());
+            if (sub.getVotedDelegates().size() == 0) {
+                Transaction tx = TransactionService.createTransaction(account.getAddress(), sub.getAddress(), 2, "send to sub wallet to vote", masterPassphrase.getText());
+                transactions.add(tx);
+                ti = new TransactionItem(tx.getId(), account.getUsername(), sub.getUsername(), 2.0, 0.1, "send to sub wallet to vote");
+                //sendToSubwallet(account, sub, delegate);
             }
+            sub.setMasterAccountAddress(account.getAddress());
+            subAccounts.put(delegate.getUsername(), sub);
+            StorageService.getInstance().addAccountToUserAccounts(account, true);
+            StorageService.getInstance().addAccountToSubAccounts(sub);
+
+            //  }
+            transactionItems.add(ti);
+
         }
-        StorageService.getInstance().addAccountToUserAccounts(account);
+        StorageService.getInstance().addAccountToUserAccounts(account, true);
         this.accountsViewMenuController.selectAccountItem(account);
-        closeWindow();
+
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLSubWalletTransactionsView.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            FXMLSubWalletTransactionsViewController createSubWalletViewController = ((FXMLSubWalletTransactionsViewController) fxmlLoader.getController());
+            //createSubWalletViewController.setAccountSubWalletManagerController(this);
+            createSubWalletViewController.setTransactions(transactions);
+            createSubWalletViewController.setTransactionItems(transactionItems);
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.setTitle("C");
+            stage.setScene(new Scene(root1));
+            stage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLAccountsViewMenuController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        //closeWindow();
     }
 
     public void sendToSubwallet(Account account, Account sub, Delegate delegate) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(() -> {
-            try {
-                Transaction tx = TransactionService.createTransaction(account.getAddress(), sub.getAddress(), 2, "send to sub wallet to vote", masterPassphrase.getText());
-                TransactionService.broadcastTransaction(tx);
-
-//                Thread.sleep(8000); // wait to confirm
-//                Account newSub = null;
-//                int counter = 0;
-//                while (newSub == null && ++counter <= 10) {
-//                    newSub = AccountService.getFullAccount(sub.getAddress());
-//                }
-//                if (newSub == null) {
-//                    return;
-//                }
-//
-//                if (newSub.getBalance() > 1) {
-//                    tx = TransactionService.createVote(sub.getAddress(), delegate.getUsername(), masterPassphrase.getText() + " " + delegate.getUsername(), false);
-//                    TransactionService.broadcastTransaction(tx);
-//                    counter = 0;
-//                    newSub = null;
-//                    while (newSub == null && ++counter <= 10) {
-//                        newSub = AccountService.getFullAccount(sub.getAddress());
-//                    }
-//                    if (newSub == null) {
-//                        return;
-//                    }
-//                    if (newSub.getVotedDelegates().size() > 0) {
-//                        sub.getVotedDelegates().add(delegate);
-//                    }
-//                }
-            } catch (Exception ex) {
-                Logger.getLogger(FXMLDelegatesViewController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-        });
-
+        Transaction tx = TransactionService.createTransaction(account.getAddress(), sub.getAddress(), 2, "send to sub wallet to vote", masterPassphrase.getText());
+        TransactionService.broadcastTransaction(tx);
     }
 
-    private void onCreateImportSubWalletsCancel(ActionEvent event
-    ) {
+    private void onCreateImportSubWalletsCancel(ActionEvent event) {
         closeWindow();
     }
 
@@ -300,10 +347,14 @@ public class FXMLSubWalletManagerViewController implements Initializable {
             }
             String subWalletName = this.selectedAccount.getUsername() + "(" + d.getUsername() + ")";
             si = new SubWalletItem(d.getUsername(), d.getRate(), subWalletName, 0, d.getPayoutPercentage());
-            si.setChecked(Boolean.TRUE);
+            si.setChecked(Boolean.FALSE);
+            si.setVoted(Boolean.FALSE);
+            si.setDelegateTotalVotes(d.getVote());
+            si.setDelegateExcludedVotes(new Double(d.getVote() * d.getExlcudedPercentage() / 100.0).intValue());
+
             subWalletsTable.getItems().add(si);
             subWalletsMap.put(d.getUsername(), si);
-            StorageService.getInstance().addDelegate(d);
+            StorageService.getInstance().addDelegate(d, true);
 
         }
 
@@ -330,20 +381,18 @@ public class FXMLSubWalletManagerViewController implements Initializable {
 
     @FXML
     private void onClose(ActionEvent event) {
+        accountsViewMenuController.selectAccountItem(this.selectedAccount);
         closeWindow();
     }
 
-    @FXML
-    private void onSelectAll(ActionEvent event) {
+    private void selectAll(Boolean select) {
         selectedSubWallets.clear();
-        if (selectAll.getText().equals("Select All")) {
-            selectAll.setText("De-Select All");
+        if (select) {
             for (SubWalletItem si : subWalletsTable.getItems()) {
                 si.setChecked(Boolean.TRUE);
                 selectedSubWallets.add(si);
             }
         } else {
-            selectAll.setText("Select All");
             for (SubWalletItem si : subWalletsTable.getItems()) {
                 si.setChecked(Boolean.FALSE);
             }
@@ -351,36 +400,285 @@ public class FXMLSubWalletManagerViewController implements Initializable {
         subWalletsTable.refresh();
     }
 
+    private EventHandler<ActionEvent> handleSelectAllCheckbox() {
+
+        return new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                CheckBox cb = (CheckBox) event.getSource();
+                TableColumn column = (TableColumn) cb.getUserData();
+                if (cb.isSelected()) {
+                    selectAll(true);
+                } else {
+                    selectAll(false);
+                }
+
+            }
+        };
+    }
+
     @FXML
     private void onSubWalletVote(ActionEvent event) {
+
+        if (accounts.getValue() == null) {
+
+            new AlertController().alertUser("Please select master wallet");
+            return;
+        }
+        if (masterPassphrase.getText() == null || masterPassphrase.getText().equals("")) {
+            new AlertController().alertUser("Please enter master passphrase");
+            return;
+        }
+
+        List<Transaction> transactions = new ArrayList<Transaction>();
+        List<TransactionItem> transactionItems = new ArrayList<TransactionItem>();
+
+        Account account = accounts.getValue();
+        Map<String, Account> subAccounts = account.getSubAccounts();
+        for (SubWalletItem si : selectedSubWallets) {
+            Account sub = subAccounts.get(si.getDelegateName());
+            Delegate delegate = StorageService.getInstance().getWallet().getDelegates().get(si.getDelegateName());
+            TransactionItem ti = new TransactionItem("---", sub.getUsername(), sub.getUsername(), 0.0, 0.0, "Already voted");
+
+            if (sub.getVotedDelegates().size() == 0) {
+                Transaction tx = TransactionService.createVote(sub.getAddress(), si.getDelegateName(), masterPassphrase.getText() + " " + si.getDelegateName(), false);
+                transactions.add(tx);
+                ti = new TransactionItem(tx.getId(), sub.getUsername(), sub.getUsername(), 0.0, 1.0, "vote to delegate");
+            }
+            transactionItems.add(ti);
+
+        }
+
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLSubWalletVotesView.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            FXMLSubWalletVotesViewController subWalletVotesViewController = ((FXMLSubWalletVotesViewController) fxmlLoader.getController());
+            //createSubWalletViewController.setAccountSubWalletManagerController(this);
+            subWalletVotesViewController.setTransactions(transactions);
+            subWalletVotesViewController.setTransactionItems(transactionItems);
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.setTitle("C");
+            stage.setScene(new Scene(root1));
+            stage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLAccountsViewMenuController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     @FXML
     private void onSendToMaster(ActionEvent event) {
+
+        if (accounts.getValue() == null) {
+
+            new AlertController().alertUser("Please select master wallet");
+            return;
+        }
+        if (masterPassphrase.getText() == null || masterPassphrase.getText().equals("")) {
+            new AlertController().alertUser("Please enter master passphrase");
+            return;
+        }
+
+        List<Transaction> transactions = new ArrayList<Transaction>();
+        List<TransactionItem> transactionItems = new ArrayList<TransactionItem>();
+
+        Account account = accounts.getValue();
+        Map<String, Account> subAccounts = account.getSubAccounts();
+        for (SubWalletItem si : selectedSubWallets) {
+            Account sub = subAccounts.get(si.getDelegateName());
+            Delegate delegate = StorageService.getInstance().getWallet().getDelegates().get(si.getDelegateName());
+            TransactionItem ti = new TransactionItem("---", sub.getAddress(), sub.getAddress(), 0.0, 0.0, "Insufficient Balance to transfer");
+
+            if (sub.getBalance() > 1.1) {
+                Integer amount = sub.getBalance().intValue();
+                Transaction tx = TransactionService.createTransaction(sub.getAddress(), account.getAddress(), amount, "send to Master", masterPassphrase.getText() + " " + si.getDelegateName());
+                transactions.add(tx);
+                ti = new TransactionItem(tx.getId(), sub.getUsername(), account.getUsername(), amount.doubleValue(), 0.1, "send to Master");
+
+            }
+            transactionItems.add(ti);
+
+        }
+
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLSubWalletTransactionsView.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            FXMLSubWalletTransactionsViewController createSubWalletViewController = ((FXMLSubWalletTransactionsViewController) fxmlLoader.getController());
+            //createSubWalletViewController.setAccountSubWalletManagerController(this);
+            createSubWalletViewController.setTransactions(transactions);
+            createSubWalletViewController.setTransactionItems(transactionItems);
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.setTitle("C");
+            stage.setScene(new Scene(root1));
+            stage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLAccountsViewMenuController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     void selectMasterAccount(Account account) {
+        subWalletsTable.getItems().clear();
+        subWalletsMap.clear();
+        selectedSubWallets.clear();
         if (account == null) {
             return;
         }
         this.selectedAccount = account;
-        accounts.getSelectionModel().select(account);
         for (Map.Entry<String, Account> entry : account.getSubAccounts().entrySet()) {
             Boolean checked = false;
             String delegateName = entry.getKey();
             Account subAccount = entry.getValue();
-            if (entry.getValue().getVotedDelegates().size() > 0) {
-                checked = true;
-            }
             Delegate delegate = StorageService.getInstance().getWallet().getDelegates().get(delegateName);
             SubWalletItem si = new SubWalletItem(delegateName, delegate.getRate(), subAccount.getUsername(), subAccount.getBalance().intValue(), delegate.getPayoutPercentage());
+            if (entry.getValue().getVotedDelegates().size() > 0) {
+                checked = true;
+                this.selectedSubWallets.add(si);
+            }
             si.setChecked(checked);
+            si.setVoted(checked);
+            si.setDelegateTotalVotes(delegate.getVote());
+            si.setDelegateExcludedVotes(new Double(delegate.getVote() * delegate.getExlcudedPercentage() / 100.0).intValue());
             subWalletsTable.getItems().add(si);
             subWalletsMap.put(delegate.getUsername(), si);
 
         }
-
         subWalletsTable.refresh();
+        accounts.getSelectionModel().select(account);
+
+    }
+
+    @FXML
+    private void onOptimize(ActionEvent event) {
+
+        if (accounts.getValue() == null) {
+
+            new AlertController().alertUser("Please select master wallet");
+            return;
+        }
+        if (masterPassphrase.getText() == null || masterPassphrase.getText().equals("")) {
+            new AlertController().alertUser("Please enter master passphrase");
+            return;
+        }
+
+        try {
+            runOptimization(selectedAccount, masterPassphrase.getText());
+
+        } catch (Exception ex) {
+            Logger.getLogger(FXMLAccountsViewMenuController.class
+                    .getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    private void runOptimization(Account account, String passphrase) {
+        int walletsVotes = 0;
+        for (String delegateName : account.getSubAccounts().keySet()) {
+            Account subaccount = account.getSubAccounts().get(delegateName);
+            subaccount = AccountService.getAccount(subaccount.getAddress());
+            Double walletVotes = subaccount.getBalance() - 1;
+            if (walletVotes != null && walletVotes > 0) {
+                walletsVotes += walletVotes.intValue();
+            }
+
+        }
+        Account acc = AccountService.getAccount(account.getAddress());
+        walletsVotes += acc.getBalance().intValue();
+        //walletsVotes = new Double((masterWalletPercentage/100.0) * walletsVotes).intValue();
+        List<Delegate> selectedDelegates = new ArrayList<Delegate>();
+        Map<String, Account> subAccounts = account.getSubAccounts();
+        for (SubWalletItem si : selectedSubWallets) {
+            Account sub = subAccounts.get(si.getDelegateName());
+            Delegate delegate = StorageService.getInstance().getWallet().getDelegates().get(si.getDelegateName());
+            selectedDelegates.add(delegate);
+        }
+        //walletsVotes = 150000;
+        Map<String, Double> votes = OptimizationService.runConvexOptimizattion(walletsVotes, selectedDelegates);
+        runOptimizationReport(account, passphrase, votes);
+        return;
+    }
+
+    private void runOptimizationReport(Account account, String passphrase, Map<String, Double> votes) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLOptimizationReportView.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            FXMLOptimizationReportViewController optReportController = (FXMLOptimizationReportViewController) fxmlLoader.getController();
+            optReportController.setSubWalletManagerController(this);
+            optReportController.updateReport(account, passphrase, votes);
+            //updateVoteController.setDelegateName(_delegatestable.getSelectionModel().getSelectedItem().getUsername());
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.setTitle("C");
+            stage.setScene(new Scene(root1));
+            stage.show();
+
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLAccountsViewMenuController.class
+                    .getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void executeOptimizationTrades(Account account, String passphrase, Map<String, Double> votes) {
+
+        // send new votes to subwallets
+        try {
+            List<Transaction> transactions = new ArrayList<Transaction>();
+            List<TransactionItem> transactionItems = new ArrayList<TransactionItem>();
+
+            Map<String, Account> subAccounts = account.getSubAccounts();
+            for (SubWalletItem si : selectedSubWallets) {
+                Account sub = subAccounts.get(si.getDelegateName());
+                TransactionItem ti = new TransactionItem("---", account.getUsername(), sub.getUsername(), 0.0, 0.0, "Zero Votes/Arks to transfer");
+                Double vote = votes.get(si.getDelegateName());
+
+                if (vote >= 1) {
+                    Transaction tx = TransactionService.createTransaction(account.getAddress(), sub.getAddress(), vote.longValue(), "send opt vote to SubWallet", masterPassphrase.getText());
+                    transactions.add(tx);
+                    ti = new TransactionItem(tx.getId(), account.getUsername(), sub.getUsername(), vote, 0.1, "send to Subwallet");
+
+                }
+                transactionItems.add(ti);
+
+            }
+
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLSubWalletTransactionsView.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            FXMLSubWalletTransactionsViewController createSubWalletViewController = ((FXMLSubWalletTransactionsViewController) fxmlLoader.getController());
+            //createSubWalletViewController.setAccountSubWalletManagerController(this);
+            createSubWalletViewController.setTransactions(transactions);
+            createSubWalletViewController.setTransactionItems(transactionItems);
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.setTitle("C");
+            stage.setScene(new Scene(root1));
+            stage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLAccountsViewMenuController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(FXMLDelegatesViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    @FXML
+    private void onRemoveSelected(ActionEvent event) {
+        Account master = this.selectedAccount;
+        Map<String, Account> subs = master.getSubAccounts();
+        for (SubWalletItem si : selectedSubWallets) {
+            String delegateName = si.getDelegateName();
+            subs.remove(delegateName);
+            subWalletsTable.getItems().remove(si);
+            subWalletsMap.remove(delegateName);
+        }
+        master.setSubAccounts(subs);
+        StorageService.getInstance().addAccountToUserAccounts(master, true);
+
     }
 
     private class HyperlinkCell implements Callback<TableColumn<SubWalletItem, Hyperlink>, TableCell<SubWalletItem, Hyperlink>> {
@@ -398,14 +696,10 @@ public class FXMLSubWalletManagerViewController implements Initializable {
                         setGraphic(item);
 
                         item.setOnAction(t -> {
-                            URI u;
                             try {
-                                u = new URI(item.getText());
-                                java.awt.Desktop.getDesktop().browse(u);
-                            } catch (URISyntaxException ex) {
-                                Logger.getLogger(FXMLAccountViewController.class.getName()).log(Level.SEVERE, null, ex);
-                            } catch (IOException ex) {
-                                Logger.getLogger(FXMLAccountViewController.class.getName()).log(Level.SEVERE, null, ex);
+                                HostServicesProvider.getInstance().getHostServices().showDocument("https://explorer.ark.io/");
+                            } catch (Exception ex) {
+                                Logger.getLogger(FXMLOptimizationReportViewController.class.getName()).log(Level.SEVERE, null, ex);
                             }
 
                         });

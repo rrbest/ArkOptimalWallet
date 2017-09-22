@@ -42,5 +42,23 @@ public class AlertController {
                     .getName()).log(Level.SEVERE, null, ex);
         }
     }
+    public void successMessage(String message){
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLAlertSuccessView.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            FXMLAlertViewController alertViewController = (FXMLAlertViewController) fxmlLoader.getController();
+            alertViewController.setMessage(message);
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.setTitle("C");
+            stage.setScene(new Scene(root1));
+            stage.show();
+
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLAccountsViewMenuController.class
+                    .getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     
 }

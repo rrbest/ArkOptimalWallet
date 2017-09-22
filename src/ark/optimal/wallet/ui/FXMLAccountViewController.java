@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import javafx.animation.FadeTransition;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -39,6 +40,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.Tooltip;
@@ -56,6 +58,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.ScrollEvent;
 
 /**
  * FXML Controller class
@@ -113,11 +116,13 @@ public class FXMLAccountViewController implements Initializable {
         try {
             // TODO
             FXMLLoader loader = new FXMLLoader(getClass().getResource("FXMLAccountsViewMenu.fxml"));
-            VBox vb = loader.load();
+            ScrollPane sp = loader.load();
+            sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+            
             menuController = loader.getController();
             menuController.setAccountViewController(this);
 
-            accountsDrawer.setSidePane(vb);
+            accountsDrawer.setSidePane(sp);
 
             if (accountAddress.getText() != null && accountAddress.getText() != "") {
                 qrCodeGenerator = new QRCodeGenerator();
@@ -153,7 +158,7 @@ public class FXMLAccountViewController implements Initializable {
             content.putString(accountAddress.getText());
             clipboard.setContent(content);
             copyToCliboardLabel.setVisible(true);
-            
+
             FadeTransition fadeOut = new FadeTransition(Duration.millis(2000));
             fadeOut.setNode(copyToCliboardLabel);
             fadeOut.setFromValue(1.0);
@@ -162,7 +167,7 @@ public class FXMLAccountViewController implements Initializable {
             fadeOut.setAutoReverse(false);
             //copyToCliboardLabel.setVisible(false);
             fadeOut.playFromStart();
-            
+
             //TimeUnit.SECONDS.sleep(10);
             //copyToCliboardLabel.setVisible(false);
         } catch (Exception ex) {
@@ -190,11 +195,11 @@ public class FXMLAccountViewController implements Initializable {
         addQRCode(account.getAddress());
         setNode(transactionsView);
         menuController.selectAccountItem(account);
-        StorageService.getInstance().addAccountToUserAccounts(account);
+        StorageService.getInstance().addAccountToUserAccounts(account, true);
         btnTransactions.requestFocus();
 
     }
-    
+
     public void selectSubAccount(Account subAccount) {
         //String name = subAccount.getUsername();
         //subAccount = AccountService.getFullAccount(subAccount.getAddress());
@@ -216,10 +221,10 @@ public class FXMLAccountViewController implements Initializable {
         //Account account = AccountService.getFullAccount(accountAddress.getText());
         //List<Transaction> transactions = AccountService.getTransactions(accountAddress.getText(), 50);
         Account account = StorageService.getInstance().getWallet().getUserAccounts().get(accountAddress.getText());
-        if (account == null){
+        if (account == null) {
             String masterAccountAddress = this.account.getMasterAccountAddress();
-            if (masterAccountAddress != null){
-             /*   Account masterAccount = StorageService.getInstance().getWallet().getUserAccounts().get(masterAccountAddress);
+            if (masterAccountAddress != null) {
+                /*   Account masterAccount = StorageService.getInstance().getWallet().getUserAccounts().get(masterAccountAddress);
                 List<Account> subs = (List<Account>) masterAccount.getSubAccounts().values();
                 for (Account sub : subs){
                     if(sub.getAddress() == this.account.getAddress()){
@@ -228,11 +233,11 @@ public class FXMLAccountViewController implements Initializable {
                     }
                         
                 }
-               */
-             account = StorageService.getInstance().getWallet().getSubAccounts().get(accountAddress.getText());
+                 */
+                account = StorageService.getInstance().getWallet().getSubAccounts().get(accountAddress.getText());
             }
         }
-        if(account == null){
+        if (account == null) {
             account = AccountService.getFullAccount(accountAddress.getText());
         }
         transactionsViewController.updateTransactionsTable(account);
@@ -345,71 +350,4 @@ public class FXMLAccountViewController implements Initializable {
         menuController.clearAccountsMenu();
     }
 
-    private class HyperlinkCell implements Callback<TableColumn<TransactionItem, Hyperlink>, TableCell<TransactionItem, Hyperlink>> {
-
-        @Override
-        public TableCell<TransactionItem, Hyperlink> call(TableColumn<TransactionItem, Hyperlink> arg) {
-            TableCell<TransactionItem, Hyperlink> cell = new TableCell<TransactionItem, Hyperlink>() {
-                @Override
-                protected void updateItem(Hyperlink item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (item == null || empty) {
-                        setGraphic(null);
-                    } else {
-
-                        setGraphic(item);
-
-                        item.setOnAction(t -> {
-                            URI u;
-                            try {
-                                u = new URI("https://explorer.ark.io/tx/" + item.getText());
-                                java.awt.Desktop.getDesktop().browse(u);
-                            } catch (URISyntaxException ex) {
-                                Logger.getLogger(FXMLAccountViewController.class.getName()).log(Level.SEVERE, null, ex);
-                            } catch (IOException ex) {
-                                Logger.getLogger(FXMLAccountViewController.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-
-                        });
-                    }
-
-                }
-            };
-            return cell;
-        }
-    }
-
-    private class ColumnFormatter<S, T> implements Callback<TableColumn<S, T>, TableCell<S, T>> {
-
-        private final DateTimeFormatter formatter = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm");
-
-        public ColumnFormatter() {
-            super();
-        }
-
-        @Override
-        public TableCell<S, T> call(TableColumn<S, T> arg0) {
-            return new TableCell<S, T>() {
-                @Override
-                protected void updateItem(T item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (item == null || empty) {
-                        setGraphic(null);
-                    } else {
-                        String val = item.toString();
-                        if (item instanceof DateTime) {
-                            DateTime ld = (DateTime) item;
-                            val = formatter.print(ld);
-
-                        }
-                        if (item instanceof Hyperlink) {
-
-                        }
-                        setGraphic(new Label(val));
-                        setAlignment(Pos.CENTER);
-                    }
-                }
-            };
-        }
-    }
 }

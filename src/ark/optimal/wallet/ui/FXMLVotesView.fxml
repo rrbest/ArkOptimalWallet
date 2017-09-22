@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="502.0" prefWidth="805.0" style="-fx-border-width: 0 0 0 0;;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ark.optimal.wallet.ui.FXMLVotesViewController">
+<AnchorPane id="AnchorPane" prefHeight="505.0" prefWidth="805.0" style="-fx-border-width: 0 0 0 0;;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ark.optimal.wallet.ui.FXMLVotesViewController">
     <children>
       <VBox prefHeight="490.0" prefWidth="801.0">
          <children>
@@ -21,14 +21,14 @@
                   <Insets left="20.0" />
                </padding>
             </Label>
-            <TableView fx:id="masterVotedDelegateTable" prefHeight="106.0" prefWidth="801.0" styleClass="transactions-table-view" stylesheets="@main/custom.css">
+            <TableView fx:id="masterVotedDelegateTable" prefHeight="82.0" prefWidth="801.0" styleClass="transactions-table-view" stylesheets="@main/custom.css">
                <columns>
                   <TableColumn fx:id="masterDelegateName" prefWidth="121.0" text="Delegate" />
                   <TableColumn fx:id="masterDelegateRank" prefWidth="60.0" text="Rank" />
                   <TableColumn fx:id="masterAddress" prefWidth="249.0" text="MasterWallet" />
                   <TableColumn fx:id="masterVotes" prefWidth="105.0" text="Votes/Ark" />
                   <TableColumn fx:id="masterPayoutPercentage" prefWidth="114.0" text="Payout %" />
-                  <TableColumn fx:id="masterMinPayout" prefWidth="114.0" text="Min Payout" />
+                  <TableColumn fx:id="masterExcludedVotesPercentage" prefWidth="121.0" text="Excluded Votes %" />
                </columns>
             </TableView>
             <Separator prefWidth="200.0" />
@@ -40,14 +40,14 @@
                   <Insets left="20.0" />
                </padding>
             </Label>
-            <TableView fx:id="SubWalletsVotedDelegateTable" prefHeight="331.0" prefWidth="801.0" styleClass="transactions-table-view" stylesheets="@main/custom.css">
+            <TableView fx:id="SubWalletsVotedDelegateTable" prefHeight="284.0" prefWidth="801.0" styleClass="transactions-table-view" stylesheets="@main/custom.css">
                <columns>
                   <TableColumn fx:id="subWalletDelegateName" prefWidth="121.0" text="Delegate" />
                   <TableColumn fx:id="subWalletDelegateRank" prefWidth="60.0" text="Rank" />
                   <TableColumn fx:id="subWalletAddress" prefWidth="249.0" text="SubWallet" />
                   <TableColumn fx:id="subWalletVotes" prefWidth="105.0" text="Votes/Ark" />
                   <TableColumn fx:id="subWalletPayoutPercentage" prefWidth="114.0" text="Payout %" />
-                  <TableColumn fx:id="subWalletMinPayout" prefWidth="114.0" text="Min Payout" />
+                  <TableColumn fx:id="subWalletExcludedVotesPercentage" prefWidth="124.0" text="Excluded Votes %" />
                </columns>
             </TableView>
          </children>

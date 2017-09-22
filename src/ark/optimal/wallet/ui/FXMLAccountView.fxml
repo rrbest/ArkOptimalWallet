@@ -56,7 +56,7 @@
                                   </JFXButton>
                         <JFXButton fx:id="btnSendArk" contentDisplay="CENTER" layoutX="753.0" layoutY="14.0" onAction="#onSendArk" prefHeight="27.0" prefWidth="100.0">
                            <graphic>
-                              <ImageView fitHeight="40.0" fitWidth="59.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fitHeight="35.0" fitWidth="38.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@../../../../resources/send.png" />
                                  </image>

@@ -20,9 +20,9 @@ public class Delegate {
     private Double approval;
     private Double productivity;
     
-    private Double poolPercentage;
-    private Double payoutFrequency;
-    private Double minPayout;
+    //private Double poolPercentage;
+    //private Double payoutFrequency;
+    //private Double minPayout;
     private Double payoutPercentage;
     private Double exlcudedPercentage;
 
@@ -52,29 +52,29 @@ public class Delegate {
         this.checked = checked;
     }
 
-    public Double getPoolPercentage() {
-        return poolPercentage;
-    }
-
-    public void setPoolPercentage(Double poolPercentage) {
-        this.poolPercentage = poolPercentage;
-    }
-
-    public Double getPayoutFrequency() {
-        return payoutFrequency;
-    }
-
-    public void setPayoutFrequency(Double payoutFrequency) {
-        this.payoutFrequency = payoutFrequency;
-    }
-
-    public Double getMinPayout() {
-        return minPayout;
-    }
-
-    public void setMinPayout(Double minPayout) {
-        this.minPayout = minPayout;
-    }
+//    public Double getPoolPercentage() {
+//        return poolPercentage;
+//    }
+//
+//    public void setPoolPercentage(Double poolPercentage) {
+//        this.poolPercentage = poolPercentage;
+//    }
+//
+//    public Double getPayoutFrequency() {
+//        return payoutFrequency;
+//    }
+//
+//    public void setPayoutFrequency(Double payoutFrequency) {
+//        this.payoutFrequency = payoutFrequency;
+//    }
+//
+//    public Double getMinPayout() {
+//        return minPayout;
+//    }
+//
+//    public void setMinPayout(Double minPayout) {
+//        this.minPayout = minPayout;
+//    }
 
     public Double getPayoutPercentage() {
         return payoutPercentage;
@@ -132,9 +132,9 @@ public class Delegate {
         this.approval = approval;
         this.productivity = productivity;
         this.checked = false;
-        this.payoutFrequency = PAYOUTFREQUENCY;
-        this.poolPercentage = POOLPERCENTAGE;
-        this.minPayout = MINPAYOUT;
+//        this.payoutFrequency = PAYOUTFREQUENCY;
+//        this.poolPercentage = POOLPERCENTAGE;
+//        this.minPayout = MINPAYOUT;
         this.payoutPercentage = PAYOUTPERCENTAGE;
         this.exlcudedPercentage = EXCLUDEDPERCENTAGE;
     }

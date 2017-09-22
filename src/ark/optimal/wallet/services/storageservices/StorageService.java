@@ -8,19 +8,18 @@ package ark.optimal.wallet.services.storageservices;
 import ark.optimal.wallet.pojo.Account;
 import ark.optimal.wallet.pojo.Delegate;
 import ark.optimal.wallet.services.accountservices.AccountService;
+import ark.optimal.wallet.ui.main.Settings;
 import com.google.gson.Gson;
 import io.ark.core.Crypto;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import static java.util.Collections.list;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.Callable;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -35,6 +34,16 @@ public class StorageService {
 
     private static StorageService instance = null;
     private Wallet wallet;
+    private String walletFilePath;
+    private final String SETTINGSFILEPATH = System.getProperty("user.dir") + "/settings.json";
+
+    public String getWalletFilePath() {
+        return walletFilePath;
+    }
+
+    public void setWalletFilePath(String walletFilePath) {
+        this.walletFilePath = walletFilePath;
+    }
 
     public Wallet getWallet() {
         return wallet;
@@ -46,14 +55,29 @@ public class StorageService {
 
     private StorageService() {
         this.wallet = new Wallet();
+        this.walletFilePath = System.getProperty("user.dir") + "/wallet.json";
+        File f = new File(SETTINGSFILEPATH);
+        if (f.exists() && !f.isDirectory()) {
+            Gson gson = new Gson();
+            try {
+                Settings settings = gson.fromJson(new FileReader(SETTINGSFILEPATH), Settings.class);
+                if (settings != null) {
+                    this.walletFilePath = settings.getWalletPath();
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(AccountService.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
+        } else {
+            this.updateSettings();
+        }
     }
 
     public static StorageService getInstance() {
         if (instance == null) {
             instance = new StorageService();
             ScheduledExecutorService executor
-                    = Executors.newScheduledThreadPool(5, new ThreadFactory() {
+                    = Executors.newScheduledThreadPool(1, new ThreadFactory() {
                         public Thread newThread(Runnable r) {
                             Thread t = Executors.defaultThreadFactory().newThread(r);
                             t.setDaemon(true);
@@ -71,7 +95,7 @@ public class StorageService {
             executor.scheduleAtFixedRate(periodicTask, 10, 30, TimeUnit.SECONDS);
 
             ScheduledExecutorService executor2
-                    = Executors.newScheduledThreadPool(3, new ThreadFactory() {
+                    = Executors.newScheduledThreadPool(2, new ThreadFactory() {
                         public Thread newThread(Runnable r) {
                             Thread t = Executors.defaultThreadFactory().newThread(r);
                             t.setDaemon(true);
@@ -131,11 +155,25 @@ public class StorageService {
         return account;
     }
 
-    public void addAccountToUserAccounts(Account account) {
+    public synchronized void addAccountToUserAccounts(Account account, boolean masterThread) {
+        Account dirtyAccount = this.wallet.getUserAccounts().get(account.getAddress());
+        if (!masterThread && dirtyAccount != null) {
+            if (dirtyAccount.getSubAccounts().size() != account.getSubAccounts().size()) { // don't overwrite master thread changes
+                return;
+            }
+        }
+//        Map<String, Account> merged = new ConcurrentHashMap<String, Account>();
+//        if (dirtyAccount != null && !masterThread) {
+//            
+//            Map<String, Account> subs = dirtyAccount.getSubAccounts();
+//            merged.putAll(subs);
+//        }
+//        merged.putAll(account.getSubAccounts());
+//        account.setSubAccounts(merged);
         this.wallet.getUserAccounts().put(account.getAddress(), account);
     }
 
-    public void addAccountToSubAccounts(Account account) {
+    public synchronized void addAccountToSubAccounts(Account account) {
         this.wallet.getSubAccounts().put(account.getAddress(), account);
     }
 
@@ -143,16 +181,24 @@ public class StorageService {
         this.wallet.getWatchAccounts().put(account.getAddress(), account);
     }
 
-    public void addDelegate(Delegate d) {
+    public synchronized void addDelegate(Delegate d, boolean masterThread) {
+        if (!masterThread) {
+            Delegate dirtyDelegate = this.wallet.getDelegates().get(d.getUsername());
+            d.setExlcudedPercentage(dirtyDelegate.getExlcudedPercentage());
+            d.setPayoutPercentage(dirtyDelegate.getPayoutPercentage());
+
+        }
+
         this.wallet.getDelegates().put(d.getUsername(), d);
     }
 
-    public void saveWallet() {
+    public void updateSettings() {
+        Settings settings = new Settings(this.walletFilePath);
         Gson gson = new Gson();
         try {
-            String jsonobject = gson.toJson(this.wallet);
+            String jsonobject = gson.toJson(settings);
             System.out.println(jsonobject);
-            FileWriter writer = new FileWriter("wallet.json");
+            FileWriter writer = new FileWriter(SETTINGSFILEPATH);
             writer.write(jsonobject);
             writer.close();
 
@@ -162,10 +208,32 @@ public class StorageService {
 
     }
 
-    public Wallet loadWallet() {
+    public void saveWallet() {
+        saveWallet(walletFilePath);
+    }
+
+    public void saveWallet(String filepath) {
         Gson gson = new Gson();
         try {
-            Wallet wallet = gson.fromJson(new FileReader("wallet.json"), Wallet.class);
+            String jsonobject = gson.toJson(this.wallet);
+            System.out.println(jsonobject);
+            FileWriter writer = new FileWriter(filepath);
+            writer.write(jsonobject);
+            writer.close();
+
+        } catch (IOException ex) {
+            Logger.getLogger(StorageService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public Wallet loadWallet(){
+        return this.loadWallet(walletFilePath);
+    }
+ 
+    public Wallet loadWallet(String filepath) {
+        Gson gson = new Gson();
+        try {
+            Wallet wallet = gson.fromJson(new FileReader(filepath), Wallet.class);
             if (wallet != null) {
                 this.wallet = wallet;
             }
@@ -178,12 +246,13 @@ public class StorageService {
     }
 
     public void updateWallet() {
-        for (String address : this.wallet.getUserAccounts().keySet()) {
+        Set<String> addresses = this.wallet.getUserAccounts().keySet(); // to avoid concurrentModification
+        for (String address : addresses) {
             Account account = this.wallet.getUserAccounts().get(address);
             String accountName = account.getUsername();
             Map<String, Account> subAccounts = account.getSubAccounts();
             account = AccountService.getFullAccount(address);
-            if(account == null){
+            if (account == null) {
                 break;
             }
             account.setUsername(accountName);
@@ -194,37 +263,36 @@ public class StorageService {
                 subAccount.setUsername(subAccountName);
                 subAccount.setMasterAccountAddress(masterAccountAddress);
                 account.getSubAccounts().put(entry.getKey(), subAccount);
-                this.wallet.getSubAccounts().put(subAccount.getAddress(), subAccount);
+                this.addAccountToSubAccounts(subAccount);
 
             }
-            this.wallet.getUserAccounts().put(address, account);
+            this.addAccountToUserAccounts(account, false);
 
         }
         for (String address : this.wallet.getWatchAccounts().keySet()) {
             Account account = this.wallet.getWatchAccounts().get(address);
             String accountName = account.getUsername();
             account = AccountService.getFullAccount(address);
-            if(account == null){
+            if (account == null) {
                 break;
             }
             account.setUsername(accountName);
             this.wallet.getWatchAccounts().put(address, account);
 
         }
-        Iterator<String> iter = this.wallet.getDelegates().keySet().iterator();
-        while(iter.hasNext()){// (String delegateName : this.wallet.getDelegates().keySet()) {
-            String delegateName = iter.next();
+        Set<String> names = this.wallet.getDelegates().keySet();
+        for (String delegateName : names) {
             Delegate delegate = this.wallet.getDelegates().get(delegateName);
             Delegate newDelegate = AccountService.getDelegateByUsername(delegateName);
-            if(newDelegate == null){
+            if (newDelegate == null) {
                 break;
             }
-            newDelegate.setExlcudedPercentage(delegate.getExlcudedPercentage());
-            newDelegate.setPayoutFrequency(delegate.getPayoutFrequency());
-            newDelegate.setPayoutPercentage(delegate.getPayoutPercentage());
-            newDelegate.setPoolPercentage(delegate.getPoolPercentage());
-            newDelegate.setMinPayout(delegate.getMinPayout());
-            this.wallet.getDelegates().put(delegateName, newDelegate);
+            //newDelegate.setExlcudedPercentage(delegate.getExlcudedPercentage());
+            //newDelegate.setPayoutFrequency(delegate.getPayoutFrequency());
+            //newDelegate.setPayoutPercentage(delegate.getPayoutPercentage());
+            //newDelegate.setPoolPercentage(delegate.getPoolPercentage());
+            //newDelegate.setMinPayout(delegate.getMinPayout());
+            this.addDelegate(newDelegate, false);
         }
 
     }

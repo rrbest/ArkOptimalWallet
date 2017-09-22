@@ -125,7 +125,7 @@ public class FXMLDelegatesViewController implements Initializable {
     private JFXTextField delegatePayoutPercentage;
     @FXML
     private JFXTextField delegateExcludedPercentage;
-    
+
     /**
      * Initializes the controller class.
      */
@@ -207,6 +207,11 @@ public class FXMLDelegatesViewController implements Initializable {
 
         _delegateChecked.setEditable(true);
 
+        CheckBox selectAllCB = new CheckBox();
+        selectAllCB.setUserData(this._delegateChecked);
+        selectAllCB.setOnAction(handleSelectAllCheckbox());
+        this._delegateChecked.setGraphic(selectAllCB);
+
         // intialize from storage 
         for (Delegate delegate : StorageService.getInstance().getWallet().getDelegates().values()) {
             delegate.setChecked(Boolean.FALSE);
@@ -225,13 +230,17 @@ public class FXMLDelegatesViewController implements Initializable {
             d = delegatesMap.get(n);
 
         } else {
-            d = AccountService.getDelegateByUsername(n);
+            d = StorageService.getInstance().getWallet().getDelegates().get(n);
             if (d == null) {
-                return;
+                d = AccountService.getDelegateByUsername(n);
+                if (d == null) {
+                    return;
+                }
+
             }
             _delegatestable.getItems().add(d);
             delegatesMap.put(d.getUsername(), d);
-            StorageService.getInstance().addDelegate(d);
+            StorageService.getInstance().addDelegate(d, true);
 
         }
 
@@ -248,9 +257,6 @@ public class FXMLDelegatesViewController implements Initializable {
         lbl_delegateproductivity.setText(String.format("%.2f%%", d.getProductivity()) + " Productivity");
         lbl_delegateproducedblocks.setText(d.getProducedblocks().toString() + " Blocks");
         lbl_delegatemissedblocks.setText(d.getMissedblocks().toString() + " Blocks");
-        delegatePoolPercentage.setText(d.getPoolPercentage().toString());
-        delegatePayoutFrequency.setText(d.getPayoutFrequency().toString());
-        delegateMinPayout.setText(d.getMinPayout().toString());
         delegatePayoutPercentage.setText(d.getPayoutPercentage().toString());
         delegateExcludedPercentage.setText(d.getExlcudedPercentage().toString());
         delegateAddress.setText(d.getAddress());
@@ -313,201 +319,60 @@ public class FXMLDelegatesViewController implements Initializable {
 
     }
 
-    public void executeOptimizationTrades(Account account, String passphrase, Map<String, Double> votes) {
+    private void selectAll(Boolean select) {
+        selectedDelegates.clear();
+        if (select) {
+            for (Delegate d : _delegatestable.getItems()) {
+                d.setChecked(Boolean.TRUE);
+                selectedDelegates.add(d);
+            }
+        } else {
+            for (Delegate d : _delegatestable.getItems()) {
+                d.setChecked(Boolean.FALSE);
+            }
+        }
+        _delegatestable.refresh();
+    }
 
-//        // send all subwallets balance to master wallet  
-//        int walletsVotes = 0;
-//        for (String delegateName : account.getSubAccounts().keySet()) {
-//            Account subaccount = account.getSubAccounts().get(delegateName);
-//            subaccount = AccountService.getAccount(subaccount.getAddress());
-//            Double walletVotes = subaccount.getBalance() - 1;
-//            if (walletVotes != null && walletVotes > 0) {
-//                Transaction tx = TransactionService.createTransaction(subaccount.getAddress(), account.getAddress(), walletVotes.longValue(), "send to master wallet", passphrase + " " + delegateName);
-//                TransactionService.PostTransaction(tx);
-//                walletsVotes += walletVotes.intValue();
-//            }
-//
-//        }
-//        // create new subwallets
-//
-//        createSubWallets(account, passphrase);
+    private EventHandler<ActionEvent> handleSelectAllCheckbox() {
 
-        // send new votes to subwallets
-        try {
-//            TimeUnit.SECONDS.sleep(2);
-//            Account acc = AccountService.getAccount(account.getAddress());
-//            while (acc.getBalance() < walletsVotes - 2) {
-//                System.out.println("Wait for Confirmation of transactions");
-//                System.out.println("subwallets votes = " + walletsVotes);
-//                System.out.println("master wallet balance  = " + acc.getBalance());
-//                acc = AccountService.getAccount(account.getAddress());
-//
-//            }
-            for (Delegate delegate : selectedDelegates) {
-                Account subaccount = account.getSubAccounts().get(delegate.getUsername());
-                Double vote = votes.get(delegate.getUsername());
-                if (vote >= 1) {
-                    Transaction tx = TransactionService.createTransaction(account.getAddress(), subaccount.getAddress(), vote.longValue(), "send to sub wallet", passphrase);
-                    TransactionService.broadcastTransaction(tx);
+        return new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                CheckBox cb = (CheckBox) event.getSource();
+                TableColumn column = (TableColumn) cb.getUserData();
+                if (cb.isSelected()) {
+                    selectAll(true);
+                } else {
+                    selectAll(false);
                 }
+
             }
-
-        } catch (Exception ex) {
-            Logger.getLogger(FXMLDelegatesViewController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-    }
-
-    public void optimize(Account account, String passphrase, Double masterWalletPercentage) {
-        runOptimization(account, passphrase, masterWalletPercentage);
-    }
-
-    // creates subwallets and vote for corresponding delegates
-//    private void createSubWallets(Account account, String passphrase) {
-//
-//        Map subAccounts = account.getSubAccounts();
-//        for (Delegate d : selectedDelegates) {
-//            if (!subAccounts.containsKey(d.getUsername())) {
-//                Account a = AccountService.createAccount(passphrase + " " + d.getUsername());
-//                if (a.getVotedDelegates().size() == 0) {
-//                    Transaction tx = TransactionService.createTransaction(account.getAddress(), a.getAddress(), 2, "send to sub wallet to vote", passphrase);
-//                    String response = TransactionService.PostTransaction(tx);
-//                    try {
-//                        int counter = 0;
-//                        while (!response.contains("success") && ++counter <= 10) {
-//                            System.out.println("wait for successful transaction");
-//                            response = TransactionService.PostTransaction(tx);
-//                        }
-//
-//                        tx = TransactionService.createVote(a.getAddress(), d.getUsername(), passphrase + " " + d.getUsername(), false);
-//                        response = TransactionService.PostTransaction(tx);
-//                        counter = 0;
-//                        while (!response.contains("success") && ++counter <= 10) {
-//                            System.out.println("wait for successful transaction");
-//                            response = TransactionService.PostTransaction(tx);
-//                        }
-//                        a.getVotedDelegates().add(d);
-//
-//                    } catch (Exception ex) {
-//                        Logger.getLogger(FXMLDelegatesViewController.class.getName()).log(Level.SEVERE, null, ex);
-//                    }
-//                }
-//                a.setMasterAccountAddress(account.getAddress());
-//                subAccounts.put(d.getUsername(), a);
-//                StorageService.getInstance().addAccountToSubAccounts(a);
-//
-//            }
-//            System.out.println(d.getUsername());
-//        }
-//        StorageService.getInstance().addAccountToUserAccounts(account);
-//    }
-
-    private void runOptimization(Account account, String passphrase, Double masterWalletPercentage) {
-        int walletsVotes = 0;
-        for (String delegateName : account.getSubAccounts().keySet()) {
-            Account subaccount = account.getSubAccounts().get(delegateName);
-            subaccount = AccountService.getAccount(subaccount.getAddress());
-            Double walletVotes = subaccount.getBalance() - 1;
-            if (walletVotes != null && walletVotes > 0) {
-                walletsVotes += walletVotes.intValue();
-            }
-
-        }
-        Account acc = AccountService.getAccount(account.getAddress());
-        walletsVotes += acc.getBalance().intValue();
-        walletsVotes = new Double((masterWalletPercentage/100.0) * walletsVotes).intValue();
-        // test
-        //walletsVotes = 150000;
-        Map<String, Double> votes = OptimizationService.runConvexOptimizattion(walletsVotes, selectedDelegates);
-        runOptimizationReport(account, passphrase, votes);
-        return;
-    }
-
-    private void runOptimizationReport(Account account, String passphrase, Map<String, Double> votes) {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLOptimizationReportView.fxml"));
-            Parent root1 = (Parent) fxmlLoader.load();
-            FXMLOptimizationReportViewController optReportController = (FXMLOptimizationReportViewController) fxmlLoader.getController();
-            optReportController.setDelegateViewController(this);
-            optReportController.updateReport(account, passphrase, votes);
-            //updateVoteController.setDelegateName(_delegatestable.getSelectionModel().getSelectedItem().getUsername());
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.initStyle(StageStyle.UNDECORATED);
-            stage.setTitle("C");
-            stage.setScene(new Scene(root1));
-            stage.show();
-
-        } catch (IOException ex) {
-            Logger.getLogger(FXMLAccountsViewMenuController.class
-                    .getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    @FXML
-    private void onRunOptimization(ActionEvent event) {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLOptimizationSetupView.fxml"));
-            Parent root1 = (Parent) fxmlLoader.load();
-            FXMLOptimizationSetupViewController optSetupViewController = (FXMLOptimizationSetupViewController) fxmlLoader.getController();
-            optSetupViewController.setDelegateViewController(this);
-            //updateVoteController.setDelegateName(_delegatestable.getSelectionModel().getSelectedItem().getUsername());
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.initStyle(StageStyle.UNDECORATED);
-            stage.setTitle("C");
-            stage.setScene(new Scene(root1));
-            stage.show();
-
-        } catch (IOException ex) {
-            Logger.getLogger(FXMLAccountsViewMenuController.class
-                    .getName()).log(Level.SEVERE, null, ex);
-        }
-
+        };
     }
 
     @FXML
     private void onRemoveSelectedDelegate(ActionEvent event) {
         event.consume();
         for (Delegate delegate : selectedDelegates) {
-            delegatesMap.remove(delegate);
+            delegatesMap.remove(delegate.getUsername());
             _delegatestable.getItems().remove(delegate);
-            StorageService.getInstance().getWallet().getDelegates().remove(delegate.getUsername());
+            //StorageService.getInstance().getWallet().getDelegates().remove(delegate.getUsername());
 
         }
         _delegatestable.refresh();
 
     }
 
-    @FXML
-    private void poolPercentageKeyReleased(KeyEvent event) {
-        if (event.getCode() == KeyCode.ENTER) {
-            Delegate d = _delegatestable.getSelectionModel().getSelectedItem();
-            d.setPoolPercentage(new Double(delegatePoolPercentage.getText()));
-        }
-    }
-
-    @FXML
-    private void PayoutFrequencyKeyReleased(KeyEvent event) {
-        if (event.getCode() == KeyCode.ENTER) {
-            Delegate d = _delegatestable.getSelectionModel().getSelectedItem();
-            d.setPayoutFrequency(new Double(delegatePayoutFrequency.getText()));
-        }
-    }
-
-    @FXML
-    private void MinPayoutKeyReleased(KeyEvent event) {
-        if (event.getCode() == KeyCode.ENTER) {
-            Delegate d = _delegatestable.getSelectionModel().getSelectedItem();
-            d.setMinPayout(new Double(delegateMinPayout.getText()));
-        }
-    }
 
     @FXML
     private void PayoutPrecentageReleased(KeyEvent event) {
         if (event.getCode() == KeyCode.ENTER) {
             Delegate d = _delegatestable.getSelectionModel().getSelectedItem();
             d.setPayoutPercentage(new Double(delegatePayoutPercentage.getText()));
+            Delegate dirtyDelegate = StorageService.getInstance().getWallet().getDelegates().get(d.getUsername());
+            dirtyDelegate.setPayoutPercentage(d.getPayoutPercentage());
+            StorageService.getInstance().addDelegate(dirtyDelegate, true);
         }
 
     }
@@ -517,6 +382,9 @@ public class FXMLDelegatesViewController implements Initializable {
         if (event.getCode() == KeyCode.ENTER) {
             Delegate d = _delegatestable.getSelectionModel().getSelectedItem();
             d.setExlcudedPercentage(new Double(delegateExcludedPercentage.getText()));
+            Delegate dirtyDelegate = StorageService.getInstance().getWallet().getDelegates().get(d.getUsername());
+            dirtyDelegate.setExlcudedPercentage(d.getExlcudedPercentage());
+            StorageService.getInstance().addDelegate(dirtyDelegate, true);
         }
     }
 

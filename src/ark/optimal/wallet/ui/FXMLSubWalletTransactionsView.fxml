@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="513.0" prefWidth="1038.0" style="-fx-background-radius: 10;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ark.optimal.wallet.ui.FXMLSubWalletTransactionsViewController">
+   <children>
+      <Label prefHeight="52.0" prefWidth="1038.0" style="-fx-alignment: CENTER; -fx-background-radius: 5;" styleClass="toolbar" stylesheets="@main/custom.css" text="SubWallets - Transactions" textAlignment="CENTER" textFill="#fffdfd">
+         <font>
+            <Font name="System Bold" size="22.0" />
+         </font>
+      </Label>
+      <TableView fx:id="transactionsTable" layoutX="10.0" layoutY="57.0" prefHeight="397.0" prefWidth="1012.0" styleClass="transactions-table-view" stylesheets="@main/custom.css">
+         <columns>
+            <TableColumn fx:id="tid" prefWidth="328.0" text="tid" />
+            <TableColumn fx:id="from" minWidth="0.0" prefWidth="129.0" text="From" />
+            <TableColumn fx:id="to" minWidth="0.0" prefWidth="177.0" text="To" />
+            <TableColumn fx:id="amount" minWidth="0.0" prefWidth="69.0" text="Total Ѧ" />
+            <TableColumn fx:id="fee" minWidth="0.0" prefWidth="64.0" text="Fee" />
+            <TableColumn fx:id="smartBridge" minWidth="0.0" prefWidth="227.0" text="Smart Bridge" />
+         </columns>
+      </TableView>
+      <JFXButton fx:id="executeTransactions" layoutX="355.0" layoutY="462.0" onAction="#onExecuteTransactions" prefHeight="38.0" prefWidth="175.0" text="Send" textFill="#634eda">
+         <font>
+            <Font size="19.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
+      <JFXButton fx:id="cancelTransactions" layoutX="541.0" layoutY="463.0" onAction="#onCancelTransactions" prefHeight="35.0" prefWidth="175.0" text="Cancel" textFill="#634eda">
+         <font>
+            <Font size="18.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
+   </children>
+</AnchorPane>

@@ -20,16 +20,16 @@ public class VoteItem {
     private Hyperlink address_link;
     private Integer votes;
     private Double payoutpercentage;
-    private  Double minpayout;
+    private Double excludedVotesPercentage;
 
-    public VoteItem(String delegateName, Integer delegateRank, String address, Integer votes, Double payoutpercentage, Double minpayout) {
+    public VoteItem(String delegateName, Integer delegateRank, String address, Integer votes, Double payoutpercentage, Double excludedVotesPercentage) {
         this.delegateName = delegateName;
         this.delegateRank = delegateRank;
         this.address = address;
         this.address_link = new Hyperlink(address);
         this.votes = votes;
         this.payoutpercentage = payoutpercentage;
-        this.minpayout = minpayout;
+        this.excludedVotesPercentage = excludedVotesPercentage;
     }
 
     public Hyperlink getAddress_link() {
@@ -80,15 +80,13 @@ public class VoteItem {
         this.payoutpercentage = payoutpercentage;
     }
 
-    public Double getMinpayout() {
-        return minpayout;
+    public Double getExcludedVotesPercentage() {
+        return excludedVotesPercentage;
     }
 
-    public void setMinpayout(Double minpayout) {
-        this.minpayout = minpayout;
+    public void setExcludedVotesPercentage(Double excludedVotesPercentage) {
+        this.excludedVotesPercentage = excludedVotesPercentage;
     }
-    
-    
 
     
 }

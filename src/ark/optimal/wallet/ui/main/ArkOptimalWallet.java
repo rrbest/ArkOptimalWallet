@@ -19,7 +19,7 @@ import javafx.stage.Stage;
 public class ArkOptimalWallet extends Application {
 
     private AnchorPane homeview;
-    private Stage stage;
+    private Stage mainStage;
 
     private FXMLHomeViewController homeViewController;
 
@@ -37,7 +37,11 @@ public class ArkOptimalWallet extends Application {
         Scene scene = new Scene(homeview);
         stage.setScene(scene);
         stage.show();
-        this.stage = stage;
+        this.mainStage = stage;
+    }
+
+    public Stage getMainStage() {
+        return mainStage;
     }
 
     public FXMLHomeViewController getHomeViewController() {
@@ -56,8 +60,8 @@ public class ArkOptimalWallet extends Application {
     }
 
     public void view(Parent parent) {
-        this.stage.getScene().setRoot(parent);
-        this.stage.show();
+        this.mainStage.getScene().setRoot(parent);
+        this.mainStage.show();
 
     }
 

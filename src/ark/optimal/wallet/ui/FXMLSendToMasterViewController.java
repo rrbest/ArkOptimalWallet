@@ -9,6 +9,7 @@ import ark.optimal.wallet.pojo.Account;
 import ark.optimal.wallet.pojo.Delegate;
 import ark.optimal.wallet.services.accountservices.AccountService;
 import ark.optimal.wallet.services.storageservices.StorageService;
+import ark.optimal.wallet.ui.main.HostServicesProvider;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import io.ark.core.Transaction;
@@ -132,14 +133,10 @@ public class FXMLSendToMasterViewController implements Initializable {
                         setGraphic(item);
 
                         item.setOnAction(t -> {
-                            URI u;
                             try {
-                                u = new URI(item.getText());
-                                java.awt.Desktop.getDesktop().browse(u);
-                            } catch (URISyntaxException ex) {
-                                Logger.getLogger(FXMLSendToMasterViewController.class.getName()).log(Level.SEVERE, null, ex);
-                            } catch (IOException ex) {
-                                Logger.getLogger(FXMLSendToMasterViewController.class.getName()).log(Level.SEVERE, null, ex);
+                                HostServicesProvider.getInstance().getHostServices().showDocument("https://explorer.ark.io/");
+                            } catch (Exception ex) {
+                                Logger.getLogger(FXMLOptimizationReportViewController.class.getName()).log(Level.SEVERE, null, ex);
                             }
 
                         });

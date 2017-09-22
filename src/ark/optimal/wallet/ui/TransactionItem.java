@@ -22,7 +22,25 @@ public class TransactionItem {
     private String from;
     private String to;
     private String smartBridge;
+    
+    private Double fee;
 
+    public Double getFee() {
+        return fee;
+    }
+
+    public void setFee(Double fee) {
+        this.fee = fee;
+    }
+
+    public Hyperlink getTo_link() {
+        return to_link;
+    }
+
+    public void setTo_link(Hyperlink to_link) {
+        this.to_link = to_link;
+    }
+    
     private Hyperlink id_link;
     private Hyperlink from_link;
     private Hyperlink to_link;
@@ -56,6 +74,17 @@ public class TransactionItem {
         //this.id_link.setText(id);
         
         
+    }
+     public TransactionItem(String id, String from, String to, Double amount, Double fee, String smartBridge) {
+        this.id = id;
+        this.id_link = new Hyperlink(id);
+        this.amount = amount;
+        this.from = from;
+        this.from_link = new Hyperlink(from);
+        this.to = to;
+        this.to_link = new Hyperlink(to);
+        this.fee = fee;
+        this.smartBridge = smartBridge;
     }
 
     public String getId() {

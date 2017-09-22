@@ -8,6 +8,7 @@ package ark.optimal.wallet.ui;
 import ark.optimal.wallet.pojo.Account;
 import ark.optimal.wallet.pojo.Delegate;
 import ark.optimal.wallet.services.storageservices.StorageService;
+import ark.optimal.wallet.ui.main.HostServicesProvider;
 import com.jfoenix.controls.JFXButton;
 import java.io.IOException;
 import java.net.URI;
@@ -58,7 +59,11 @@ public class FXMLOptimizationReportViewController implements Initializable {
     @FXML
     private TableColumn<OptimizationReportItem, Double> payout;
 
-    private FXMLDelegatesViewController delegateViewController;
+    private FXMLSubWalletManagerViewController subWalletManagerController;
+
+    public void setSubWalletManagerController(FXMLSubWalletManagerViewController subWalletManagerController) {
+        this.subWalletManagerController = subWalletManagerController;
+    }
     @FXML
     private Label optReportTitle;
     
@@ -92,7 +97,7 @@ public class FXMLOptimizationReportViewController implements Initializable {
     @FXML
     private void onExecuteTrades(ActionEvent event) {
        List<OptimizationReportItem> trades = votedDelegatesTable.getItems();
-       delegateViewController.executeOptimizationTrades(account, passphrase, optVotes);
+       subWalletManagerController.executeOptimizationTrades(account, passphrase, optVotes);
        closeWindow();
     }
 
@@ -105,10 +110,6 @@ public class FXMLOptimizationReportViewController implements Initializable {
     private void closeWindow() {
         Stage stage = (Stage) closeReport.getScene().getWindow();
         stage.close();
-    }
-
-    public void setDelegateViewController(FXMLDelegatesViewController delegateViewController) {
-        this.delegateViewController = delegateViewController;
     }
 
     public void updateReport(Account account,String passphrase ,Map<String, Double> votes) {
@@ -144,13 +145,9 @@ public class FXMLOptimizationReportViewController implements Initializable {
                         setGraphic(item);
 
                         item.setOnAction(t -> {
-                            URI u;
                             try {
-                                u = new URI(item.getText());
-                                java.awt.Desktop.getDesktop().browse(u);
-                            } catch (URISyntaxException ex) {
-                                Logger.getLogger(FXMLOptimizationReportViewController.class.getName()).log(Level.SEVERE, null, ex);
-                            } catch (IOException ex) {
+                                HostServicesProvider.getInstance().getHostServices().showDocument("https://explorer.ark.io/");
+                            } catch (Exception ex) {
                                 Logger.getLogger(FXMLOptimizationReportViewController.class.getName()).log(Level.SEVERE, null, ex);
                             }
 

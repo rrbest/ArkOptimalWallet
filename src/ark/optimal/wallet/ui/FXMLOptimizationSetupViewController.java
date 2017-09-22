@@ -39,13 +39,10 @@ public class FXMLOptimizationSetupViewController implements Initializable {
     @FXML
     private JFXComboBox<Account> accounts;
 
-    private FXMLDelegatesViewController delegateViewController;
+    private FXMLSubWalletManagerViewController subWalletManagerViewController;
     @FXML
     private JFXTextField masterPercentageOptimization;
-    
-    public void setDelegateViewController(FXMLDelegatesViewController delegateViewController) {
-        this.delegateViewController = delegateViewController;
-    }
+   
 
     /**
      * Initializes the controller class.
@@ -97,7 +94,7 @@ public class FXMLOptimizationSetupViewController implements Initializable {
             new AlertController().alertUser("Please complete optimization form");
             return;
         }
-        delegateViewController.optimize(account, passphrase.getText(), new Double(masterPercentageOptimization.getText()));
+       // delegateViewController.optimize(account, passphrase.getText(), new Double(masterPercentageOptimization.getText()));
         closeWindow();
     }
 

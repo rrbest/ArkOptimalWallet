@@ -2,6 +2,7 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXListView?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tooltip?>
@@ -12,9 +13,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="850.0" prefWidth="1400.0" styleClass="home-anchor" stylesheets="@custom.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ark.optimal.wallet.ui.main.FXMLHomeViewController">
+<AnchorPane id="AnchorPane" fx:id="settings" prefHeight="850.0" prefWidth="1400.0" style="-fx-background-color: #1A237E;" stylesheets="@custom.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ark.optimal.wallet.ui.main.FXMLHomeViewController">
    <children>
-      <AnchorPane id="AnchorPane" layoutX="318.0" layoutY="156.0" prefHeight="100.0" prefWidth="551.0" style="-fx-background-radius: 10; -fx-background-color: white;">
+      <AnchorPane id="AnchorPane" layoutX="467.0" layoutY="164.0" prefHeight="100.0" prefWidth="551.0" style="-fx-background-radius: 10; -fx-background-color: white;">
          <children>
             <Label fx:id="myaccountstitle" prefHeight="52.0" prefWidth="556.0" style="-fx-alignment: LEFT_CENTER; -fx-background-radius: 5;" styleClass="toolbar" stylesheets="@main/custom.css" text="My Accounts" textAlignment="CENTER" textFill="#fffdfd">
                <font>
@@ -40,9 +41,9 @@
                               <Font size="15.0" />
                            </font>
                            <graphic>
-                              <ImageView fitHeight="26.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fitHeight="29.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../../../../resources/create-account.png" />
+                                    <Image url="@../../../../../resources/myaccount.png" />
                                  </image>
                               </ImageView>
                            </graphic>
@@ -58,7 +59,7 @@
                               <Font size="15.0" />
                            </font>
                            <graphic>
-                              <ImageView fitHeight="23.0" fitWidth="27.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fitHeight="28.0" fitWidth="33.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@../../../../../resources/import-account.png" />
                                  </image>
@@ -71,5 +72,65 @@
             </VBox>
          </children>
       </AnchorPane>
+      <JFXButton fx:id="goHomeBtn" onAction="#onViewHome" prefHeight="34.0" prefWidth="252.0" text="ARK SMART WALLET - 1.0" textFill="WHITE">
+         <font>
+            <Font name="Arial Bold" size="14.0" />
+         </font>
+         <graphic>
+            <ImageView fitHeight="42.0" fitWidth="53.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../../../resources/Ark.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </JFXButton>
+      <JFXButton fx:id="settingsBtn" alignment="CENTER" contentDisplay="CENTER" layoutX="1083.0" layoutY="11.0" onAction="#onSettings" prefHeight="31.0" prefWidth="66.0">
+         <graphic>
+            <FontAwesomeIconView fill="WHITE" glyphName="GEAR" size="20" />
+         </graphic>
+         <tooltip>
+            <Tooltip contentDisplay="BOTTOM" text="Settings" textAlignment="CENTER">
+               <font>
+                  <Font name="Arial" size="13.0" />
+               </font>
+            </Tooltip>
+         </tooltip>
+      </JFXButton>
+      <JFXButton fx:id="saveWalletBtn" alignment="CENTER" contentDisplay="CENTER" layoutX="1165.0" layoutY="11.0" onAction="#onSaveWallet" prefHeight="31.0" prefWidth="66.0">
+         <graphic>
+            <FontAwesomeIconView fill="WHITE" glyphName="SAVE" size="20" />
+         </graphic>
+         <tooltip>
+            <Tooltip contentDisplay="BOTTOM" text="Save">
+               <font>
+                  <Font name="Arial" size="13.0" />
+               </font>
+            </Tooltip>
+         </tooltip>
+      </JFXButton>
+      <JFXButton fx:id="loadWalletBtn" alignment="CENTER" contentDisplay="CENTER" layoutX="1241.0" layoutY="11.0" onAction="#onLoadWallet" prefHeight="31.0" prefWidth="66.0">
+         <graphic>
+            <FontAwesomeIconView fill="WHITE" glyphName="FOLDER_OPEN" size="20" />
+         </graphic>
+         <tooltip>
+            <Tooltip contentDisplay="BOTTOM" text="Load Wallet">
+               <font>
+                  <Font name="Arial" size="13.0" />
+               </font>
+            </Tooltip>
+         </tooltip>
+      </JFXButton>
+      <JFXButton fx:id="exportWalletBtn" alignment="CENTER" contentDisplay="CENTER" layoutX="1307.0" layoutY="11.0" onAction="#onExportWallet" prefHeight="31.0" prefWidth="66.0">
+         <graphic>
+            <FontAwesomeIconView fill="WHITE" glyphName="ARROW_CIRCLE_UP" size="20" />
+         </graphic>
+         <tooltip>
+            <Tooltip contentDisplay="BOTTOM" text="Export Wallet">
+               <font>
+                  <Font name="Arial" size="13.0" />
+               </font>
+            </Tooltip>
+         </tooltip>
+      </JFXButton>
    </children>
 </AnchorPane>

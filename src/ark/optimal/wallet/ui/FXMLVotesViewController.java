@@ -9,6 +9,7 @@ import ark.optimal.wallet.pojo.Account;
 import ark.optimal.wallet.pojo.Delegate;
 import ark.optimal.wallet.services.accountservices.AccountService;
 import ark.optimal.wallet.services.storageservices.StorageService;
+import ark.optimal.wallet.ui.main.HostServicesProvider;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -54,8 +55,6 @@ public class FXMLVotesViewController implements Initializable {
     @FXML
     private TableColumn<VoteItem, Double> masterPayoutPercentage;
     @FXML
-    private TableColumn<VoteItem, Double>  masterMinPayout;
-    @FXML
     private TableView<VoteItem> SubWalletsVotedDelegateTable;
     @FXML
     private TableColumn<VoteItem, String> subWalletDelegateName;
@@ -68,7 +67,9 @@ public class FXMLVotesViewController implements Initializable {
     @FXML
     private TableColumn<VoteItem, Double> subWalletPayoutPercentage;
     @FXML
-    private TableColumn<VoteItem, Double> subWalletMinPayout;
+    private TableColumn<VoteItem, Double> masterExcludedVotesPercentage;
+    @FXML
+    private TableColumn<VoteItem, Double> subWalletExcludedVotesPercentage;
 
 
     /**
@@ -91,8 +92,8 @@ public class FXMLVotesViewController implements Initializable {
         masterPayoutPercentage.setCellValueFactory(new PropertyValueFactory<VoteItem, Double>("payoutpercentage"));
         masterPayoutPercentage.setCellFactory(new FXMLVotesViewController.ColumnFormatter<VoteItem, Double>());
 
-        masterMinPayout.setCellValueFactory(new PropertyValueFactory<VoteItem, Double>("minpayout"));
-        masterMinPayout.setCellFactory(new FXMLVotesViewController.ColumnFormatter<VoteItem, Double>());
+        masterExcludedVotesPercentage.setCellValueFactory(new PropertyValueFactory<VoteItem, Double>("excludedVotesPercentage"));
+        masterExcludedVotesPercentage.setCellFactory(new FXMLVotesViewController.ColumnFormatter<VoteItem, Double>());
 
         masterAddress.setCellValueFactory(new PropertyValueFactory<VoteItem, Hyperlink>("address_link"));
         masterAddress.setCellFactory(new FXMLVotesViewController.HyperlinkCell());
@@ -111,8 +112,8 @@ public class FXMLVotesViewController implements Initializable {
         subWalletPayoutPercentage.setCellValueFactory(new PropertyValueFactory<VoteItem, Double>("payoutpercentage"));
         subWalletPayoutPercentage.setCellFactory(new FXMLVotesViewController.ColumnFormatter<VoteItem, Double>());
 
-        subWalletMinPayout.setCellValueFactory(new PropertyValueFactory<VoteItem, Double>("minpayout"));
-        subWalletMinPayout.setCellFactory(new FXMLVotesViewController.ColumnFormatter<VoteItem, Double>());
+        subWalletExcludedVotesPercentage.setCellValueFactory(new PropertyValueFactory<VoteItem, Double>("excludedVotesPercentage"));
+        subWalletExcludedVotesPercentage.setCellFactory(new FXMLVotesViewController.ColumnFormatter<VoteItem, Double>());
 
         subWalletAddress.setCellValueFactory(new PropertyValueFactory<VoteItem, Hyperlink>("address_link"));
         subWalletAddress.setCellFactory(new FXMLVotesViewController.HyperlinkCell());
@@ -127,7 +128,8 @@ public class FXMLVotesViewController implements Initializable {
         masterVotedDelegateTable.getItems().clear();
         if (account.getVotedDelegates().size() > 0){
             Delegate d = account.getVotedDelegates().get(0);
-            VoteItem vi = new VoteItem(d.getUsername(), d.getRate(), account.getUsername(), account.getBalance().intValue(),d.getPayoutPercentage(), d.getMinPayout());
+            d = StorageService.getInstance().getWallet().getDelegates().get(d.getUsername());
+            VoteItem vi = new VoteItem(d.getUsername(), d.getRate(), account.getUsername(), account.getBalance().intValue(),d.getPayoutPercentage(), d.getExlcudedPercentage());
             masterVotedDelegateTable.getItems().add(vi);
         }
         SubWalletsVotedDelegateTable.getItems().clear();
@@ -144,7 +146,7 @@ public class FXMLVotesViewController implements Initializable {
             //d.setChecked(Boolean.TRUE);
             if (sub.getVotedDelegates().size() > 0)
                 sub.getVotedDelegates().set(0, d);
-            VoteItem vi = new VoteItem(delegateName, d.getRate(), sub.getUsername(), sub.getBalance().intValue(), 80.0, 100.0);
+            VoteItem vi = new VoteItem(delegateName, d.getRate(), sub.getUsername(), sub.getBalance().intValue(), d.getPayoutPercentage(), d.getExlcudedPercentage());
             SubWalletsVotedDelegateTable.getItems().add(vi);
             
         }
@@ -167,11 +169,8 @@ public class FXMLVotesViewController implements Initializable {
                         item.setOnAction(t -> {
                             URI u;
                             try {
-                                u = new URI(item.getText());
-                                java.awt.Desktop.getDesktop().browse(u);
-                            } catch (URISyntaxException ex) {
-                                Logger.getLogger(FXMLAccountViewController.class.getName()).log(Level.SEVERE, null, ex);
-                            } catch (IOException ex) {
+                                HostServicesProvider.getInstance().getHostServices().showDocument("https://explorer.ark.io/");
+                            } catch (Exception ex) {
                                 Logger.getLogger(FXMLAccountViewController.class.getName()).log(Level.SEVERE, null, ex);
                             }
 

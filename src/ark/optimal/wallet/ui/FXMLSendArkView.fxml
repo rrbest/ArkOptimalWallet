@@ -10,7 +10,7 @@
 
 <AnchorPane id="AnchorPane" prefHeight="428.0" prefWidth="714.0" style="-fx-background-radius: 10;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ark.optimal.wallet.ui.FXMLSendArkViewController">
    <children>
-      <Label fx:id="sendArkTitle" prefHeight="52.0" prefWidth="713.0" style="-fx-alignment: LEFT_CENTER; -fx-background-radius: 5;" styleClass="toolbar" stylesheets="@main/custom.css" text="Send Ark From " textAlignment="CENTER" textFill="#fffdfd">
+      <Label fx:id="sendArkTitle" alignment="CENTER" prefHeight="52.0" prefWidth="713.0" style="-fx-alignment: LEFT_CENTER; -fx-background-radius: 5;" styleClass="toolbar" stylesheets="@main/custom.css" text="Send Ark From " textAlignment="CENTER" textFill="#fffdfd">
          <font>
             <Font name="System Bold" size="22.0" />
          </font>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="293.0" prefWidth="714.0" style="-fx-background-radius: 10;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ark.optimal.wallet.ui.main.FXMLSettingsViewController">
+   <children>
+      <Label alignment="CENTER" prefHeight="52.0" prefWidth="713.0" style="-fx-alignment: LEFT_CENTER; -fx-background-radius: 5;" styleClass="toolbar" stylesheets="@custom.css" text="Settings" textAlignment="CENTER" textFill="#fffdfd">
+         <font>
+            <Font name="System Bold" size="22.0" />
+         </font>
+         <padding>
+            <Insets left="10.0" />
+         </padding>
+      </Label>
+      <JFXButton fx:id="settingsOkBtn" layoutX="266.0" layoutY="236.0" onAction="#onSettingsOk" prefHeight="28.0" prefWidth="100.0" text="Ok" textFill="#634eda">
+         <font>
+            <Font size="19.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
+      <JFXButton fx:id="settingsCancel" layoutX="373.0" layoutY="238.0" onAction="#onSettingsCancel" prefHeight="27.0" prefWidth="100.0" text="Cancel" textFill="#634eda">
+         <font>
+            <Font size="18.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </JFXButton>
+      <JFXTextField fx:id="walletName" focusColor="#cd2e2c" labelFloat="true" layoutX="14.0" layoutY="82.0" maxWidth="657.0" minWidth="214.0" prefHeight="36.0" prefWidth="599.0" promptText="Wallet Name" unFocusColor="#f8f4f4">
+         <font>
+            <Font name="Roboto Black" size="13.0" />
+         </font>
+      </JFXTextField>
+      <JFXTextField fx:id="walletFolder" editable="false" focusColor="#cd2e2c" labelFloat="true" layoutX="14.0" layoutY="158.0" maxWidth="657.0" minWidth="214.0" prefHeight="36.0" prefWidth="599.0" promptText="Choose Desitnation Directory" unFocusColor="#f8f4f4">
+         <font>
+            <Font name="Roboto Black" size="13.0" />
+         </font>
+      </JFXTextField>
+      <JFXButton fx:id="openDirectoryBtn" alignment="CENTER" contentDisplay="CENTER" layoutX="618.0" layoutY="163.0" onAction="#onOpenWalletDirectory" prefHeight="31.0" prefWidth="45.0">
+         <graphic>
+            <ImageView fitHeight="24.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../../../resources/select-folder.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </JFXButton>
+   </children>
+</AnchorPane>

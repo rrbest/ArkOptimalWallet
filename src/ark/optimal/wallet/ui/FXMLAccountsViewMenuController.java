@@ -30,6 +30,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -70,7 +72,7 @@ public class FXMLAccountsViewMenuController implements Initializable {
 
     private Map<String, Account> masterAccounts;
     private Map<String, Account> subAccounts;
-
+    private VBox accountsParentVBox;
     /**
      * Initializes the controller class.
      */
@@ -80,6 +82,7 @@ public class FXMLAccountsViewMenuController implements Initializable {
         masterAccounts = new HashMap<String, Account>();
         subAccounts = new HashMap<String, Account>();
 
+        accountsParentVBox = (VBox) myAcountsListView.getParent();
         myAcountsListView.setEditable(true);
         myAcountsListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         myAcountsListView.setCellFactory(myAcountsListView -> new JFXListCell<AccountItem>() {
@@ -90,7 +93,7 @@ public class FXMLAccountsViewMenuController implements Initializable {
                     setGraphic(null);
                 } else {
                     FontAwesomeIconView accountImage = new FontAwesomeIconView();
-                    accountImage.setGlyphName("USER");
+                    accountImage.setGlyphName("BANK");
                     accountImage.setFill(Paint.valueOf("#404bb6"));
                     accountImage.setSize("16px");
                     setText(account.getUsername());
@@ -113,9 +116,9 @@ public class FXMLAccountsViewMenuController implements Initializable {
                     setGraphic(null);
                 } else {
                     FontAwesomeIconView accountImage = new FontAwesomeIconView();
-                    accountImage.setGlyphName("USER");
-                    accountImage.setFill(Paint.valueOf("#404bb6"));
-                    accountImage.setSize("16px");
+                    accountImage.setGlyphName("BANK");
+                    accountImage.setFill(Paint.valueOf("#03A9F4"));
+                    accountImage.setSize("13px");
                     setText(account.getUsername());
                     setGraphic(accountImage);
                     setPrefWidth(USE_PREF_SIZE);
@@ -126,7 +129,9 @@ public class FXMLAccountsViewMenuController implements Initializable {
         });
 
         subAcountsListView.setPrefHeight(subAcountsListView.getItems().size() * 40);
-
+        
+        accountsParentVBox.setPrefHeight(myAcountsListView.getItems().size() * 40 + subAcountsListView.getItems().size() * 40 + 100);
+        ((AnchorPane)accountsParentVBox.getParent()).setPrefHeight(accountsParentVBox.getPrefHeight() + 50);
     }
 
     public void runCreateAccount() {
@@ -211,7 +216,7 @@ public class FXMLAccountsViewMenuController implements Initializable {
 
     private void addToMyAccounts(Account account) {
         if (!StorageService.getInstance().getWallet().getUserAccounts().containsKey(account.getAddress())) {
-            StorageService.getInstance().addAccountToUserAccounts(account);
+            StorageService.getInstance().addAccountToUserAccounts(account, true);
             myAcountsListView.getItems().add(new AccountItem(account.getUsername(), account.getAddress()));
         }
         masterAccounts.put(account.getAddress(), account);
@@ -220,13 +225,14 @@ public class FXMLAccountsViewMenuController implements Initializable {
         //myAcountsListView.getSelectionModel().select(0);
         myAcountsListView.refresh();
         myAcountsListView.setPrefHeight(myAcountsListView.getItems().size() * 40);
+        accountsParentVBox.setPrefHeight(myAcountsListView.getItems().size() * 40 + subAcountsListView.getItems().size() * 40 + 100);
         subAcountsListView.getSelectionModel().select(-1);
     }
 
     private void viewSubAccounts(Account account) {
         subAcountsListView.getItems().clear();
         if (account.getSubAccounts().size() == 0) {
-            sendToMaster.setVisible(false);
+            //    sendToMaster.setVisible(false);
         } else {
             for (String delegateName : account.getSubAccounts().keySet()) {
                 Account sub = account.getSubAccounts().get(delegateName);
@@ -235,9 +241,12 @@ public class FXMLAccountsViewMenuController implements Initializable {
                 //StorageService.getInstance().addAccountToSubAccounts(sub);
                 subAccounts.put(sub.getAddress(), sub);
             }
-            sendToMaster.setVisible(true);
+            //     sendToMaster.setVisible(true);
         }
         subAcountsListView.setPrefHeight(subAcountsListView.getItems().size() * 40);
+        accountsParentVBox.setPrefHeight(myAcountsListView.getItems().size() * 40 + subAcountsListView.getItems().size() * 40 + 100);
+        ((AnchorPane)accountsParentVBox.getParent()).setPrefHeight(accountsParentVBox.getPrefHeight() + 100);
+
     }
 
     private void addToWatchAccounts(Account account) {
@@ -350,7 +359,10 @@ public class FXMLAccountsViewMenuController implements Initializable {
             FXMLSubWalletManagerViewController subwalletManager = ((FXMLSubWalletManagerViewController) fxmlLoader.getController());
             subwalletManager.setAccountMenuController(this);
             AccountItem ai = myAcountsListView.getSelectionModel().getSelectedItem();
-            Account account = StorageService.getInstance().getWallet().getUserAccounts().get(ai.getAddress());
+            Account account = null;
+            if (ai != null) {
+                account = StorageService.getInstance().getWallet().getUserAccounts().get(ai.getAddress());
+            }
             subwalletManager.selectMasterAccount(account);
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);

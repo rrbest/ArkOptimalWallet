@@ -12,12 +12,41 @@ import javafx.scene.control.Hyperlink;
  * @author Mastadon
  */
 public class SubWalletItem {
+
     private String delegateName;
     private Integer delegateRank;
     private String address;
     private Hyperlink address_link;
     private Integer votes;
     private Double payoutPercentage;
+    private Boolean voted;
+
+    private Integer delegateTotalVotes;
+    private Integer delegateExcludedVotes;
+
+    public Integer getDelegateTotalVotes() {
+        return delegateTotalVotes;
+    }
+
+    public void setDelegateTotalVotes(Integer delegateTotalVotes) {
+        this.delegateTotalVotes = delegateTotalVotes;
+    }
+
+    public Integer getDelegateExcludedVotes() {
+        return delegateExcludedVotes;
+    }
+
+    public void setDelegateExcludedVotes(Integer delegateExcludedVotes) {
+        this.delegateExcludedVotes = delegateExcludedVotes;
+    }
+
+    public Boolean getVoted() {
+        return voted;
+    }
+
+    public void setVoted(Boolean voted) {
+        this.voted = voted;
+    }
 
     public Double getPayoutPercentage() {
         return payoutPercentage;
@@ -84,5 +113,5 @@ public class SubWalletItem {
         this.votes = votes;
         this.payoutPercentage = payoutPercentage;
     }
-    
+
 }
