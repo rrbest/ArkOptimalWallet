@@ -14,9 +14,9 @@
 
 <AnchorPane id="AnchorPane" fx:id="settings" prefHeight="850.0" prefWidth="1400.0" style="-fx-background-color: #1A237E;" stylesheets="@custom.css" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ark.optimal.wallet.ui.main.FXMLHomeViewController">
    <children>
-      <AnchorPane id="AnchorPane" layoutX="467.0" layoutY="87.0" prefHeight="395.0" prefWidth="552.0" style="-fx-background-radius: 10; -fx-background-color: white;">
+      <AnchorPane id="AnchorPane" layoutX="446.0" layoutY="87.0" prefHeight="395.0" prefWidth="573.0" style="-fx-background-radius: 10; -fx-background-color: white;">
          <children>
-            <JFXListView fx:id="homeAccounts" layoutY="50.0" onMouseClicked="#handleUserAccountMouseClick" prefHeight="288.0" prefWidth="552.0" />
+            <JFXListView fx:id="homeAccounts" layoutY="50.0" onMouseClicked="#handleUserAccountMouseClick" prefHeight="288.0" prefWidth="573.0" />
             <HBox layoutX="5.0" layoutY="342.0" prefHeight="47.0" prefWidth="543.0">
                <children>
                   <JFXButton fx:id="btnCreateAccount" alignment="BASELINE_LEFT" onAction="#onCreateAccount" prefHeight="42.0" prefWidth="264.0" style="-fx-text-align: center;" text="Create Account" textFill="#757575" textOverrun="CLIP">
@@ -57,7 +57,7 @@
                   </JFXButton>
                </children>
             </HBox>
-            <Label fx:id="myaccountstitle" prefHeight="52.0" prefWidth="552.0" style="-fx-alignment: LEFT_CENTER; -fx-background-radius: 5;" styleClass="toolbar" stylesheets="@main/custom.css" text="My Accounts" textAlignment="CENTER" textFill="#fffdfd">
+            <Label fx:id="myaccountstitle" prefHeight="52.0" prefWidth="573.0" style="-fx-alignment: LEFT_CENTER; -fx-background-radius: 5;" styleClass="toolbar" stylesheets="@main/custom.css" text="My Accounts" textAlignment="CENTER" textFill="#fffdfd">
                <font>
                   <Font name="System Bold" size="22.0" />
                </font>
@@ -127,14 +127,14 @@
             </Tooltip>
          </tooltip>
       </JFXButton>
-      <AnchorPane layoutX="559.0" layoutY="521.0" prefHeight="200.0" prefWidth="351.0" style="-fx-background-color: white; -fx-background-radius: 10;">
+      <AnchorPane layoutX="541.0" layoutY="521.0" prefHeight="200.0" prefWidth="386.0" style="-fx-background-color: white; -fx-background-radius: 10;">
          <children>
             <Label layoutX="14.0" layoutY="15.0" prefHeight="31.0" prefWidth="122.0" text="Price">
                <font>
                   <Font name="Arial Bold" size="15.0" />
                </font>
             </Label>
-            <Label fx:id="priceLabel" alignment="CENTER_RIGHT" layoutX="193.0" layoutY="15.0" prefHeight="31.0" prefWidth="147.0">
+            <Label fx:id="priceLabel" alignment="CENTER_RIGHT" layoutX="225.0" layoutY="15.0" prefHeight="31.0" prefWidth="147.0">
                <font>
                   <Font name="Arial" size="14.0" />
                </font>
@@ -144,21 +144,21 @@
                   <Font name="Arial Bold" size="15.0" />
                </font>
             </Label>
-            <Label fx:id="change1hLabel" alignment="CENTER" layoutX="179.0" layoutY="85.0" prefHeight="17.0" prefWidth="46.0" />
-            <Label fx:id="change24hLabel" alignment="CENTER" layoutX="229.0" layoutY="85.0" prefHeight="17.0" prefWidth="53.0" />
-            <Label fx:id="change7dLabel" alignment="CENTER" layoutX="292.0" layoutY="85.0" prefHeight="17.0" prefWidth="53.0" />
+            <Label fx:id="change1hLabel" alignment="CENTER" layoutX="208.0" layoutY="85.0" prefHeight="17.0" prefWidth="46.0" />
+            <Label fx:id="change24hLabel" alignment="CENTER" layoutX="263.0" layoutY="85.0" prefHeight="17.0" prefWidth="53.0" />
+            <Label fx:id="change7dLabel" alignment="CENTER" layoutX="320.0" layoutY="85.0" prefHeight="17.0" prefWidth="53.0" />
             <Label layoutX="14.0" layoutY="140.0" prefHeight="31.0" prefWidth="122.0" text="Market Cap.">
                <font>
                   <Font name="Arial Bold" size="15.0" />
                </font>
             </Label>
-            <Label fx:id="marketcapLabel" alignment="CENTER_RIGHT" layoutX="193.0" layoutY="140.0" prefHeight="31.0" prefWidth="147.0">
+            <Label fx:id="marketcapLabel" alignment="CENTER_RIGHT" layoutX="225.0" layoutY="140.0" prefHeight="31.0" prefWidth="147.0">
                <font>
                   <Font name="Arial" size="14.0" />
                </font>
             </Label>
-            <Label alignment="CENTER" layoutX="222.0" layoutY="84.0" prefHeight="17.0" prefWidth="13.0" text="/" />
-            <Label alignment="CENTER" layoutX="283.0" layoutY="85.0" prefHeight="17.0" prefWidth="13.0" text="/" />
+            <Label alignment="CENTER" layoutX="252.0" layoutY="85.0" prefHeight="17.0" prefWidth="13.0" text="/" />
+            <Label alignment="CENTER" layoutX="311.0" layoutY="85.0" prefHeight="17.0" prefWidth="13.0" text="/" />
          </children></AnchorPane>
    </children>
 </AnchorPane>

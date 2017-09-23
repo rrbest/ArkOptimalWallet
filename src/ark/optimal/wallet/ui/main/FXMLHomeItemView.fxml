@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="38.0" prefWidth="491.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ark.optimal.wallet.ui.main.FXMLHomeItemViewController">
+   <children>
+      <Label fx:id="accountNameLabel" layoutX="2.0" layoutY="2.0" prefHeight="36.0" prefWidth="281.0">
+         <font>
+            <Font size="16.0" />
+         </font>
+         <graphic>
+            <FontAwesomeIconView fill="#404bb6" glyphName="BANK" size="16" />
+         </graphic>
+      </Label>
+      <Label fx:id="accountBalanceLabel" alignment="CENTER_RIGHT" layoutX="276.0" layoutY="2.0" prefHeight="36.0" prefWidth="246.0">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

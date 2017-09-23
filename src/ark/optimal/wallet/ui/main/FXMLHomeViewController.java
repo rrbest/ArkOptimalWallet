@@ -9,10 +9,13 @@ import ark.optimal.wallet.pojo.Account;
 import ark.optimal.wallet.services.storageservices.StorageService;
 import ark.optimal.wallet.services.storageservices.Wallet;
 import ark.optimal.wallet.services.xchangeservices.XChangeServices;
+import ark.optimal.wallet.ui.AccountVotedDelegateTreeItem;
 import ark.optimal.wallet.ui.AlertController;
+import ark.optimal.wallet.ui.DelegateItem;
 import ark.optimal.wallet.ui.FXMLAccountsViewMenuController;
 import ark.optimal.wallet.ui.FXMLCreateAccountController;
 import ark.optimal.wallet.ui.FXMLImportAccountController;
+import ark.optimal.wallet.ui.FXMLVotedDelegateViewController;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXListCell;
 import com.jfoenix.controls.JFXListView;
@@ -126,24 +129,38 @@ public class FXMLHomeViewController implements Initializable {
                         setText(null);
                         setGraphic(null);
                     } else {
-                        FontAwesomeIconView accountImage = new FontAwesomeIconView();
-                        accountImage.setGlyphName("BANK");
-                        accountImage.setFill(Paint.valueOf("#404bb6"));
-                        accountImage.setSize("16px");
-                        Account acc = StorageService.getInstance().getWallet().getUserAccounts().get(account.getAddress());
-                        Double balance = acc.getBalance();
-                        for (Account sub : acc.getSubAccounts().values()) {
-                            balance += sub.getBalance();
+                        try {
+//                        FontAwesomeIconView accountImage = new FontAwesomeIconView();
+//                        accountImage.setGlyphName("BANK");
+//                        accountImage.setFill(Paint.valueOf("#404bb6"));
+//                        accountImage.setSize("16px");
+                            Account acc = StorageService.getInstance().getWallet().getUserAccounts().get(account.getAddress());
+                            Double balance = acc.getBalance();
+                            for (Account sub : acc.getSubAccounts().values()) {
+                                balance += sub.getBalance();
+                            }
+//                        setText(account.getUsername() + "\t\t\t\t\t\t\t\t\t\t     Ѧ" + Math.round(balance * 100.0) / 100.0);
+//                        setGraphic(accountImage);
+//                        setPrefWidth(USE_PREF_SIZE);
+//                        setPrefHeight(45);
+
+                            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLHomeItemView.fxml"));
+                            AnchorPane accountItem = (AnchorPane) fxmlLoader.load();
+                            FXMLHomeItemViewController homeItemController = (FXMLHomeItemViewController) fxmlLoader.getController();
+                            homeItemController.setAccountDetails(account.getUsername(), Math.round(balance * 100.0) / 100.0);
+                            setGraphic(accountItem);
+
+                        } catch (Exception ex) {
+                            Logger.getLogger(AccountVotedDelegateTreeItem.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        setText(account.getUsername() + "\t\t\t\t\t\t\t\t\t\t     Ѧ" + Math.round(balance * 100.0) / 100.0);
-                        setGraphic(accountImage);
-                        setPrefWidth(USE_PREF_SIZE);
-                        setPrefHeight(45);
+
                     }
                 }
 
-            });
-            if (wallet != null) {
+            }
+            );
+            if (wallet
+                    != null) {
                 Double balance = 0.0;
                 for (String address : wallet.getUserAccounts().keySet()) {
                     // Account account = AccountService.getFullAccount(address);
@@ -209,6 +226,8 @@ public class FXMLHomeViewController implements Initializable {
         if (!accountItemsMap.containsKey(account.getAddress())) {
             homeAccounts.getItems().add(new FXMLHomeViewController.AccountItem(account.getUsername(), account.getAddress()));
             accountItemsMap.put(account.getAddress(), account);
+            mainController.addToUserAccountsMenu(account);
+
         }
         //homeAccounts.requestFocus();
         //homeAccounts.getSelectionModel().select(new FXMLHomeViewController.AccountItem(account.getUsername(), account.getAddress()));
@@ -216,9 +235,8 @@ public class FXMLHomeViewController implements Initializable {
         //homeAccounts.setPrefHeight(homeAccounts.getItems().size() * 40);
         //((AnchorPane) homeAccounts.getParent()).setPrefHeight(40 + homeAccounts.getItems().size() * 40);
 
-        mainController.addToUserAccountsMenu(account);
     }
-    
+
     public void updateMyAccounts(Account account) {
         addToMyAccounts(account);
         homeAccounts.requestFocus();
@@ -228,8 +246,6 @@ public class FXMLHomeViewController implements Initializable {
         //((AnchorPane) homeAccounts.getParent()).setPrefHeight(40 + homeAccounts.getItems().size() * 40);
 
     }
-    
-    
 
     private void addToWatchAccounts(Account account) {
         mainController.addToWatchAccountsMenu(account);
