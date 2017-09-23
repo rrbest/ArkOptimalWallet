@@ -41,7 +41,7 @@ public class FXMLVotesViewController implements Initializable {
     private FXMLAccountViewController accountViewController;
 
     private Account account;
- 
+
     @FXML
     private TableView<VoteItem> masterVotedDelegateTable;
     @FXML
@@ -71,7 +71,6 @@ public class FXMLVotesViewController implements Initializable {
     @FXML
     private TableColumn<VoteItem, Double> subWalletExcludedVotesPercentage;
 
-
     /**
      * Initializes the controller class.
      */
@@ -79,7 +78,7 @@ public class FXMLVotesViewController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
         masterVotedDelegateTable.setPlaceholder(new Label(" "));
-        
+
         masterDelegateName.setCellValueFactory(new PropertyValueFactory<VoteItem, String>("delegateName"));
         masterDelegateName.setCellFactory(new FXMLVotesViewController.ColumnFormatter<VoteItem, String>());
 
@@ -99,7 +98,7 @@ public class FXMLVotesViewController implements Initializable {
         masterAddress.setCellFactory(new FXMLVotesViewController.HyperlinkCell());
 
         SubWalletsVotedDelegateTable.setPlaceholder(new Label(" "));
-        
+
         subWalletDelegateName.setCellValueFactory(new PropertyValueFactory<VoteItem, String>("delegateName"));
         subWalletDelegateName.setCellFactory(new FXMLVotesViewController.ColumnFormatter<VoteItem, String>());
 
@@ -126,29 +125,38 @@ public class FXMLVotesViewController implements Initializable {
 
     public void viewVotes(Account account) {
         masterVotedDelegateTable.getItems().clear();
-        if (account.getVotedDelegates().size() > 0){
+        if (account.getVotedDelegates().size() > 0) {
             Delegate d = account.getVotedDelegates().get(0);
-            d = StorageService.getInstance().getWallet().getDelegates().get(d.getUsername());
-            VoteItem vi = new VoteItem(d.getUsername(), d.getRate(), account.getUsername(), account.getBalance().intValue(),d.getPayoutPercentage(), d.getExlcudedPercentage());
+            Delegate delegate = StorageService.getInstance().getWallet().getDelegates().get(d.getUsername());
+            if (delegate != null) {
+                d = delegate;
+            } else {
+                StorageService.getInstance().addDelegate(d, true);
+            }
+            VoteItem vi = new VoteItem(d.getUsername(), d.getRate(), account.getUsername(), account.getBalance().intValue(), d.getPayoutPercentage(), d.getExlcudedPercentage());
             masterVotedDelegateTable.getItems().add(vi);
         }
         SubWalletsVotedDelegateTable.getItems().clear();
-       
+
         for (String delegateName : account.getSubAccounts().keySet()) {
-            Delegate d = StorageService.getInstance().getWallet().getDelegates().get(delegateName);
+            Delegate delegate = StorageService.getInstance().getWallet().getDelegates().get(delegateName);
             Account sub = account.getSubAccounts().get(delegateName);
-            if (sub.getVotedDelegates().size()  == 0)
-            {   
+            if (sub.getVotedDelegates().size() == 0) {
                 sub = AccountService.getFullAccount(sub.getAddress());
             }
             sub.setUsername(account.getUsername() + "(" + delegateName + ")");
-            
+
             //d.setChecked(Boolean.TRUE);
-            if (sub.getVotedDelegates().size() > 0)
-                sub.getVotedDelegates().set(0, d);
-            VoteItem vi = new VoteItem(delegateName, d.getRate(), sub.getUsername(), sub.getBalance().intValue(), d.getPayoutPercentage(), d.getExlcudedPercentage());
-            SubWalletsVotedDelegateTable.getItems().add(vi);
-            
+            if (sub.getVotedDelegates().size() > 0) {
+                if (delegate != null) {
+                    sub.getVotedDelegates().set(0, delegate);
+                }
+                delegate = sub.getVotedDelegates().get(0);
+                VoteItem vi = new VoteItem(delegateName, delegate.getRate(), sub.getUsername(), sub.getBalance().intValue(), delegate.getPayoutPercentage(), delegate.getExlcudedPercentage());
+                SubWalletsVotedDelegateTable.getItems().add(vi);
+
+            }
+
         }
     }
 
