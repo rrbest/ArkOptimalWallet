@@ -217,12 +217,14 @@ public class FXMLAccountsViewMenuController implements Initializable {
     private void addToMyAccounts(Account account) {
         if (!StorageService.getInstance().getWallet().getUserAccounts().containsKey(account.getAddress())) {
             StorageService.getInstance().addAccountToUserAccounts(account, true);
+        }
+        if(!masterAccounts.containsKey(account.getAddress())){
+            masterAccounts.put(account.getAddress(), account);
             myAcountsListView.getItems().add(new AccountItem(account.getUsername(), account.getAddress()));
         }
-        masterAccounts.put(account.getAddress(), account);
+        
         myAcountsListView.requestFocus();
         myAcountsListView.getSelectionModel().select(new AccountItem(account.getUsername(), account.getAddress()));
-        //myAcountsListView.getSelectionModel().select(0);
         myAcountsListView.refresh();
         myAcountsListView.setPrefHeight(myAcountsListView.getItems().size() * 40);
         accountsParentVBox.setPrefHeight(myAcountsListView.getItems().size() * 40 + subAcountsListView.getItems().size() * 40 + 100);
@@ -330,6 +332,10 @@ public class FXMLAccountsViewMenuController implements Initializable {
             } catch (IOException ex) {
                 Logger.getLogger(FXMLAccountsViewMenuController.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
+        AccountItem accountItem = myAcountsListView.getSelectionModel().getSelectedItem();
+        if(accountItem == null){ // no account item selected (clicked)
+            return;
         }
         String address = myAcountsListView.getSelectionModel().getSelectedItem().getAddress();
         Account account = StorageService.getInstance().getWallet().getUserAccounts().get(address);

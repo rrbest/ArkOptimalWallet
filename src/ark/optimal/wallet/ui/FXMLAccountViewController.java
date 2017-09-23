@@ -190,7 +190,7 @@ public class FXMLAccountViewController implements Initializable {
         accountName.setText(account.getUsername());
         accountAddress.setText(account.getAddress());
         accountBalance.setText(accountBalance.getText().charAt(0) + account.getBalance().toString());
-        accountBalanceExchangeValue.setText(NumberFormat.getCurrencyInstance().format(new Double(account.getBalance() * XChangeServices.getPrice("usd"))));
+        accountBalanceExchangeValue.setText(NumberFormat.getCurrencyInstance().format(new Double(account.getBalance() * XChangeServices.getInstance().getPrice())));
         transactionsViewController.updateTransactionsTable(account);
         addQRCode(account.getAddress());
         setNode(transactionsView);
@@ -208,7 +208,7 @@ public class FXMLAccountViewController implements Initializable {
         accountName.setText(subAccount.getUsername());
         accountAddress.setText(subAccount.getAddress());
         accountBalance.setText(accountBalance.getText().charAt(0) + subAccount.getBalance().toString());
-        accountBalanceExchangeValue.setText(NumberFormat.getCurrencyInstance().format(new Double(subAccount.getBalance() * XChangeServices.getPrice("usd"))));
+        accountBalanceExchangeValue.setText(NumberFormat.getCurrencyInstance().format(new Double(subAccount.getBalance() * XChangeServices.getInstance().getPrice())));
         transactionsViewController.updateTransactionsTable(subAccount);
         addQRCode(subAccount.getAddress());
         setNode(transactionsView);

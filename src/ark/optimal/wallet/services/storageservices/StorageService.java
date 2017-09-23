@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -246,9 +247,15 @@ public class StorageService {
     }
 
     public void updateWallet() {
+     try{
+         
+        
         Set<String> addresses = this.wallet.getUserAccounts().keySet(); // to avoid concurrentModification
         for (String address : addresses) {
             Account account = this.wallet.getUserAccounts().get(address);
+            if(account == null){
+                continue;
+            }
             String accountName = account.getUsername();
             Map<String, Account> subAccounts = account.getSubAccounts();
             account = AccountService.getFullAccount(address);
@@ -294,6 +301,9 @@ public class StorageService {
             //newDelegate.setMinPayout(delegate.getMinPayout());
             this.addDelegate(newDelegate, false);
         }
+     }catch(ConcurrentModificationException ex){
+         Logger.getLogger(StorageService.class.getName()).log(Level.FINE, null, ex);
+     }
 
     }
 

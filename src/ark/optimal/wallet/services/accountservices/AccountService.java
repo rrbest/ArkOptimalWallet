@@ -9,24 +9,15 @@ import ark.optimal.wallet.pojo.Account;
 import ark.optimal.wallet.pojo.Delegate;
 import ark.optimal.wallet.pojo.Transaction;
 import ark.optimal.wallet.services.networkservices.NetworkService;
-import com.eclipsesource.v8.NodeJS;
-import com.eclipsesource.v8.Releasable;
-import com.eclipsesource.v8.V8Object;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ark.core.Crypto;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import static java.lang.Math.round;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bitcoinj.core.ECKey;
@@ -271,48 +262,5 @@ public class AccountService {
         return transactions;
 
     }
-
-    public String getDateCurrentTimeZone(long timestamp) {
-        try {
-            Calendar calendar = Calendar.getInstance();
-            TimeZone tz = TimeZone.getDefault();
-            calendar.setTimeInMillis(timestamp * 1000);
-            calendar.add(Calendar.MILLISECOND, tz.getOffset(calendar.getTimeInMillis()));
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date currenTimeZone = (Date) calendar.getTime();
-            return sdf.format(currenTimeZone);
-        } catch (Exception e) {
-        }
-        return "";
-    }
-
-    private static String readFileAsString(String filePath) throws java.io.IOException {
-        StringBuffer fileData = new StringBuffer(1000);
-        BufferedReader reader = new BufferedReader(
-                new FileReader(filePath));
-        char[] buf = new char[1024];
-        int numRead = 0;
-        while ((numRead = reader.read(buf)) != -1) {
-            String readData = String.valueOf(buf, 0, numRead);
-            fileData.append(readData);
-            buf = new char[1024];
-        }
-        reader.close();
-        return fileData.toString();
-    }
-
-    private static void executeJSFunction(V8Object object, String name, Object... params) {
-        Object result = object.executeJSFunction(name, params);
-        if (result instanceof Releasable) {
-            ((Releasable) result).release();
-        }
-    }
-
-    private static void runMessageLoop(NodeJS nodeJS) {
-        while (nodeJS.isRunning()) {
-            nodeJS.handleMessage();
-        }
-    }
-    
 
 }

@@ -8,6 +8,7 @@ package ark.optimal.wallet.ui;
 import ark.optimal.wallet.pojo.Account;
 import ark.optimal.wallet.services.accountservices.AccountService;
 import ark.optimal.wallet.services.storageservices.StorageService;
+import ark.optimal.wallet.ui.main.FXMLHomeViewController;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import java.net.URL;
@@ -28,6 +29,8 @@ public class FXMLImportAccountController implements Initializable {
     private JFXTextField accountPassphrase;
 
     private FXMLAccountsViewMenuController accountMenuController;
+    private FXMLHomeViewController homeViewController;
+    
     @FXML
     private JFXButton accountImportAccount;
     @FXML
@@ -61,13 +64,23 @@ public class FXMLImportAccountController implements Initializable {
             new AlertController().alertUser("Network may be unavailable");
             return;
         }
-        accountMenuController.updateMyAccounts(account);
+        if(accountMenuController != null){
+            accountMenuController.updateMyAccounts(account);
+        }else if(homeViewController != null){
+            homeViewController.updateMyAccounts(account);
+        }
+        
+        
         closeWindow();
     }
     
     private void closeWindow(){
         Stage stage = (Stage) accountPassphrase.getScene().getWindow();
         stage.close();
+    }
+
+    public void setHomeViewController(FXMLHomeViewController homeViewController) {
+        this.homeViewController = homeViewController;
     }
 
    
