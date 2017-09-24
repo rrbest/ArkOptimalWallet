@@ -260,7 +260,9 @@ public class FXMLSubWalletManagerViewController implements Initializable {
     @FXML
     private void onCreateImportSubWallets(ActionEvent event) {
 
-        if (accounts.getValue() == null) {
+        Account account = accounts.getValue();
+
+        if (account == null) {
 
             new AlertController().alertUser("Please select master wallet");
             return;
@@ -269,11 +271,17 @@ public class FXMLSubWalletManagerViewController implements Initializable {
             new AlertController().alertUser("Please enter master passphrase");
             return;
         }
+        String senderByPassphrase = AccountService.getAddress(masterPassphrase.getText());
+        if(!senderByPassphrase.equals(account.getAddress()))
+        {
+            new AlertController().alertUser("Passphrase is not corresponding to account");
+            return;
+        }
 
         List<Transaction> transactions = new ArrayList<Transaction>();
         List<TransactionItem> transactionItems = new ArrayList<TransactionItem>();
 
-        Account account = accounts.getValue();
+       
         Map subAccounts = account.getSubAccounts();
         for (SubWalletItem si : selectedSubWallets) {
             TransactionItem ti = new TransactionItem("---", account.getUsername(), account.getUsername() + "(" + si.getDelegateName() + ")", 0.0, 0.0, "SubWallet created/imported");
@@ -422,7 +430,9 @@ public class FXMLSubWalletManagerViewController implements Initializable {
     @FXML
     private void onSubWalletVote(ActionEvent event) {
 
-        if (accounts.getValue() == null) {
+        Account account = accounts.getValue();
+
+        if (account == null) {
 
             new AlertController().alertUser("Please select master wallet");
             return;
@@ -431,11 +441,16 @@ public class FXMLSubWalletManagerViewController implements Initializable {
             new AlertController().alertUser("Please enter master passphrase");
             return;
         }
+        String senderByPassphrase = AccountService.getAddress(masterPassphrase.getText());
+        if(!senderByPassphrase.equals(account.getAddress()))
+        {
+            new AlertController().alertUser("Passphrase is not corresponding to account");
+            return;
+        }
 
         List<Transaction> transactions = new ArrayList<Transaction>();
         List<TransactionItem> transactionItems = new ArrayList<TransactionItem>();
 
-        Account account = accounts.getValue();
         Map<String, Account> subAccounts = account.getSubAccounts();
         for (SubWalletItem si : selectedSubWallets) {
             Account sub = subAccounts.get(si.getDelegateName());
@@ -473,7 +488,9 @@ public class FXMLSubWalletManagerViewController implements Initializable {
     @FXML
     private void onSendToMaster(ActionEvent event) {
 
-        if (accounts.getValue() == null) {
+        Account account = accounts.getValue();
+
+        if (account == null) {
 
             new AlertController().alertUser("Please select master wallet");
             return;
@@ -482,11 +499,16 @@ public class FXMLSubWalletManagerViewController implements Initializable {
             new AlertController().alertUser("Please enter master passphrase");
             return;
         }
+        String senderByPassphrase = AccountService.getAddress(masterPassphrase.getText());
+        if(!senderByPassphrase.equals(account.getAddress()))
+        {
+            new AlertController().alertUser("Passphrase is not corresponding to account");
+            return;
+        }
 
         List<Transaction> transactions = new ArrayList<Transaction>();
         List<TransactionItem> transactionItems = new ArrayList<TransactionItem>();
 
-        Account account = accounts.getValue();
         Map<String, Account> subAccounts = account.getSubAccounts();
         for (SubWalletItem si : selectedSubWallets) {
             Account sub = subAccounts.get(si.getDelegateName());
@@ -557,13 +579,21 @@ public class FXMLSubWalletManagerViewController implements Initializable {
     @FXML
     private void onOptimize(ActionEvent event) {
 
-        if (accounts.getValue() == null) {
+        Account account = accounts.getValue();
+
+        if (account == null) {
 
             new AlertController().alertUser("Please select master wallet");
             return;
         }
         if (masterPassphrase.getText() == null || masterPassphrase.getText().equals("")) {
             new AlertController().alertUser("Please enter master passphrase");
+            return;
+        }
+        String senderByPassphrase = AccountService.getAddress(masterPassphrase.getText());
+        if(!senderByPassphrase.equals(account.getAddress()))
+        {
+            new AlertController().alertUser("Passphrase is not corresponding to account");
             return;
         }
 

@@ -20,12 +20,12 @@
     <children>
           <AnchorPane fx:id="holderAnchor" prefHeight="733.0" prefWidth="1185.0">
               <children>
-                  <HBox layoutX="25.0" layoutY="49.0" prefHeight="166.0" prefWidth="1035.0" style="-fx-background-color: white;">
+                  <HBox layoutX="25.0" layoutY="49.0" prefHeight="166.0" prefWidth="961.0" style="-fx-background-color: white;">
                       <effect>
                           <DropShadow blurType="GAUSSIAN" height="10.0" offsetX="1.0" offsetY="1.0" radius="4.5" width="10.0" />
                       </effect>
                       <children>
-                          <AnchorPane prefHeight="166.0" prefWidth="1035.0">
+                          <AnchorPane prefHeight="166.0" prefWidth="981.0">
                               <children>
                                   <ImageView fx:id="qrcodeImageView" fitHeight="130.0" fitWidth="130.0" layoutX="21.0" layoutY="19.0" pickOnBounds="true" preserveRatio="true" />
                                   <Label fx:id="accountName" layoutX="166.0" layoutY="20.0" prefHeight="37.0" prefWidth="348.0">
@@ -54,7 +54,7 @@
                                           <Cursor fx:constant="HAND" />
                                       </cursor>
                                   </JFXButton>
-                        <JFXButton fx:id="btnSendArk" contentDisplay="CENTER" layoutX="753.0" layoutY="14.0" onAction="#onSendArk" prefHeight="27.0" prefWidth="100.0">
+                        <JFXButton fx:id="btnSendArk" contentDisplay="CENTER" layoutX="653.0" layoutY="16.0" onAction="#onSendArk" prefHeight="27.0" prefWidth="100.0">
                            <graphic>
                               <ImageView fitHeight="35.0" fitWidth="38.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -68,6 +68,15 @@
                               <Insets left="20.0" />
                            </padding>
                         </Label>
+                        <JFXButton fx:id="AccountOperationMenuBtn" contentDisplay="CENTER" layoutX="842.0" layoutY="13.0" onAction="#onAccountOperationMenu" prefHeight="52.0" prefWidth="100.0">
+                           <graphic>
+                              <ImageView fitHeight="54.0" fitWidth="42.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../../resources/accountMenu.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </JFXButton>
                               </children>
                           </AnchorPane>
                       </children>
@@ -87,16 +96,12 @@
                           <Cursor fx:constant="HAND" />
                       </cursor>
                   </JFXButton>
-            <JFXButton fx:id="btnExchange" layoutX="343.0" layoutY="228.0" onAction="#onExchange" prefHeight="52.0" prefWidth="141.0" styleClass="tab-buttons" stylesheets="@main/custom.css" text="EXCHANGE" textFill="GREY">
-               <cursor>
-                  <Cursor fx:constant="HAND" />
-               </cursor>
-            </JFXButton>
             <Separator layoutX="36.0" layoutY="286.0" prefHeight="4.0" prefWidth="1035.0" />
             <AnchorPane fx:id="accountHolderPane" layoutX="37.0" layoutY="287.0" prefHeight="450.0" prefWidth="1026.0" />
             
                           </children>
           </AnchorPane>
             <JFXDrawer fx:id="accountsDrawer" defaultDrawerSize="250.0" direction="RIGHT" layoutX="942.0" layoutY="49.0" overLayVisible="false" prefHeight="697.0" prefWidth="253.0" />
+      <JFXDrawer fx:id="accountOperationsDrawer" defaultDrawerSize="250.0" direction="BOTTOM" layoutY="552.0" prefHeight="250.0" prefWidth="1199.0" />
     </children>
 </AnchorPane>

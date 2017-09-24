@@ -32,11 +32,13 @@ public class FXMLEditAccountNameController implements Initializable {
     private JFXButton AccountLabelCancel;
 
     private FXMLAccountsViewMenuController accountMenuController;
-    private AccountItem account;
+
+    private Account account;
 
     public void setAccountMenuController(FXMLAccountsViewMenuController accountMenuController) {
         this.accountMenuController = accountMenuController;
     }
+
     /**
      * Initializes the controller class.
      */
@@ -50,11 +52,9 @@ public class FXMLEditAccountNameController implements Initializable {
         Account account = StorageService.getInstance().checkIfAccountExistByAddress(this.account.getAddress());
         account.setUsername(accountLabel.getText());
         this.account.setUsername(accountLabel.getText());
-        if(StorageService.getInstance().getWallet().getUserAccounts().get(account.getAddress()) != null){
+        if (StorageService.getInstance().getWallet().getUserAccounts().get(account.getAddress()) != null) {
             accountMenuController.updateMyAccounts(account);
-        } else {
-            accountMenuController.updateWatchAccounts(account);
-        }
+        } 
         
         closeWindow();
     }
@@ -69,7 +69,13 @@ public class FXMLEditAccountNameController implements Initializable {
         stage.close();
     }
 
-    public void setAccount(AccountItem account){
+    public void setAccount(AccountItem accountItem) {
+        Account account = StorageService.getInstance().getWallet().getUserAccounts().get(accountItem.getAddress());
+        accountLabel.setText(account.getUsername());
+        this.account = account;
+    }
+
+    void setAccount(Account account) {
         accountLabel.setText(account.getUsername());
         this.account = account;
     }

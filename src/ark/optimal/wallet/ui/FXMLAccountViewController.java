@@ -104,9 +104,15 @@ public class FXMLAccountViewController implements Initializable {
     private FXMLVotesViewController votesViewController;
     private FXMLAccountsViewMenuController menuController;
 
+    private FXMLAccountOperationsViewController accountOpController;
     private Account account;
     @FXML
     private Label copyToCliboardLabel;
+    @FXML
+    private JFXButton AccountOperationMenuBtn;
+    @FXML
+    private JFXDrawer accountOperationsDrawer;
+    private FXMLArkOptimalWalletMainViewController mainViewController;
 
     /**
      * Initializes the controller class.
@@ -118,11 +124,18 @@ public class FXMLAccountViewController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("FXMLAccountsViewMenu.fxml"));
             ScrollPane sp = loader.load();
             sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-            
+
             menuController = loader.getController();
             menuController.setAccountViewController(this);
 
             accountsDrawer.setSidePane(sp);
+
+            loader = new FXMLLoader(getClass().getResource("FXMLAccountOperationsView.fxml"));
+            AnchorPane ap = loader.load();
+            accountOpController = (FXMLAccountOperationsViewController) loader.getController();
+            accountOpController.setAccountViewController(this);
+
+            accountOperationsDrawer.setSidePane(ap);
 
             if (accountAddress.getText() != null && accountAddress.getText() != "") {
                 qrCodeGenerator = new QRCodeGenerator();
@@ -148,6 +161,10 @@ public class FXMLAccountViewController implements Initializable {
             Logger.getLogger(FXMLAccountViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    public FXMLAccountsViewMenuController getMenuController() {
+        return menuController;
     }
 
     @FXML
@@ -197,6 +214,7 @@ public class FXMLAccountViewController implements Initializable {
         menuController.selectAccountItem(account);
         StorageService.getInstance().addAccountToUserAccounts(account, true);
         btnTransactions.requestFocus();
+        closeAccountOperationsDrawer();
 
     }
 
@@ -243,6 +261,7 @@ public class FXMLAccountViewController implements Initializable {
         transactionsViewController.updateTransactionsTable(account);
         btnTransactions.requestFocus();
         setNode(transactionsView);
+        closeAccountOperationsDrawer();
 
     }
 
@@ -283,10 +302,7 @@ public class FXMLAccountViewController implements Initializable {
         btnVotes.requestFocus();
         votesViewController.viewVotes(this.account);
         setNode(votesView);
-    }
-
-    @FXML
-    private void onExchange(ActionEvent event) {
+        closeAccountOperationsDrawer();
     }
 
     private void addQRCode(String address) {
@@ -320,7 +336,7 @@ public class FXMLAccountViewController implements Initializable {
         } catch (IOException ex) {
             Logger.getLogger(FXMLAccountsViewMenuController.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        closeAccountOperationsDrawer();
     }
 
     public void runImportAccount() {
@@ -349,5 +365,33 @@ public class FXMLAccountViewController implements Initializable {
     public void clearAccountsMenu() {
         menuController.clearAccountsMenu();
     }
+
+    @FXML
+    private void onAccountOperationMenu(ActionEvent event) {
+        if (!accountOperationsDrawer.isShown()) {
+            accountOperationsDrawer.open();
+        } else {
+            accountOperationsDrawer.close();
+        }
+
+        accountOpController.setAccount(this.account);
+
+    }
+
+    public void closeAccountOperationsDrawer() {
+        accountOperationsDrawer.close();
+    }
+
+    void viewHome() {
+       this.mainViewController.viewHome();
+    }
+
+    public void setMainViewControler(FXMLArkOptimalWalletMainViewController mainViewController) {
+        this.mainViewController = mainViewController;
+    }
+
+    void removeAccountFromHome(Account account) {
+            mainViewController.removeAccountFromHome(account);
+     }
 
 }

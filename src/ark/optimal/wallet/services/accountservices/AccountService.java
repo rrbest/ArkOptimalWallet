@@ -30,11 +30,11 @@ public class AccountService {
 
     private static Delegate getDelegate(String api) {
         String response = NetworkService.getFromPeer(api, 1);
-        
-        if (response == null){
+
+        if (response == null) {
             return null;
         }
-        
+
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> respMap = new HashMap<String, Object>();
 
@@ -118,7 +118,7 @@ public class AccountService {
     public static Account getFullAccount(String address) {
         String response = NetworkService.getFromPeer("/api/accounts?address=" + address, 1);
 
-        if(response == null){
+        if (response == null) {
             return null;
         }
         ObjectMapper mapper = new ObjectMapper();
@@ -129,8 +129,9 @@ public class AccountService {
             respMap = mapper.readValue(response, new TypeReference<Map<String, Object>>() {
             });
             //Gson g = new Gson();
-            if (!(Boolean)respMap.get("success"))
+            if (!(Boolean) respMap.get("success")) {
                 return new Account(address, address, null, 0.0);
+            }
             Map accountMap = (Map) respMap.get("account");
             Double balance = round((Double.parseDouble((String) accountMap.get("balance")) / 100000000) * 100.0) / 100.0;
 
@@ -160,8 +161,7 @@ public class AccountService {
     public static Account createAccount(String passphrase) {
         Account account = null;
         try {
-            ECKey addressKey = Crypto.getKeys(passphrase);
-            String address = Crypto.getAddress(addressKey);
+            String address = getAddress(passphrase);
             account = getFullAccount(address);
 
         } catch (Exception ex) {
@@ -173,11 +173,18 @@ public class AccountService {
         return account;
 
     }
-    
-    public static List<Delegate> getVotedDelegates(String address){
-        String response = NetworkService.getFromPeer("/api/accounts/delegates/?address="+address, 1);
+
+    public static String getAddress(String passphrase) {
+        ECKey addressKey = Crypto.getKeys(passphrase);
+        String address = Crypto.getAddress(addressKey);
+        return address;
+
+    }
+
+    public static List<Delegate> getVotedDelegates(String address) {
+        String response = NetworkService.getFromPeer("/api/accounts/delegates/?address=" + address, 1);
         //System.out.println(response);
-        if(response == null){
+        if (response == null) {
             return null;
         }
         ObjectMapper mapper = new ObjectMapper();
@@ -192,15 +199,15 @@ public class AccountService {
                 Double vote = Double.parseDouble((String) delegateMap.get("vote")) / 100000000;
                 int v = vote.intValue();
                 Delegate d = new Delegate((String) delegateMap.get("username"),
-                    (String) delegateMap.get("address"),
-                    (String) delegateMap.get("publicKey"),
-                    v,
-                    (Integer) delegateMap.get("producedblocks"),
-                    (Integer) delegateMap.get("missedblocks"),
-                    (Integer) delegateMap.get("rate"),
-                    (delegateMap.get("approval") instanceof Integer) ? (Double) ((Integer) delegateMap.get("approval") * 1.0) : (Double) delegateMap.get("approval"),
-                    (delegateMap.get("productivity") instanceof Integer) ? (Double) ((Integer) delegateMap.get("productivity") * 1.0) : (Double) delegateMap.get("productivity"));
-            
+                        (String) delegateMap.get("address"),
+                        (String) delegateMap.get("publicKey"),
+                        v,
+                        (Integer) delegateMap.get("producedblocks"),
+                        (Integer) delegateMap.get("missedblocks"),
+                        (Integer) delegateMap.get("rate"),
+                        (delegateMap.get("approval") instanceof Integer) ? (Double) ((Integer) delegateMap.get("approval") * 1.0) : (Double) delegateMap.get("approval"),
+                        (delegateMap.get("productivity") instanceof Integer) ? (Double) ((Integer) delegateMap.get("productivity") * 1.0) : (Double) delegateMap.get("productivity"));
+
                 delegates.add(d);
             }
 
@@ -213,8 +220,8 @@ public class AccountService {
 
     public static List<Transaction> getTransactions(String address, int limit) {
         String response = NetworkService.getFromPeer("/api/transactions?orderBy=timestamp:desc&limit=" + limit + "&recipientId=" + address + "&senderId=" + address, 1);
-        
-        if (response == null){
+
+        if (response == null) {
             return null;
         }
         //System.out.println(response);

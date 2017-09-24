@@ -5,17 +5,27 @@
  */
 package ark.optimal.wallet.ui;
 
+import ark.optimal.wallet.services.accountservices.AccountService;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
+import io.ark.core.Crypto;
 import io.ark.core.Transaction;
 import io.ark.core.TransactionService;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 /**
  * FXML Controller class
@@ -58,8 +68,30 @@ public class FXMLSendArkViewController implements Initializable {
 
     @FXML
     private void onSendArkNext(ActionEvent event) {
-        Transaction tx = TransactionService.createTransaction(this.senderAddress,destinationAddress.getText(), new Long(amountArk.getText()), smartBridge.getText(), passphrase.getText());
-        TransactionService.broadcastTransaction(tx);
+        
+        String senderByPassphrase = AccountService.getAddress(passphrase.getText());
+        if(!senderByPassphrase.equals(this.senderAddress))
+        {
+            new AlertController().alertUser("Passphrase is not corresponding to account");
+            closeWindow();
+            return;
+        }
+         try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLSendArkConfirmationView.fxml"));
+                Parent root1 = (Parent) fxmlLoader.load();
+                FXMLSendArkConfirmationViewController sendArkConfController = (FXMLSendArkConfirmationViewController) fxmlLoader.getController();
+                Transaction tx = TransactionService.createTransaction(this.senderAddress,destinationAddress.getText(), new Long(amountArk.getText()), smartBridge.getText(), passphrase.getText());
+                sendArkConfController.setTransaction(tx);
+                Stage stage = new Stage();
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.initStyle(StageStyle.UNDECORATED);
+                stage.setTitle("C");
+                stage.setScene(new Scene(root1));
+                stage.show();
+            } catch (IOException ex) {
+                Logger.getLogger(FXMLAccountsViewMenuController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        
         closeWindow();
     }
 

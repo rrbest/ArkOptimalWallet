@@ -61,6 +61,7 @@ public class FXMLTransactionsViewController implements Initializable {
     private TableColumn<TransactionItem, String> __transactionSmartBridge;
 
     private FXMLAccountViewController accountViewController;
+
     /**
      * Initializes the controller class.
      */
@@ -92,17 +93,18 @@ public class FXMLTransactionsViewController implements Initializable {
         __transactionSmartBridge.setCellValueFactory(new PropertyValueFactory<TransactionItem, String>("smartBridge"));
         __transactionSmartBridge.setCellFactory(new FXMLTransactionsViewController.ColumnFormatter<TransactionItem, String>());
 
+        transactionsTable.setPlaceholder(new Label(" "));
+
     }
 
     public void setAccountsViewController(FXMLAccountViewController accountViewController) {
         this.accountViewController = accountViewController;
     }
-    
-    
+
     public void updateTransactionsTable(Account account) {
 
         transactionsTable.getItems().clear();
-        if (account == null){
+        if (account == null) {
             return;
         }
         List<Transaction> transactions = account.getTransactions();
@@ -114,14 +116,14 @@ public class FXMLTransactionsViewController implements Initializable {
             System.out.println(t.getAmount());
             System.out.println(formatTransactionTimeStamp((long) t.getTimestamp()));
             DateTime dt = ConvertTransactionTimeStampToLocal(t.getTimestamp());
-            Double fee = t.getFee().doubleValue() /100000000.0;
+            Double fee = t.getFee().doubleValue() / 100000000.0;
             Double amount = t.getAmount().doubleValue() / 100000000.0;
             String type = "";
             if (t.getType() == 0) {
-                if (account.getAddress().equals(t.getSenderId())){
-                   type = "Send Ark";
-                    amount = -1 * (amount+fee);
-                }else{
+                if (account.getAddress().equals(t.getSenderId())) {
+                    type = "Send Ark";
+                    amount = -1 * (amount + fee);
+                } else {
                     type = "Receive Ark";
                 }
             } else if (t.getType() == 3) {
@@ -132,7 +134,7 @@ public class FXMLTransactionsViewController implements Initializable {
                 type = "Delegate Registration";
                 amount = -1 * t.getFee().doubleValue() / 100000000.0;
             }
-            
+
             String smartbridge = t.getVendorField();
             String from = t.getFrom();
             if (t.getSenderId() != null) {
@@ -167,7 +169,7 @@ public class FXMLTransactionsViewController implements Initializable {
 
         }
 
-       /* if (transactionsTable.getItems().size() * 40 > 450) {
+        /* if (transactionsTable.getItems().size() * 40 > 450) {
             transactionsTable.setPrefHeight(transactionsTable.getItems().size() * 40);
         }*/
     }
@@ -200,7 +202,7 @@ public class FXMLTransactionsViewController implements Initializable {
 
         return dt;
     }
-    
+
     private class HyperlinkCell implements Callback<TableColumn<TransactionItem, Hyperlink>, TableCell<TransactionItem, Hyperlink>> {
 
         @Override
@@ -218,7 +220,7 @@ public class FXMLTransactionsViewController implements Initializable {
                         item.setOnAction(t -> {
                             try {
                                 HostServicesProvider.getInstance().getHostServices().showDocument("https://explorer.ark.io/tx/" + item.getText());
-                             } catch (Exception ex) {
+                            } catch (Exception ex) {
                                 Logger.getLogger(FXMLAccountViewController.class.getName()).log(Level.SEVERE, null, ex);
                             }
 

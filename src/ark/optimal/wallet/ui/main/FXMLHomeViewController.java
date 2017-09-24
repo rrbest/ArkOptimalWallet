@@ -99,7 +99,7 @@ public class FXMLHomeViewController implements Initializable {
     @FXML
     private Label marketcapLabel;
 
-    private Map<String, Account> accountItemsMap;
+    private Map<String, AccountItem> accountItemsMap;
 
     public void setHomeview(AnchorPane homeview) {
         this.homeview = homeview;
@@ -113,7 +113,7 @@ public class FXMLHomeViewController implements Initializable {
         try {
             // TODO
             Wallet wallet = StorageService.getInstance().loadWallet();
-            accountItemsMap = new HashMap<String, Account>();
+            accountItemsMap = new HashMap<String, AccountItem>();
 
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLArkOptimalWalletMainView.fxml"));
             mainview = fxmlLoader.load();
@@ -159,8 +159,7 @@ public class FXMLHomeViewController implements Initializable {
 
             }
             );
-            if (wallet
-                    != null) {
+            if (wallet!= null) {
                 Double balance = 0.0;
                 for (String address : wallet.getUserAccounts().keySet()) {
                     // Account account = AccountService.getFullAccount(address);
@@ -224,8 +223,9 @@ public class FXMLHomeViewController implements Initializable {
             StorageService.getInstance().addAccountToUserAccounts(account, true);
         }
         if (!accountItemsMap.containsKey(account.getAddress())) {
-            homeAccounts.getItems().add(new FXMLHomeViewController.AccountItem(account.getUsername(), account.getAddress()));
-            accountItemsMap.put(account.getAddress(), account);
+            AccountItem accountItem = new AccountItem(account.getUsername(), account.getAddress());
+            homeAccounts.getItems().add(accountItem);
+            accountItemsMap.put(account.getAddress(), accountItem);
             mainController.addToUserAccountsMenu(account);
 
         }
@@ -240,7 +240,7 @@ public class FXMLHomeViewController implements Initializable {
     public void updateMyAccounts(Account account) {
         addToMyAccounts(account);
         homeAccounts.requestFocus();
-        homeAccounts.getSelectionModel().select(new FXMLHomeViewController.AccountItem(account.getUsername(), account.getAddress()));
+        homeAccounts.getSelectionModel().select(accountItemsMap.get(account.getAddress()));
         homeAccounts.refresh();
         //homeAccounts.setPrefHeight(homeAccounts.getItems().size() * 40);
         //((AnchorPane) homeAccounts.getParent()).setPrefHeight(40 + homeAccounts.getItems().size() * 40);
@@ -304,6 +304,9 @@ public class FXMLHomeViewController implements Initializable {
         mainController.clearAccountsMenu();
         Double balance = 0.0;
         for (String address : StorageService.getInstance().getWallet().getUserAccounts().keySet()) {
+            if(StorageService.getInstance().getRemoveableAccounts().get(address) != null){
+                continue;
+            }
             Account account = StorageService.getInstance().getWallet().getUserAccounts().get(address);
             addToMyAccounts(account);
             balance += account.getBalance();
@@ -421,6 +424,13 @@ public class FXMLHomeViewController implements Initializable {
         } catch (IOException ex) {
             Logger.getLogger(FXMLHomeViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    void removeAccount(Account account) {
+        AccountItem accountItem = accountItemsMap.get(account.getAddress());
+        homeAccounts.getItems().remove(accountItem);
+        accountItemsMap.remove(account.getAddress());
+        homeAccounts.refresh();
     }
 
     class AccountItem extends RecursiveTreeObject<AccountItem> {

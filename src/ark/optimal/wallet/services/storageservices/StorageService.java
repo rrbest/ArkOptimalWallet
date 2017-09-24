@@ -17,6 +17,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ConcurrentModificationException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -36,7 +37,9 @@ public class StorageService {
     private static StorageService instance = null;
     private Wallet wallet;
     private String walletFilePath;
+    private Map<String, Account> removableAccounts;
     private final String SETTINGSFILEPATH = System.getProperty("user.dir") + "/settings.json";
+    
 
     public String getWalletFilePath() {
         return walletFilePath;
@@ -56,6 +59,7 @@ public class StorageService {
 
     private StorageService() {
         this.wallet = new Wallet();
+        removableAccounts = new HashMap<String, Account>();
         this.walletFilePath = System.getProperty("user.dir") + "/wallet.json";
         File f = new File(SETTINGSFILEPATH);
         if (f.exists() && !f.isDirectory()) {
@@ -192,6 +196,9 @@ public class StorageService {
 
         this.wallet.getDelegates().put(d.getUsername(), d);
     }
+    public synchronized void removeAccount(Account account){
+        removableAccounts.put(account.getAddress(), account);
+    }
 
     public void updateSettings() {
         Settings settings = new Settings(this.walletFilePath);
@@ -252,6 +259,12 @@ public class StorageService {
         
         Set<String> addresses = this.wallet.getUserAccounts().keySet(); // to avoid concurrentModification
         for (String address : addresses) {
+            Account removableAccount = removableAccounts.get(address);
+            if(removableAccount != null){
+                this.wallet.getUserAccounts().remove(removableAccount.getAddress());
+                this.removableAccounts.remove(removableAccount.getAddress());
+                continue;
+            }
             Account account = this.wallet.getUserAccounts().get(address);
             if(account == null){
                 continue;
@@ -305,6 +318,10 @@ public class StorageService {
          Logger.getLogger(StorageService.class.getName()).log(Level.FINE, null, ex);
      }
 
+    }
+
+    public Map<String,Account> getRemoveableAccounts() {
+        return removableAccounts;
     }
 
 }

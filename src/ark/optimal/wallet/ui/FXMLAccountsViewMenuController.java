@@ -64,15 +64,15 @@ public class FXMLAccountsViewMenuController implements Initializable {
     @FXML
     private JFXButton sendToMaster;
 
-    public void setAccountViewController(FXMLAccountViewController accountViewController) {
-        this.accountViewController = accountViewController;
-    }
-
     private FXMLAccountViewController accountViewController;
 
     private Map<String, Account> masterAccounts;
+    private Map<String, AccountItem> masterAccountsItems;
     private Map<String, Account> subAccounts;
+    private Map<String, AccountItem> subAccountsItems;
+
     private VBox accountsParentVBox;
+
     /**
      * Initializes the controller class.
      */
@@ -80,7 +80,9 @@ public class FXMLAccountsViewMenuController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
         masterAccounts = new HashMap<String, Account>();
+        masterAccountsItems = new HashMap<String, AccountItem>();
         subAccounts = new HashMap<String, Account>();
+        subAccountsItems = new HashMap<String, AccountItem>();
 
         accountsParentVBox = (VBox) myAcountsListView.getParent();
         myAcountsListView.setEditable(true);
@@ -129,9 +131,17 @@ public class FXMLAccountsViewMenuController implements Initializable {
         });
 
         subAcountsListView.setPrefHeight(subAcountsListView.getItems().size() * 40);
-        
+
         accountsParentVBox.setPrefHeight(myAcountsListView.getItems().size() * 40 + subAcountsListView.getItems().size() * 40 + 100);
-        ((AnchorPane)accountsParentVBox.getParent()).setPrefHeight(accountsParentVBox.getPrefHeight() + 50);
+        ((AnchorPane) accountsParentVBox.getParent()).setPrefHeight(accountsParentVBox.getPrefHeight() + 50);
+    }
+
+    public void setAccountViewController(FXMLAccountViewController accountViewController) {
+        this.accountViewController = accountViewController;
+    }
+
+    public FXMLAccountViewController getAccountViewController() {
+        return accountViewController;
     }
 
     public void runCreateAccount() {
@@ -218,13 +228,16 @@ public class FXMLAccountsViewMenuController implements Initializable {
         if (!StorageService.getInstance().getWallet().getUserAccounts().containsKey(account.getAddress())) {
             StorageService.getInstance().addAccountToUserAccounts(account, true);
         }
-        if(!masterAccounts.containsKey(account.getAddress())){
+        if (!masterAccounts.containsKey(account.getAddress())) {
             masterAccounts.put(account.getAddress(), account);
-            myAcountsListView.getItems().add(new AccountItem(account.getUsername(), account.getAddress()));
+            AccountItem accountItem = new AccountItem(account.getUsername(), account.getAddress());
+            myAcountsListView.getItems().add(accountItem);
+            masterAccountsItems.put(accountItem.getAddress(), accountItem);
         }
-        
+        AccountItem accountItem = masterAccountsItems.get(account.getAddress());
+        accountItem.setUsername(account.getUsername());
         myAcountsListView.requestFocus();
-        myAcountsListView.getSelectionModel().select(new AccountItem(account.getUsername(), account.getAddress()));
+        myAcountsListView.getSelectionModel().select(accountItem);
         myAcountsListView.refresh();
         myAcountsListView.setPrefHeight(myAcountsListView.getItems().size() * 40);
         accountsParentVBox.setPrefHeight(myAcountsListView.getItems().size() * 40 + subAcountsListView.getItems().size() * 40 + 100);
@@ -239,15 +252,17 @@ public class FXMLAccountsViewMenuController implements Initializable {
             for (String delegateName : account.getSubAccounts().keySet()) {
                 Account sub = account.getSubAccounts().get(delegateName);
                 sub.setUsername(account.getUsername() + " (" + delegateName + ")");
-                subAcountsListView.getItems().add(new AccountItem(sub.getUsername(), sub.getAddress()));
+                AccountItem subItem = new AccountItem(sub.getUsername(), sub.getAddress());
+                subAcountsListView.getItems().add(subItem);
                 //StorageService.getInstance().addAccountToSubAccounts(sub);
                 subAccounts.put(sub.getAddress(), sub);
+                subAccountsItems.put(sub.getAddress(), subItem);
             }
             //     sendToMaster.setVisible(true);
         }
         subAcountsListView.setPrefHeight(subAcountsListView.getItems().size() * 40);
         accountsParentVBox.setPrefHeight(myAcountsListView.getItems().size() * 40 + subAcountsListView.getItems().size() * 40 + 100);
-        ((AnchorPane)accountsParentVBox.getParent()).setPrefHeight(accountsParentVBox.getPrefHeight() + 100);
+        ((AnchorPane) accountsParentVBox.getParent()).setPrefHeight(accountsParentVBox.getPrefHeight() + 100);
 
     }
 
@@ -334,7 +349,7 @@ public class FXMLAccountsViewMenuController implements Initializable {
             }
         }
         AccountItem accountItem = myAcountsListView.getSelectionModel().getSelectedItem();
-        if(accountItem == null){ // no account item selected (clicked)
+        if (accountItem == null) { // no account item selected (clicked)
             return;
         }
         String address = myAcountsListView.getSelectionModel().getSelectedItem().getAddress();
@@ -344,7 +359,10 @@ public class FXMLAccountsViewMenuController implements Initializable {
     }
 
     public void addToUserAccountsMenu(Account account) {
-        myAcountsListView.getItems().add(new AccountItem(account.getUsername(), account.getAddress()));
+        AccountItem accountItem = new AccountItem(account.getUsername(), account.getAddress());
+        myAcountsListView.getItems().add(accountItem);
+        masterAccounts.put(account.getAddress(), account);
+        masterAccountsItems.put(accountItem.getAddress(), accountItem);
 
     }
 
@@ -355,6 +373,7 @@ public class FXMLAccountsViewMenuController implements Initializable {
 
     void clearAccountsMenu() {
         myAcountsListView.getItems().clear();
+        masterAccounts.clear();
     }
 
     @FXML
@@ -423,6 +442,28 @@ public class FXMLAccountsViewMenuController implements Initializable {
         } catch (IOException ex) {
             Logger.getLogger(FXMLAccountsViewMenuController.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+    }
+
+    void removeAccount(Account account) {
+        accountViewController.removeAccountFromHome(account);
+
+        AccountItem accountItem = masterAccountsItems.get(account.getAddress());
+        Account acct = masterAccounts.get(account.getAddress());
+        masterAccounts.remove(account.getAddress());
+        masterAccountsItems.remove(accountItem.getAddress());
+        myAcountsListView.getItems().remove(accountItem);
+        myAcountsListView.requestFocus();
+        myAcountsListView.getSelectionModel().select(0);
+        AccountItem newSelectedItem = myAcountsListView.getSelectionModel().getSelectedItem();
+        if (newSelectedItem == null) {
+            accountViewController.viewHome();
+            return;
+        }
+        Account newAcct = StorageService.getInstance().getWallet().getUserAccounts().get(newSelectedItem.getAddress());
+        accountViewController.selectAccount(newAcct);
+        myAcountsListView.refresh();
+        
 
     }
 

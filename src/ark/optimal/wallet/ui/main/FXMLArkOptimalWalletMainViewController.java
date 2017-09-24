@@ -44,7 +44,7 @@ public class FXMLArkOptimalWalletMainViewController implements Initializable {
     @FXML
     private AnchorPane holderPane;
 
-    private AnchorPane delegatesview, accountsview, proxyvotingview, settingsview;
+    private AnchorPane delegatesview, accountsview;
     @FXML
     private JFXButton goHomeBtn;
     @FXML
@@ -120,6 +120,7 @@ public class FXMLArkOptimalWalletMainViewController implements Initializable {
             fxmlLoader = new FXMLLoader(getClass().getResource("/ark/optimal/wallet/ui/FXMLAccountView.fxml"));
             accountsview = fxmlLoader.load();
             accountViewController = (FXMLAccountViewController) fxmlLoader.getController();
+            accountViewController.setMainViewControler(this);
 
             //set up default node on page load
             setNode(accountsview);
@@ -178,6 +179,9 @@ public class FXMLArkOptimalWalletMainViewController implements Initializable {
     private void onViewHome(ActionEvent event) {
         homeViewController.viewHome();
     }
+    public void viewHome(){
+        homeViewController.viewHome();
+    }
 
     @FXML
     private void onSaveWallet(ActionEvent event) {
@@ -192,6 +196,10 @@ public class FXMLArkOptimalWalletMainViewController implements Initializable {
     @FXML
     private void onExportWallet(ActionEvent event) {
         homeViewController.exportWallet();
+    }
+
+    public void removeAccountFromHome(Account account) {
+        homeViewController.removeAccount(account);
     }
 
 }

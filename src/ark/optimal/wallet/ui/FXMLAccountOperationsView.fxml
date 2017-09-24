@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane id="AnchorPane" prefHeight="247.0" prefWidth="1130.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.111" fx:controller="ark.optimal.wallet.ui.FXMLAccountOperationsViewController">
+   <children>
+      <JFXButton fx:id="openExplorerBtn" contentDisplay="TOP" layoutX="291.0" layoutY="73.0" onAction="#onOpenExplorer" prefHeight="113.0" prefWidth="188.0" text="OPEN IN EXPLORER">
+         <font>
+            <Font name="Arial Bold" size="16.0" />
+         </font>
+         <graphic>
+            <ImageView fitHeight="36.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../../resources/openexplorer.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </JFXButton>
+      <JFXButton fx:id="removeBtn" contentDisplay="TOP" layoutX="502.0" layoutY="73.0" onAction="#onRemoveAccount" prefHeight="113.0" prefWidth="159.0" text="REMOVE">
+         <font>
+            <Font name="Arial Bold" size="16.0" />
+         </font>
+         <graphic>
+            <ImageView fitHeight="36.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../../resources/remove.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </JFXButton>
+      <Label fx:id="accountAddressLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="278.0" layoutY="14.0" prefHeight="39.0" prefWidth="612.0">
+         <font>
+            <Font name="Arial Bold" size="16.0" />
+         </font>
+      </Label>
+      <JFXButton fx:id="editLabelBtn" contentDisplay="TOP" layoutX="681.0" layoutY="76.0" onAction="#onEditLabel" prefHeight="113.0" prefWidth="159.0" text=" LABEL">
+         <font>
+            <Font name="Arial Bold" size="16.0" />
+         </font>
+         <graphic>
+            <ImageView fitHeight="36.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../../resources/editlabel.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </JFXButton>
+   </children>
+</AnchorPane>
