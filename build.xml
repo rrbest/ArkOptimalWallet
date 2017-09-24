@@ -6,16 +6,19 @@
         </path>
         <description>Builds, tests, and runs the project Ark Smart Wallet.</description>
         <import file="nbproject/build-impl.xml"/>
-        <echo>$${basedir}=${basedir}</echo>
+         
+        
         <target name="-post-jfx-deploy">
             <echo>$${basedir}=${basedir}</echo>
             <fx:deploy width="${javafx.run.width}" height="${javafx.run.height}" nativeBundles="all" outdir="${basedir}/${dist.dir}" outfile="${application.title}" verbose="true">
                 <fx:application name="${application.title}" mainClass="${javafx.main.class}"/>
                     <fx:resources>
                         <fx:fileset dir="${basedir}/${dist.dir}" includes="*.jar"/>
-                        <fx:fileset dir="${basedir}/${dist.dir}/lib" includes="lib/*.jar"/>
+                        <fx:fileset dir="${basedir}/${dist.dir}" includes="lib/*.jar"/>
                     </fx:resources>
-                    <fx:info title="${application.title}" vendor="${application.vendor}"/>
+                    <fx:info title="${application.title}" vendor="${application.vendor}">
+                        <fx:icon href="${basedir}/build/classes/resources/Ark.ico" kind="default"/> 
+                    </fx:info>
             </fx:deploy>
         </target>
     
