@@ -277,7 +277,7 @@ public class FXMLDelegatesViewController implements Initializable {
 
         if (selection.size() > 1) {
             _votefordelegate.setDisable(true);
-            while (itr.hasNext()) {
+            while (itr.hasNext()) { 
                 Delegate del = itr.next();
                 if (!delegatePPercentageStr.equals(del.getPayoutPercentage().toString())) {
                     delegatePayoutPercentage.setText("");
@@ -428,6 +428,7 @@ public class FXMLDelegatesViewController implements Initializable {
             dirtyDelegate.setPayoutPercentage(d.getPayoutPercentage());
             StorageService.getInstance().addDelegate(dirtyDelegate, true);
         }
+        _delegatestable.refresh();
     }
 
     @FXML
@@ -448,6 +449,7 @@ public class FXMLDelegatesViewController implements Initializable {
             StorageService.getInstance().addDelegate(dirtyDelegate, true);
 
         }
+        _delegatestable.refresh();
 
     }
 
