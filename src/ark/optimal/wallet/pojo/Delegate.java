@@ -25,8 +25,9 @@ public class Delegate {
     //private Double minPayout;
     private Double payoutPercentage;
     private Double exlcudedPercentage;
+    private Integer excludedVotes;
 
-    private final Double PAYOUTPERCENTAGE = 80.0;
+    private final Double PAYOUTPERCENTAGE = 90.0;
     private final Double PAYOUTFREQUENCY = 0.25;
     private final Double POOLPERCENTAGE = 90.0;
     private final Double MINPAYOUT = 100.0;
@@ -39,6 +40,7 @@ public class Delegate {
 
     public void setExlcudedPercentage(Double exlcudedPercentage) {
         this.exlcudedPercentage = exlcudedPercentage;
+        this.excludedVotes = new Double(this.vote * this.exlcudedPercentage/100.0).intValue();
     }
     
     private Boolean checked;
@@ -121,6 +123,14 @@ public class Delegate {
         return productivity;
     }
 
+    public Integer getExcludedVotes() {
+        return excludedVotes;
+    }
+
+    public void setExcludedVotes(Integer excludedVotes) {
+        this.excludedVotes = excludedVotes;
+    }
+
     public Delegate(String username, String address, String publicKey, Integer vote, Integer producedblocks, Integer missedblocks, Integer rate, Double approval, Double productivity) {
         this.username = username;
         this.address = address;
@@ -137,6 +147,7 @@ public class Delegate {
 //        this.minPayout = MINPAYOUT;
         this.payoutPercentage = PAYOUTPERCENTAGE;
         this.exlcudedPercentage = EXCLUDEDPERCENTAGE;
+        this.excludedVotes = new Double(this.vote * this.exlcudedPercentage/100.0).intValue();
     }
     
     

@@ -9,6 +9,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -33,9 +34,10 @@ public class ArkOptimalWallet extends Application {
         homeViewController = (FXMLHomeViewController) fxmlLoader.getController();
         homeViewController.setAppController(this);
         homeViewController.setHomeview(homeview);
-        
+
         Scene scene = new Scene(homeview);
         stage.setScene(scene);
+        stage.getIcons().add(new Image(this.getClass().getResourceAsStream("/resources/ArkOptimalWallet.png")));
         stage.show();
         this.mainStage = stage;
     }

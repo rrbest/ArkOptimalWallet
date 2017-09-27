@@ -18,9 +18,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,6 +42,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -48,6 +52,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -74,10 +80,6 @@ public class FXMLDelegatesViewController implements Initializable {
     private TableColumn<Delegate, Integer> _rank;
     @FXML
     private TableColumn<Delegate, Integer> _votes;
-    @FXML
-    private TableColumn<Delegate, Double> _approval;
-    @FXML
-    private TableColumn<Delegate, Double> _productivity;
     @FXML
     private Label lbl_delegatename;
     @FXML
@@ -112,19 +114,17 @@ public class FXMLDelegatesViewController implements Initializable {
 
     private List<Delegate> selectedDelegates;
     @FXML
-    private JFXButton optimizationBtn;
-    @FXML
     private JFXButton removeSelectedDelegate;
-    @FXML
-    private JFXTextField delegatePoolPercentage;
-    @FXML
-    private JFXTextField delegatePayoutFrequency;
-    @FXML
-    private JFXTextField delegateMinPayout;
     @FXML
     private JFXTextField delegatePayoutPercentage;
     @FXML
     private JFXTextField delegateExcludedPercentage;
+    @FXML
+    private JFXButton updateSelected;
+    @FXML
+    private TableColumn<Delegate, Double> _payoutPercentage;
+    @FXML
+    private TableColumn<Delegate, Integer> _excludedVotes;
 
     /**
      * Initializes the controller class.
@@ -148,6 +148,12 @@ public class FXMLDelegatesViewController implements Initializable {
             }
 
         });
+        _delegatestable.addEventFilter(KeyEvent.KEY_RELEASED, (event) -> {
+            if ( new KeyCodeCombination(KeyCode.A, KeyCombination.SHORTCUT_DOWN).match(event)) {
+                event.consume();
+                updateDelegateView(_delegatestable.getSelectionModel().getSelectedItem());
+            }
+        });
         _delegatestable.setRowFactory(new Callback<TableView<Delegate>, TableRow<Delegate>>() {
             @Override
             public TableRow<Delegate> call(TableView<Delegate> tableView2) {
@@ -166,11 +172,13 @@ public class FXMLDelegatesViewController implements Initializable {
             }
         });
 
+        _delegatestable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
         _delegatename.setCellValueFactory(new PropertyValueFactory<Delegate, String>("username"));
         _votes.setCellValueFactory(new PropertyValueFactory<Delegate, Integer>("vote"));
         _rank.setCellValueFactory(new PropertyValueFactory<Delegate, Integer>("rate"));
-        _approval.setCellValueFactory(new PropertyValueFactory<Delegate, Double>("approval"));
-        _productivity.setCellValueFactory(new PropertyValueFactory<Delegate, Double>("productivity"));
+        _payoutPercentage.setCellValueFactory(new PropertyValueFactory<Delegate, Double>("payoutPercentage"));
+        _excludedVotes.setCellValueFactory(new PropertyValueFactory<Delegate, Integer>("excludedVotes"));
         _delegateChecked.setCellValueFactory(new PropertyValueFactory<Delegate, Boolean>("checked"));
 
         _delegateChecked.setCellFactory(p -> {
@@ -224,6 +232,10 @@ public class FXMLDelegatesViewController implements Initializable {
 
     @FXML
     private void onSearch(ActionEvent event) {
+        searchDelegate();
+    }
+
+    private void searchDelegate() {
         String n = delegateNameOrPublicKey.getText();
         Delegate d = null;
         if (delegatesMap.containsKey(n)) {
@@ -252,13 +264,47 @@ public class FXMLDelegatesViewController implements Initializable {
     }
 
     private void updateDelegateView(Delegate d) {
+        Set<Delegate> selection = new HashSet<Delegate>(_delegatestable.getSelectionModel().getSelectedItems());
+        if(selection.size() == 0){
+            return;
+        }
+        Iterator<Delegate> itr = selection.iterator();
+        Delegate delegate = itr.next();
+        String delegatePPercentageStr = delegate.getPayoutPercentage().toString();
+        String delegateEPercentageStr = delegate.getExlcudedPercentage().toString();
+        delegatePayoutPercentage.setText(delegatePPercentageStr);
+        delegateExcludedPercentage.setText(delegateEPercentageStr);
+
+        if (selection.size() > 1) {
+            _votefordelegate.setDisable(true);
+            while (itr.hasNext()) {
+                Delegate del = itr.next();
+                if (!delegatePPercentageStr.equals(del.getPayoutPercentage().toString())) {
+                    delegatePayoutPercentage.setText("");
+                }
+                if (!delegateEPercentageStr.equals(del.getExlcudedPercentage().toString())) {
+                    delegateExcludedPercentage.setText("");
+                }
+
+            }
+            lbl_delegatename.setText("");
+            lbl_delegateapproval.setText("");
+            lbl_delegateproductivity.setText("");
+            lbl_delegateproducedblocks.setText("");
+            lbl_delegatemissedblocks.setText("");
+            delegateAddress.setText("");
+            delegateAddressTooltip.setText("");
+            delegatepublickey.setText("");
+            delegatePublicKeyTooltip.setText("");
+            return;
+        }
+
+         _votefordelegate.setDisable(false);
         lbl_delegatename.setText(d.getUsername());
-        lbl_delegateapproval.setText(d.getApproval().toString());
-        lbl_delegateproductivity.setText(String.format("%.2f%%", d.getProductivity()) + " Productivity");
-        lbl_delegateproducedblocks.setText(d.getProducedblocks().toString() + " Blocks");
-        lbl_delegatemissedblocks.setText(d.getMissedblocks().toString() + " Blocks");
-        delegatePayoutPercentage.setText(d.getPayoutPercentage().toString());
-        delegateExcludedPercentage.setText(d.getExlcudedPercentage().toString());
+        lbl_delegateapproval.setText(d.getApproval().toString() + "\tApproval");
+        lbl_delegateproductivity.setText(String.format("%.2f%%", d.getProductivity()) + "\tProductivity");
+        lbl_delegateproducedblocks.setText(d.getProducedblocks().toString() + "\tBlocks");
+        lbl_delegatemissedblocks.setText(d.getMissedblocks().toString() + "\tBlocks");
         delegateAddress.setText(d.getAddress());
         delegateAddressTooltip.setText(d.getAddress());
         delegatepublickey.setText(d.getPublicKey());
@@ -364,28 +410,61 @@ public class FXMLDelegatesViewController implements Initializable {
 
     }
 
-
     @FXML
     private void PayoutPrecentageReleased(KeyEvent event) {
         if (event.getCode() == KeyCode.ENTER) {
-            Delegate d = _delegatestable.getSelectionModel().getSelectedItem();
+            updatePayoutPercentage();
+        }
+
+    }
+
+    private void updatePayoutPercentage() {
+        Set<Delegate> selection = new HashSet<Delegate>(_delegatestable.getSelectionModel().getSelectedItems());
+        Iterator<Delegate> itr = selection.iterator();
+        while (itr.hasNext()) {
+            Delegate d = itr.next();
             d.setPayoutPercentage(new Double(delegatePayoutPercentage.getText()));
             Delegate dirtyDelegate = StorageService.getInstance().getWallet().getDelegates().get(d.getUsername());
             dirtyDelegate.setPayoutPercentage(d.getPayoutPercentage());
             StorageService.getInstance().addDelegate(dirtyDelegate, true);
         }
-
     }
 
     @FXML
     private void excludedPercentageKeyReleased(KeyEvent event) {
         if (event.getCode() == KeyCode.ENTER) {
-            Delegate d = _delegatestable.getSelectionModel().getSelectedItem();
+            updateExcludedPercentage();
+        }
+    }
+
+    private void updateExcludedPercentage() {
+        Set<Delegate> selection = new HashSet<Delegate>(_delegatestable.getSelectionModel().getSelectedItems());
+        Iterator<Delegate> itr = selection.iterator();
+        while (itr.hasNext()) {
+            Delegate d = itr.next();
             d.setExlcudedPercentage(new Double(delegateExcludedPercentage.getText()));
             Delegate dirtyDelegate = StorageService.getInstance().getWallet().getDelegates().get(d.getUsername());
             dirtyDelegate.setExlcudedPercentage(d.getExlcudedPercentage());
             StorageService.getInstance().addDelegate(dirtyDelegate, true);
+
         }
+
+    }
+
+    @FXML
+    private void onUpdateSelected(ActionEvent event) {
+        updatePayoutPercentage();
+        updateExcludedPercentage();
+
+    }
+
+    
+    @FXML
+    private void onSearchDelegate(KeyEvent event) {
+     if (event.getCode() == KeyCode.ENTER) {
+            searchDelegate();
+        }
+
     }
 
 }

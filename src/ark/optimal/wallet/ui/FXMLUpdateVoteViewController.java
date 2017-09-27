@@ -115,6 +115,10 @@ public class FXMLUpdateVoteViewController implements Initializable {
         Account account = accounts.getSelectionModel().getSelectedItem();
         //delegateViewController.optimize(account, passphrase.getText());
 
+        if(account == null){
+             new AlertController().alertUser("Please select master account");
+             return;
+        }
         if (passphrase.getText() == null || passphrase.getText().equals("")) {
             new AlertController().alertUser("Please enter master passphrase");
             closeWindow();

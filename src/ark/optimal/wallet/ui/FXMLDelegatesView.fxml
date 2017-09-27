@@ -29,15 +29,15 @@
                       <TableColumn fx:id="_delegatename" prefWidth="106.99996948242188" text="Delegate" />
                       <TableColumn fx:id="_rank" prefWidth="77.0" text="Rank" />
                         <TableColumn fx:id="_votes" prefWidth="150.0" text="Votes" />
-                        <TableColumn fx:id="_approval" prefWidth="150.0" text="Approval" />
-                        <TableColumn fx:id="_productivity" prefWidth="150.0" text="Productivity" />
+                        <TableColumn fx:id="_excludedVotes" prefWidth="150.0" text="Excluded Votes" />
+                        <TableColumn fx:id="_payoutPercentage" prefWidth="150.0" text="Payout %" />
                     </columns>
                   </TableView>
-                  <AnchorPane layoutX="794.0" layoutY="47.0" prefHeight="631.0" prefWidth="337.0" styleClass="card-white">
+                  <AnchorPane layoutX="784.0" layoutY="47.0" prefHeight="631.0" prefWidth="377.0" styleClass="card-white">
                      <children>
-                        <StackPane layoutX="47.0" layoutY="39.0" prefHeight="647.0" prefWidth="337.0" AnchorPane.bottomAnchor="-36.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <StackPane layoutX="-28.0" prefHeight="631.0" prefWidth="409.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-28.0" AnchorPane.rightAnchor="-34.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <VBox prefHeight="645.0" prefWidth="337.0">
+                              <VBox prefHeight="631.0" prefWidth="408.0">
                                  <children>
                                     <Pane prefHeight="166.0" prefWidth="299.0">
                                        <children>
@@ -48,7 +48,7 @@
                                           </ImageView>
                                        </children>
                                     </Pane>
-                                    <AnchorPane prefHeight="439.0" prefWidth="337.0">
+                                    <AnchorPane prefHeight="439.0" prefWidth="409.0">
                                        <children>
                                           <Separator layoutX="24.0" layoutY="218.0" prefHeight="0.0" prefWidth="290.0" />
                                           <VBox layoutX="47.0" layoutY="16.0" prefHeight="188.0" prefWidth="290.0">
@@ -126,7 +126,7 @@
                                                 <Font name="Roboto Black" size="12.0" />
                                              </font>
                                           </Label>
-                                          <JFXButton fx:id="_votefordelegate" layoutX="83.0" layoutY="334.0" onAction="#onVoteForDelegate" prefHeight="34.0" prefWidth="171.0" style="-fx-background-color: #f44336;" text="Vote" textFill="WHITE">
+                                          <JFXButton fx:id="_votefordelegate" layoutX="243.0" layoutY="335.0" onAction="#onVoteForDelegate" prefHeight="34.0" prefWidth="181.0" style="-fx-background-color: #f44336;" text="Vote" textFill="WHITE">
                                              <font>
                                                 <Font name="System Bold" size="17.0" />
                                              </font>
@@ -139,6 +139,11 @@
                                              </font>
                                           </Label>
                                           <JFXTextField fx:id="delegateExcludedPercentage" layoutX="195.0" layoutY="272.0" onKeyReleased="#excludedPercentageKeyReleased" prefHeight="25.0" prefWidth="85.0" />
+                                          <JFXButton fx:id="updateSelected" layoutX="38.0" layoutY="335.0" onAction="#onUpdateSelected" prefHeight="34.0" prefWidth="181.0" style="-fx-background-color: #0073B7;" text="Update Selected" textFill="WHITE">
+                                             <font>
+                                                <Font size="17.0" />
+                                             </font>
+                                          </JFXButton>
                                        </children></AnchorPane>
                                  </children>
                               </VBox>
@@ -148,7 +153,7 @@
                   </AnchorPane>
                   <AnchorPane layoutX="26.0" layoutY="47.0" prefHeight="106.0" prefWidth="706.0" style="-fx-background-color: rgb(0, 115, 183,0.6); -fx-effect: dropshadow(gaussian, rgb(0.0, 0.0, 0.0, 0.15), 6.0, 0.7, 0.0,1.5); -fx-background-radius: 5;">
                      <children>
-                        <JFXTextField fx:id="delegateNameOrPublicKey" focusColor="#fcfcfc" labelFloat="true" layoutX="15.0" layoutY="42.0" maxWidth="552.0" minWidth="214.0" prefHeight="31.0" prefWidth="552.0" promptText="Search by name or public key " unFocusColor="WHITE">
+                        <JFXTextField fx:id="delegateNameOrPublicKey" focusColor="#fcfcfc" labelFloat="true" layoutX="15.0" layoutY="42.0" maxWidth="552.0" minWidth="214.0" onKeyReleased="#onSearchDelegate" prefHeight="31.0" prefWidth="552.0" promptText="Search by name or public key " unFocusColor="WHITE">
                            <font>
                               <Font name="Roboto Black" size="13.0" />
                            </font>
