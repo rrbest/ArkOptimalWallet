@@ -119,7 +119,7 @@ public class StorageService {
                 }
             };
 
-            executor2.scheduleAtFixedRate(periodicTask2, 1, 16, TimeUnit.SECONDS);
+            executor2.scheduleAtFixedRate(periodicTask2, 1, 8, TimeUnit.SECONDS);
         }
         return instance;
     }

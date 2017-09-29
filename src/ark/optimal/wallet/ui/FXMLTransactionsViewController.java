@@ -9,13 +9,20 @@ import ark.optimal.wallet.pojo.Account;
 import ark.optimal.wallet.pojo.Transaction;
 import ark.optimal.wallet.services.storageservices.StorageService;
 import ark.optimal.wallet.ui.main.HostServicesProvider;
+import com.google.common.collect.HashBiMap;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.fxml.FXML;
@@ -62,13 +69,16 @@ public class FXMLTransactionsViewController implements Initializable {
 
     private FXMLAccountViewController accountViewController;
 
+    private Account account;
+    private Map<String, TransactionItem> transactionsItems;
+
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-
+        transactionsItems = new HashMap<String, TransactionItem>();
         _transactionid.setCellValueFactory(new PropertyValueFactory<TransactionItem, Hyperlink>("id_link"));
         _transactionid.setCellFactory(new FXMLTransactionsViewController.HyperlinkCell());
 
@@ -93,7 +103,8 @@ public class FXMLTransactionsViewController implements Initializable {
         __transactionSmartBridge.setCellValueFactory(new PropertyValueFactory<TransactionItem, String>("smartBridge"));
         __transactionSmartBridge.setCellFactory(new FXMLTransactionsViewController.ColumnFormatter<TransactionItem, String>());
 
-        transactionsTable.setPlaceholder(new Label(" "));
+        transactionsTable.setPlaceholder(new Label("No Transactions"));
+
 
     }
 
@@ -101,9 +112,97 @@ public class FXMLTransactionsViewController implements Initializable {
         this.accountViewController = accountViewController;
     }
 
-    public void updateTransactionsTable(Account account) {
+    public void refreshTransactionsTable(Account account) {
+        if (account == null) {
+            account = this.account;
+        }
+        if (account == null){
+            return;
+        }
+        Account updatedAccount = StorageService.getInstance().getWallet().getUserAccounts().get(account.getAddress());
+        if (updatedAccount == null) {
+            updatedAccount = StorageService.getInstance().getWallet().getSubAccounts().get(account.getAddress());
+        }
+        if (updatedAccount == null) {
+            return;
+        }
+        List<Transaction> transactions = updatedAccount.getTransactions();
+        if (transactions == null) {
+            return;
+        }
+        for (Transaction t : transactions) {
+            TransactionItem ti = transactionsItems.get(t.getId());
+            if (ti != null) {
+                ti.setConfirmations(t.getConfirmations());
+            } else {
+                ti = buildTranscationItem(t);
+                transactionsTable.getItems().add(0,ti);
+                transactionsItems.put(ti.getId(), ti);
+            }
 
+        }
+        transactionsTable.sort();
+        transactionsTable.refresh();
+    }
+
+    private TransactionItem buildTranscationItem(Transaction t) {
+        DateTime dt = ConvertTransactionTimeStampToLocal(t.getTimestamp());
+        Double fee = t.getFee().doubleValue() / 100000000.0;
+        Double amount = t.getAmount().doubleValue() / 100000000.0;
+        String type = "";
+        if (t.getType() == 0) {
+            if (account.getAddress().equals(t.getSenderId())) {
+                type = "Send Ark";
+                amount = -1 * (amount + fee);
+            } else {
+                type = "Receive Ark";
+            }
+        } else if (t.getType() == 3) {
+            type = "Vote";
+            amount = -1 * t.getFee().doubleValue() / 100000000.0;
+
+        } else if (t.getType() == 2) {
+            type = "Delegate Registration";
+            amount = -1 * t.getFee().doubleValue() / 100000000.0;
+        }
+
+        String smartbridge = t.getVendorField();
+        String from = t.getFrom();
+        if (t.getSenderId() != null) {
+            Account acc = StorageService.getInstance().getWallet().getUserAccounts().get(t.getSenderId());
+            if (acc != null) {
+                from = acc.getUsername();
+            } else {
+                acc = StorageService.getInstance().getWallet().getSubAccounts().get(t.getSenderId());
+                if (acc != null) {
+                    from = acc.getUsername();
+                }
+            }
+
+        }
+
+        String to = t.getTo();
+        if (t.getRecipientId() != null) {
+            Account acc = StorageService.getInstance().getWallet().getUserAccounts().get(t.getRecipientId());
+            if (acc != null) {
+                to = acc.getUsername();
+            } else {
+                acc = StorageService.getInstance().getWallet().getSubAccounts().get(t.getRecipientId());
+                if (acc != null) {
+                    to = acc.getUsername();
+                }
+            }
+
+        }
+
+        TransactionItem ti = new TransactionItem(t.getId(), t.getConfirmations(), dt, type, amount, from, to, smartbridge);
+        return ti;
+    }
+
+    public void updateTransactionsTable(Account account) {
+        this.account = account;
         transactionsTable.getItems().clear();
+        transactionsItems.clear();
         if (account == null) {
             return;
         }
@@ -112,66 +211,12 @@ public class FXMLTransactionsViewController implements Initializable {
             return;
         }
         for (Transaction t : transactions) {
-            System.out.println(t.getId());
-            System.out.println(t.getAmount());
-            System.out.println(formatTransactionTimeStamp((long) t.getTimestamp()));
-            DateTime dt = ConvertTransactionTimeStampToLocal(t.getTimestamp());
-            Double fee = t.getFee().doubleValue() / 100000000.0;
-            Double amount = t.getAmount().doubleValue() / 100000000.0;
-            String type = "";
-            if (t.getType() == 0) {
-                if (account.getAddress().equals(t.getSenderId())) {
-                    type = "Send Ark";
-                    amount = -1 * (amount + fee);
-                } else {
-                    type = "Receive Ark";
-                }
-            } else if (t.getType() == 3) {
-                type = "Vote";
-                amount = -1 * t.getFee().doubleValue() / 100000000.0;
-
-            } else if (t.getType() == 2) {
-                type = "Delegate Registration";
-                amount = -1 * t.getFee().doubleValue() / 100000000.0;
-            }
-
-            String smartbridge = t.getVendorField();
-            String from = t.getFrom();
-            if (t.getSenderId() != null) {
-                Account acc = StorageService.getInstance().getWallet().getUserAccounts().get(t.getSenderId());
-                if (acc != null) {
-                    from = acc.getUsername();
-                } else {
-                    acc = StorageService.getInstance().getWallet().getSubAccounts().get(t.getSenderId());
-                    if (acc != null) {
-                        from = acc.getUsername();
-                    }
-                }
-
-            }
-
-            String to = t.getTo();
-            if (t.getRecipientId() != null) {
-                Account acc = StorageService.getInstance().getWallet().getUserAccounts().get(t.getRecipientId());
-                if (acc != null) {
-                    to = acc.getUsername();
-                } else {
-                    acc = StorageService.getInstance().getWallet().getSubAccounts().get(t.getRecipientId());
-                    if (acc != null) {
-                        to = acc.getUsername();
-                    }
-                }
-
-            }
-
-            TransactionItem ti = new TransactionItem(t.getId(), t.getConfirmations(), dt, type, amount, from, to, smartbridge);
+            TransactionItem ti = buildTranscationItem(t);
             transactionsTable.getItems().add(ti);
+            transactionsItems.put(ti.getId(), ti);
 
         }
 
-        /* if (transactionsTable.getItems().size() * 40 > 450) {
-            transactionsTable.setPrefHeight(transactionsTable.getItems().size() * 40);
-        }*/
     }
 
     private String formatTransactionTimeStamp(long timestamp) {

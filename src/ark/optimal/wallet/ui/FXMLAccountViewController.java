@@ -24,10 +24,16 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.FadeTransition;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -149,17 +155,72 @@ public class FXMLAccountViewController implements Initializable {
                 burgerTask.play();
                 if (accountsDrawer.isShown()) {
                     accountsDrawer.close();
+                    accountsDrawer.setVisible(false);
                 } else {
                     accountsDrawer.open();
+                    accountsDrawer.setVisible(true);
 
                 }
             });
 
             createPages();
 
+            /*     ScheduledExecutorService executor
+                    = Executors.newScheduledThreadPool(1, new ThreadFactory() {
+                        public Thread newThread(Runnable r) {
+                            Thread t = Executors.defaultThreadFactory().newThread(r);
+                            t.setDaemon(true);
+                            return t;
+                        }
+                    });
+
+            Runnable periodicTask = new Runnable() {
+                public void run() {
+                    try {
+                        refreshAccount();
+                    } catch (Exception ex) {
+                        Logger.getLogger(FXMLTransactionsViewController.class.getName()).log(Level.WARNING, null, ex);
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            };
+
+            executor.scheduleAtFixedRate(periodicTask, 1, 8, TimeUnit.SECONDS);*/
+            Timeline fiveSecondsWonder = new Timeline(new KeyFrame(Duration.seconds(8), new EventHandler<ActionEvent>() {
+
+                @Override
+                public void handle(ActionEvent event) {
+                    try {
+                        refreshAccount();
+                    } catch (Exception ex) {
+                        Logger.getLogger(FXMLTransactionsViewController.class.getName()).log(Level.WARNING, null, ex);
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }));
+            fiveSecondsWonder.setCycleCount(Timeline.INDEFINITE);
+            fiveSecondsWonder.play();
+
         } catch (IOException ex) {
             Logger.getLogger(FXMLAccountViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+    }
+
+    public void refreshAccount() {
+        if (this.account == null) {
+            return;
+        }
+        Account updateAccount = StorageService.getInstance().getWallet().getUserAccounts().get(this.account.getAddress());
+        if (updateAccount == null) {
+            updateAccount = StorageService.getInstance().getWallet().getSubAccounts().get(this.account.getAddress());
+        }
+        if (updateAccount == null) {
+            return;
+        }
+        this.accountBalance.setText(this.accountBalance.getText().charAt(0) + updateAccount.getBalance().toString());
+        this.accountBalanceExchangeValue.setText(NumberFormat.getCurrencyInstance().format(new Double(updateAccount.getBalance() * XChangeServices.getInstance().getPrice())));
+        transactionsViewController.refreshTransactionsTable(account);
 
     }
 
@@ -370,8 +431,12 @@ public class FXMLAccountViewController implements Initializable {
     private void onAccountOperationMenu(ActionEvent event) {
         if (!accountOperationsDrawer.isShown()) {
             accountOperationsDrawer.open();
+            accountOperationsDrawer.setVisible(true);
+
         } else {
             accountOperationsDrawer.close();
+            accountOperationsDrawer.setVisible(false);
+
         }
 
         accountOpController.setAccount(this.account);
@@ -380,10 +445,11 @@ public class FXMLAccountViewController implements Initializable {
 
     public void closeAccountOperationsDrawer() {
         accountOperationsDrawer.close();
+        accountOperationsDrawer.setVisible(false);
     }
 
     void viewHome() {
-       this.mainViewController.viewHome();
+        this.mainViewController.viewHome();
     }
 
     public void setMainViewControler(FXMLArkOptimalWalletMainViewController mainViewController) {
@@ -391,7 +457,7 @@ public class FXMLAccountViewController implements Initializable {
     }
 
     void removeAccountFromHome(Account account) {
-            mainViewController.removeAccountFromHome(account);
-     }
+        mainViewController.removeAccountFromHome(account);
+    }
 
 }

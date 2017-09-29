@@ -97,11 +97,11 @@
                       </cursor>
                   </JFXButton>
             <Separator layoutX="36.0" layoutY="286.0" prefHeight="4.0" prefWidth="1035.0" />
-            <AnchorPane fx:id="accountHolderPane" layoutX="37.0" layoutY="287.0" prefHeight="450.0" prefWidth="1026.0" />
+            <AnchorPane fx:id="accountHolderPane" layoutX="41.0" layoutY="286.0" prefHeight="450.0" prefWidth="1026.0" />
             
                           </children>
           </AnchorPane>
             <JFXDrawer fx:id="accountsDrawer" defaultDrawerSize="250.0" direction="RIGHT" layoutX="942.0" layoutY="49.0" overLayVisible="false" prefHeight="697.0" prefWidth="253.0" />
-      <JFXDrawer fx:id="accountOperationsDrawer" defaultDrawerSize="250.0" direction="BOTTOM" layoutY="514.0" prefHeight="288.0" prefWidth="1199.0" />
+      <JFXDrawer fx:id="accountOperationsDrawer" defaultDrawerSize="350.0" direction="BOTTOM" layoutY="551.0" overLayVisible="false" prefHeight="251.0" prefWidth="1199.0" visible="false" />
     </children>
 </AnchorPane>
