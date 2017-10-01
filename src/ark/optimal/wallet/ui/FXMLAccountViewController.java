@@ -165,28 +165,7 @@ public class FXMLAccountViewController implements Initializable {
 
             createPages();
 
-            /*     ScheduledExecutorService executor
-                    = Executors.newScheduledThreadPool(1, new ThreadFactory() {
-                        public Thread newThread(Runnable r) {
-                            Thread t = Executors.defaultThreadFactory().newThread(r);
-                            t.setDaemon(true);
-                            return t;
-                        }
-                    });
-
-            Runnable periodicTask = new Runnable() {
-                public void run() {
-                    try {
-                        refreshAccount();
-                    } catch (Exception ex) {
-                        Logger.getLogger(FXMLTransactionsViewController.class.getName()).log(Level.WARNING, null, ex);
-                        Thread.currentThread().interrupt();
-                    }
-                }
-            };
-
-            executor.scheduleAtFixedRate(periodicTask, 1, 8, TimeUnit.SECONDS);*/
-            Timeline fiveSecondsWonder = new Timeline(new KeyFrame(Duration.seconds(8), new EventHandler<ActionEvent>() {
+            Timeline updateTimeline = new Timeline(new KeyFrame(Duration.seconds(8), new EventHandler<ActionEvent>() {
 
                 @Override
                 public void handle(ActionEvent event) {
@@ -198,8 +177,8 @@ public class FXMLAccountViewController implements Initializable {
                     }
                 }
             }));
-            fiveSecondsWonder.setCycleCount(Timeline.INDEFINITE);
-            fiveSecondsWonder.play();
+            updateTimeline.setCycleCount(Timeline.INDEFINITE);
+            updateTimeline.play();
 
         } catch (IOException ex) {
             Logger.getLogger(FXMLAccountViewController.class.getName()).log(Level.SEVERE, null, ex);

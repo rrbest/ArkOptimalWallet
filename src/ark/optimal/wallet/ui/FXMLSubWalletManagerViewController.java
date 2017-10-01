@@ -272,8 +272,7 @@ public class FXMLSubWalletManagerViewController implements Initializable {
             return;
         }
         String senderByPassphrase = AccountService.getAddress(masterPassphrase.getText());
-        if(!senderByPassphrase.equals(account.getAddress()))
-        {
+        if (!senderByPassphrase.equals(account.getAddress())) {
             new AlertController().alertUser("Passphrase is not corresponding to account");
             return;
         }
@@ -281,7 +280,6 @@ public class FXMLSubWalletManagerViewController implements Initializable {
         List<Transaction> transactions = new ArrayList<Transaction>();
         List<TransactionItem> transactionItems = new ArrayList<TransactionItem>();
 
-       
         Map subAccounts = account.getSubAccounts();
         for (SubWalletItem si : selectedSubWallets) {
             TransactionItem ti = new TransactionItem("---", account.getUsername(), account.getUsername() + "(" + si.getDelegateName() + ")", 0.0, 0.0, "SubWallet created/imported");
@@ -338,7 +336,13 @@ public class FXMLSubWalletManagerViewController implements Initializable {
     }
 
     @FXML
-    private void onSearch(ActionEvent event) {
+    private void onSearchDelegate(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            searchDelegate();
+        }
+
+    }
+    private void searchDelegate() {
         String n = delegateNameOrPublicKey.getText();
         SubWalletItem si = null;
         if (subWalletsMap.containsKey(n)) {
@@ -365,9 +369,16 @@ public class FXMLSubWalletManagerViewController implements Initializable {
             StorageService.getInstance().addDelegate(d, true);
 
         }
-
+        subWalletsTable.getSelectionModel().clearSelection();
         subWalletsTable.requestFocus();
         subWalletsTable.getSelectionModel().select(si);
+        subWalletsTable.scrollTo(si);
+        delegateNameOrPublicKey.setText("");
+    }
+
+    @FXML
+    private void onSearch(ActionEvent event) {
+        searchDelegate();
     }
 
     private void closeWindow() {
@@ -389,7 +400,7 @@ public class FXMLSubWalletManagerViewController implements Initializable {
 
     @FXML
     private void onClose(ActionEvent event) {
-        if(this.selectedAccount != null){
+        if (this.selectedAccount != null) {
             accountsViewMenuController.selectAccountItem(this.selectedAccount);
         }
         closeWindow();
@@ -442,8 +453,7 @@ public class FXMLSubWalletManagerViewController implements Initializable {
             return;
         }
         String senderByPassphrase = AccountService.getAddress(masterPassphrase.getText());
-        if(!senderByPassphrase.equals(account.getAddress()))
-        {
+        if (!senderByPassphrase.equals(account.getAddress())) {
             new AlertController().alertUser("Passphrase is not corresponding to account");
             return;
         }
@@ -500,8 +510,7 @@ public class FXMLSubWalletManagerViewController implements Initializable {
             return;
         }
         String senderByPassphrase = AccountService.getAddress(masterPassphrase.getText());
-        if(!senderByPassphrase.equals(account.getAddress()))
-        {
+        if (!senderByPassphrase.equals(account.getAddress())) {
             new AlertController().alertUser("Passphrase is not corresponding to account");
             return;
         }
@@ -591,8 +600,7 @@ public class FXMLSubWalletManagerViewController implements Initializable {
             return;
         }
         String senderByPassphrase = AccountService.getAddress(masterPassphrase.getText());
-        if(!senderByPassphrase.equals(account.getAddress()))
-        {
+        if (!senderByPassphrase.equals(account.getAddress())) {
             new AlertController().alertUser("Passphrase is not corresponding to account");
             return;
         }

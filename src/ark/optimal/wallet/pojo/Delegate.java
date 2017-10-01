@@ -54,6 +54,10 @@ public class Delegate {
         this.checked = checked;
     }
 
+    public void setVote(Integer vote) {
+        this.vote = vote;
+    }
+
 //    public Double getPoolPercentage() {
 //        return poolPercentage;
 //    }
@@ -77,6 +81,9 @@ public class Delegate {
 //    public void setMinPayout(Double minPayout) {
 //        this.minPayout = minPayout;
 //    }
+    public void setRate(Integer rate) {
+        this.rate = rate;
+    }
 
     public Double getPayoutPercentage() {
         return payoutPercentage;

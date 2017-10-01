@@ -154,7 +154,7 @@
                   </AnchorPane>
                   <AnchorPane layoutX="26.0" layoutY="47.0" prefHeight="106.0" prefWidth="706.0" style="-fx-background-color: rgb(0, 115, 183,0.6); -fx-effect: dropshadow(gaussian, rgb(0.0, 0.0, 0.0, 0.15), 6.0, 0.7, 0.0,1.5); -fx-background-radius: 5;">
                      <children>
-                        <JFXTextField fx:id="delegateNameOrPublicKey" focusColor="#fcfcfc" labelFloat="true" layoutX="15.0" layoutY="42.0" maxWidth="552.0" minWidth="214.0" onKeyReleased="#onSearchDelegate" prefHeight="31.0" prefWidth="552.0" promptText="Search by name or public key " unFocusColor="WHITE">
+                        <JFXTextField fx:id="delegateNameOrPublicKey" focusColor="#fcfcfc" labelFloat="true" layoutX="15.0" layoutY="42.0" maxWidth="552.0" minWidth="214.0" onKeyReleased="#onSearchDelegate" prefHeight="31.0" prefWidth="552.0" promptText="Search by name" unFocusColor="WHITE">
                            <font>
                               <Font name="Roboto Black" size="13.0" />
                            </font>

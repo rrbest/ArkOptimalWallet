@@ -10,12 +10,14 @@ import ark.optimal.wallet.pojo.Delegate;
 import ark.optimal.wallet.services.accountservices.AccountService;
 import ark.optimal.wallet.services.optimizationservices.OptimizationService;
 import ark.optimal.wallet.services.storageservices.StorageService;
+import ark.optimal.wallet.services.xchangeservices.XChangeServices;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import io.ark.core.Transaction;
 import io.ark.core.TransactionService;
 import java.io.IOException;
 import java.net.URL;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +29,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -61,6 +65,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
+import javafx.util.Duration;
 import org.spongycastle.jcajce.provider.asymmetric.dsa.DSASigner;
 
 /**
@@ -151,7 +156,7 @@ public class FXMLDelegatesViewController implements Initializable {
 
         });
         _delegatestable.addEventFilter(KeyEvent.KEY_RELEASED, (event) -> {
-            if ( new KeyCodeCombination(KeyCode.A, KeyCombination.SHORTCUT_DOWN).match(event)) {
+            if (new KeyCodeCombination(KeyCode.A, KeyCombination.SHORTCUT_DOWN).match(event)) {
                 event.consume();
                 updateDelegateView(_delegatestable.getSelectionModel().getSelectedItem());
             }
@@ -230,6 +235,21 @@ public class FXMLDelegatesViewController implements Initializable {
         }
         _delegatestable.refresh();
 
+        Timeline updateTimeline = new Timeline(new KeyFrame(Duration.minutes(1), new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                try {
+                    refreshDelegates();
+                } catch (Exception ex) {
+                    Logger.getLogger(FXMLTransactionsViewController.class.getName()).log(Level.WARNING, null, ex);
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }));
+        updateTimeline.setCycleCount(Timeline.INDEFINITE);
+        updateTimeline.play();
+
     }
 
     @FXML
@@ -259,15 +279,16 @@ public class FXMLDelegatesViewController implements Initializable {
         }
 
         updateDelegateView(d);
-
+        _delegatestable.getSelectionModel().clearSelection();
         _delegatestable.requestFocus();
         _delegatestable.getSelectionModel().select(d);
-
+        _delegatestable.scrollTo(d);
+        delegateNameOrPublicKey.setText("");
     }
 
     private void updateDelegateView(Delegate d) {
         Set<Delegate> selection = new HashSet<Delegate>(_delegatestable.getSelectionModel().getSelectedItems());
-        if(selection.size() == 0){
+        if (selection.size() == 0) {
             return;
         }
         Iterator<Delegate> itr = selection.iterator();
@@ -279,7 +300,7 @@ public class FXMLDelegatesViewController implements Initializable {
 
         if (selection.size() > 1) {
             _votefordelegate.setDisable(true);
-            while (itr.hasNext()) { 
+            while (itr.hasNext()) {
                 Delegate del = itr.next();
                 if (!delegatePPercentageStr.equals(del.getPayoutPercentage().toString())) {
                     delegatePayoutPercentage.setText("");
@@ -301,7 +322,7 @@ public class FXMLDelegatesViewController implements Initializable {
             return;
         }
 
-         _votefordelegate.setDisable(false);
+        _votefordelegate.setDisable(false);
         lbl_delegatename.setText(d.getUsername());
         lbl_delegateapproval.setText(d.getApproval().toString() + "\tApproval");
         lbl_delegateproductivity.setText(String.format("%.2f%%", d.getProductivity()) + "\tProductivity");
@@ -462,10 +483,9 @@ public class FXMLDelegatesViewController implements Initializable {
 
     }
 
-    
     @FXML
     private void onSearchDelegate(KeyEvent event) {
-     if (event.getCode() == KeyCode.ENTER) {
+        if (event.getCode() == KeyCode.ENTER) {
             searchDelegate();
         }
 
@@ -473,7 +493,7 @@ public class FXMLDelegatesViewController implements Initializable {
 
     @FXML
     private void onOptimize(ActionEvent event) {
-        
+
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLOptimizationSetupView.fxml"));
             Parent root1 = (Parent) fxmlLoader.load();
@@ -492,6 +512,18 @@ public class FXMLDelegatesViewController implements Initializable {
             Logger.getLogger(FXMLSubWalletManagerViewController.class
                     .getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public void refreshDelegates() {
+        if (this.delegatesMap.size() == 0) {
+            return;
+        }
+        for (Delegate d : this._delegatestable.getItems()) {
+            Delegate updatedDelegate = StorageService.getInstance().getWallet().getDelegates().get(d.getUsername());
+            d.setRate(updatedDelegate.getRate());
+            d.setVote(updatedDelegate.getVote());
+        }
+        this._delegatestable.refresh();
     }
 
 }
