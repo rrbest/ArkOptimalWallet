@@ -60,17 +60,19 @@ public class FXMLOptimizationReportViewController implements Initializable {
     private TableColumn<OptimizationReportItem, Double> payout;
 
     private FXMLSubWalletManagerViewController subWalletManagerController;
+    @FXML
+    private JFXButton okReport;
 
     public void setSubWalletManagerController(FXMLSubWalletManagerViewController subWalletManagerController) {
         this.subWalletManagerController = subWalletManagerController;
     }
     @FXML
     private Label optReportTitle;
-    
+
     private Account account;
     private String passphrase;
     private Map<String, Double> optVotes;
-    
+
     /**
      * Initializes the controller class.
      */
@@ -96,9 +98,9 @@ public class FXMLOptimizationReportViewController implements Initializable {
 
     @FXML
     private void onExecuteTrades(ActionEvent event) {
-       List<OptimizationReportItem> trades = votedDelegatesTable.getItems();
-       subWalletManagerController.executeOptimizationTrades(account, passphrase, optVotes);
-       closeWindow();
+        List<OptimizationReportItem> trades = votedDelegatesTable.getItems();
+        subWalletManagerController.executeOptimizationTrades(account, passphrase, optVotes);
+        closeWindow();
     }
 
     @FXML
@@ -112,17 +114,38 @@ public class FXMLOptimizationReportViewController implements Initializable {
         stage.close();
     }
 
-    public void updateReport(Account account,String passphrase ,Map<String, Double> votes) {
+    public void createReport(Account account, String passphrase, Map<String, Double> votes) {
+        this.okReport.setVisible(false);
+        this.executeTrades.setVisible(true);
+        this.closeReport.setVisible(true);
         this.passphrase = passphrase;
         this.optVotes = votes;
         this.account = account;
         double balance = votes.values().stream().mapToDouble(Double::doubleValue).sum();
-        optReportTitle.setText("Optimization Report - "+ account.getUsername() + " / Ѧ" + balance);
+        optReportTitle.setText("Optimization Report - " + account.getUsername() + " / Ѧ" + balance);
         votedDelegatesTable.getItems().clear();
         for (String delegateName : votes.keySet()) {
             String subUsername = account.getUsername() + "(" + delegateName + ")";
             Delegate d = StorageService.getInstance().getWallet().getDelegates().get(delegateName);
-            double includedvotes = 100 * ( d.getVote() * (1 - d.getExlcudedPercentage()/100.0));
+            double includedvotes = 100 * (d.getVote() * (1 - d.getExlcudedPercentage() / 100.0));
+            double payout = 422 * d.getPayoutPercentage() * votes.get(delegateName) / (includedvotes);
+            OptimizationReportItem oi = new OptimizationReportItem(delegateName, d.getRate(), subUsername, votes.get(delegateName).intValue(), payout);
+            votedDelegatesTable.getItems().add(oi);
+        }
+
+    }
+
+    public void createReport(String masterName, Map<String, Double> votes) {
+        this.okReport.setVisible(true);
+        this.executeTrades.setVisible(false);
+        this.closeReport.setVisible(false);
+        double balance = votes.values().stream().mapToDouble(Double::doubleValue).sum();
+        optReportTitle.setText("Optimization Report - " + masterName + " / Ѧ" + balance);
+        votedDelegatesTable.getItems().clear();
+        for (String delegateName : votes.keySet()) {
+            String subUsername = masterName + "(" + delegateName + ")";
+            Delegate d = StorageService.getInstance().getWallet().getDelegates().get(delegateName);
+            double includedvotes = 100 * (d.getVote() * (1 - d.getExlcudedPercentage() / 100.0));
             double payout = 422 * d.getPayoutPercentage() * votes.get(delegateName) / (includedvotes);
             OptimizationReportItem oi = new OptimizationReportItem(delegateName, d.getRate(), subUsername, votes.get(delegateName).intValue(), payout);
             votedDelegatesTable.getItems().add(oi);
@@ -185,6 +208,9 @@ public class FXMLOptimizationReportViewController implements Initializable {
                         }
                         if (item instanceof Hyperlink) {
 
+                        }
+                        if (item instanceof Double) {
+                            val = String.format("%.8f", (Double) item);
                         }
                         setGraphic(new Label(val));
                         setAlignment(Pos.CENTER);

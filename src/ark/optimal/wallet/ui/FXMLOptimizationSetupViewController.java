@@ -5,24 +5,27 @@
  */
 package ark.optimal.wallet.ui;
 
-import ark.optimal.wallet.pojo.Account;
-import ark.optimal.wallet.services.storageservices.StorageService;
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.stage.Stage;
-import javafx.util.Callback;
-import javafx.util.StringConverter;
-
+import ark.optimal.wallet.pojo.Delegate;
+import ark.optimal.wallet.services.optimizationservices.OptimizationService;
+import java.io.IOException;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.StageStyle;
+import org.apache.commons.lang3.StringUtils;
 /**
  * FXML Controller class
  *
@@ -31,71 +34,63 @@ import javafx.util.StringConverter;
 public class FXMLOptimizationSetupViewController implements Initializable {
 
     @FXML
-    private JFXTextField passphrase;
-    @FXML
     private JFXButton optimize;
     @FXML
     private JFXButton optimizationCancel;
     @FXML
-    private JFXComboBox<Account> accounts;
-
-    private FXMLSubWalletManagerViewController subWalletManagerViewController;
+    private JFXTextField scenarioMasterVotes;
     @FXML
-    private JFXTextField masterPercentageOptimization;
-   
-
+    private JFXTextField scenarioName;
+    
+    private List<Delegate> selectedDelegates;
+    private FXMLDelegatesViewController delegateViewController;
+    
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-        ObservableList<Account> userAccounts = FXCollections.observableArrayList();
-         userAccounts.addAll(StorageService.getInstance().getWallet().getUserAccounts().values());
-         accounts.setItems(userAccounts);
-         
-         accounts.setCellFactory(new Callback<ListView<Account>,ListCell<Account>>(){
-            public ListCell<Account> call(ListView<Account> l){
-                return new ListCell<Account>(){
-                    @Override
-                    protected void updateItem(Account item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (item == null || empty) {
-                            setGraphic(null);
-                        } else {
-                            setText(item.getUsername());
-                        }
-                    }
-                } ;
-            }
-        });
-        //selected value showed in combo box
-        accounts.setConverter(new StringConverter<Account>() {
-              public String toString(Account account) {
-                if (account == null){
-                  return null;
-                } else {
-                  return account.getUsername();
-                }
-              }
-
-            @Override
-            public Account fromString(String username) {
-                return null;
-            }
-        });
+        this.scenarioName.setText("Scenario1");
+        this.scenarioMasterVotes.setText("1000");
          
     }
 
     @FXML
     private void onOptimize(ActionEvent event) {
-        Account account = accounts.getSelectionModel().getSelectedItem();
-        if (account == null || masterPercentageOptimization.getText() == null){
-            new AlertController().alertUser("Please complete optimization form");
+        if (scenarioName.getText() == null || scenarioMasterVotes.getText() == null){
+            new AlertController().alertUser("Please enter scenario name and Votes/Arks");
             return;
         }
-       // delegateViewController.optimize(account, passphrase.getText(), new Double(masterPercentageOptimization.getText()));
+        if(! StringUtils.isNumeric(scenarioMasterVotes.getText())){
+            new AlertController().alertUser("Please enter numeric value for scenario Votes/Arks");
+            return;
+        }
+        Integer scenarioValue = new Double(scenarioMasterVotes.getText()).intValue();
+
+        Map<String, Double> votes = OptimizationService.runConvexOptimizattion(scenarioValue , selectedDelegates);
+        runOptimizationReport(votes);
+        
         closeWindow();
+    }
+    private void runOptimizationReport(Map<String, Double> votes) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLOptimizationReportView.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            FXMLOptimizationReportViewController optReportController = (FXMLOptimizationReportViewController) fxmlLoader.getController();
+            optReportController.createReport(scenarioName.getText(), votes);
+            //updateVoteController.setDelegateName(_delegatestable.getSelectionModel().getSelectedItem().getUsername());
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.setTitle("C");
+            stage.setScene(new Scene(root1));
+            stage.show();
+
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLSubWalletManagerViewController.class
+                    .getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @FXML
@@ -107,4 +102,13 @@ public class FXMLOptimizationSetupViewController implements Initializable {
         Stage stage = (Stage) optimize.getScene().getWindow();
         stage.close();
     }
+
+    public void setDelegateViewController(FXMLDelegatesViewController delegateViewController) {
+        this.delegateViewController = delegateViewController;
+    }
+
+    public void setSelectedDelegates(List<Delegate> selectedDelegates) {
+        this.selectedDelegates = selectedDelegates;
+    }
+    
 }

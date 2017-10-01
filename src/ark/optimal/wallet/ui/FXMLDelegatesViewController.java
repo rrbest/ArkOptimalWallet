@@ -125,6 +125,8 @@ public class FXMLDelegatesViewController implements Initializable {
     private TableColumn<Delegate, Double> _payoutPercentage;
     @FXML
     private TableColumn<Delegate, Integer> _excludedVotes;
+    @FXML
+    private JFXButton optimizeBtn;
 
     /**
      * Initializes the controller class.
@@ -467,6 +469,29 @@ public class FXMLDelegatesViewController implements Initializable {
             searchDelegate();
         }
 
+    }
+
+    @FXML
+    private void onOptimize(ActionEvent event) {
+        
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLOptimizationSetupView.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+            FXMLOptimizationSetupViewController optimizationSetupViewController = (FXMLOptimizationSetupViewController) fxmlLoader.getController();
+            optimizationSetupViewController.setDelegateViewController(this);
+            optimizationSetupViewController.setSelectedDelegates(this.selectedDelegates);
+            //updateVoteController.setDelegateName(_delegatestable.getSelectionModel().getSelectedItem().getUsername());
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.setTitle("C");
+            stage.setScene(new Scene(root1));
+            stage.show();
+
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLSubWalletManagerViewController.class
+                    .getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

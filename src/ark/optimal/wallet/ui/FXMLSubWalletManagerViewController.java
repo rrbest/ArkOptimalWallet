@@ -628,7 +628,6 @@ public class FXMLSubWalletManagerViewController implements Initializable {
             Delegate delegate = StorageService.getInstance().getWallet().getDelegates().get(si.getDelegateName());
             selectedDelegates.add(delegate);
         }
-        //walletsVotes = 150000;
         Map<String, Double> votes = OptimizationService.runConvexOptimizattion(walletsVotes, selectedDelegates);
         runOptimizationReport(account, passphrase, votes);
         return;
@@ -640,7 +639,7 @@ public class FXMLSubWalletManagerViewController implements Initializable {
             Parent root1 = (Parent) fxmlLoader.load();
             FXMLOptimizationReportViewController optReportController = (FXMLOptimizationReportViewController) fxmlLoader.getController();
             optReportController.setSubWalletManagerController(this);
-            optReportController.updateReport(account, passphrase, votes);
+            optReportController.createReport(account, passphrase, votes);
             //updateVoteController.setDelegateName(_delegatestable.getSelectionModel().getSelectedItem().getUsername());
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
