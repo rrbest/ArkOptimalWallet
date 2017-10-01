@@ -117,6 +117,7 @@ public class FXMLArkOptimalWalletMainViewController implements Initializable {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/ark/optimal/wallet/ui/FXMLDelegatesView.fxml"));
             delegatesview = fxmlLoader.load();
             delegatesViewController = (FXMLDelegatesViewController) fxmlLoader.getController();
+            delegatesViewController.setMainViewControler(this);
             fxmlLoader = new FXMLLoader(getClass().getResource("/ark/optimal/wallet/ui/FXMLAccountView.fxml"));
             accountsview = fxmlLoader.load();
             accountViewController = (FXMLAccountViewController) fxmlLoader.getController();

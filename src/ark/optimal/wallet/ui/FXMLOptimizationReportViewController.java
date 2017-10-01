@@ -127,8 +127,9 @@ public class FXMLOptimizationReportViewController implements Initializable {
         for (String delegateName : votes.keySet()) {
             String subUsername = account.getUsername() + "(" + delegateName + ")";
             Delegate d = StorageService.getInstance().getWallet().getDelegates().get(delegateName);
-            double includedvotes = 100 * (d.getVote() * (1 - d.getExlcudedPercentage() / 100.0));
-            double payout = 422 * d.getPayoutPercentage() * votes.get(delegateName) / (includedvotes);
+            double includedvotes = d.getVote() - d.getExcludedVotes();
+            double v = new Double(votes.get(delegateName).intValue());
+            double payout = 422 * d.getPayoutPercentage() * v / (includedvotes);
             OptimizationReportItem oi = new OptimizationReportItem(delegateName, d.getRate(), subUsername, votes.get(delegateName).intValue(), payout);
             votedDelegatesTable.getItems().add(oi);
         }
@@ -145,8 +146,9 @@ public class FXMLOptimizationReportViewController implements Initializable {
         for (String delegateName : votes.keySet()) {
             String subUsername = masterName + "(" + delegateName + ")";
             Delegate d = StorageService.getInstance().getWallet().getDelegates().get(delegateName);
-            double includedvotes = 100 * (d.getVote() * (1 - d.getExlcudedPercentage() / 100.0));
-            double payout = 422 * d.getPayoutPercentage() * votes.get(delegateName) / (includedvotes);
+            double includedvotes = d.getVote() - d.getExcludedVotes();
+            double v = new Double(votes.get(delegateName).intValue());
+            double payout = 422 * d.getPayoutPercentage() * v / (includedvotes);
             OptimizationReportItem oi = new OptimizationReportItem(delegateName, d.getRate(), subUsername, votes.get(delegateName).intValue(), payout);
             votedDelegatesTable.getItems().add(oi);
         }

@@ -134,12 +134,12 @@
                                           </JFXButton>
                                           <JFXTextField fx:id="delegatePayoutPercentage" layoutX="195.0" layoutY="242.0" onKeyReleased="#PayoutPrecentageReleased" prefHeight="25.0" prefWidth="85.0" />
                                           <Separator layoutX="47.0" layoutY="270.0" prefHeight="3.0" prefWidth="233.0" />
-                                          <Label layoutX="52.0" layoutY="276.0" prefHeight="17.0" prefWidth="70.0" text="Excluded %" textFill="#a19d9d">
+                                          <Label layoutX="52.0" layoutY="276.0" prefHeight="17.0" prefWidth="99.0" text="Excluded Votes" textFill="#a19d9d">
                                              <font>
                                                 <Font name="Roboto Black" size="12.0" />
                                              </font>
                                           </Label>
-                                          <JFXTextField fx:id="delegateExcludedPercentage" layoutX="195.0" layoutY="272.0" onKeyReleased="#excludedPercentageKeyReleased" prefHeight="25.0" prefWidth="85.0" />
+                                          <JFXTextField fx:id="delegateExcludedVotes" layoutX="195.0" layoutY="272.0" onKeyReleased="#excludedPercentageKeyReleased" prefHeight="25.0" prefWidth="85.0" />
                                           <JFXButton fx:id="updateSelected" layoutX="38.0" layoutY="335.0" onAction="#onUpdateSelected" prefHeight="34.0" prefWidth="181.0" style="-fx-background-color: #0073B7;" text="Update Selected" textFill="WHITE">
                                              <font>
                                                 <Font size="17.0" />
@@ -173,18 +173,23 @@
             </AnchorPane>
          </children>
       </StackPane>
-      <JFXButton fx:id="removeSelectedDelegate" layoutX="23.0" layoutY="693.0" onAction="#onRemoveSelectedDelegate" prefHeight="34.0" prefWidth="171.0" style="-fx-background-color: ;" text="Remove Selected" textFill="#634eda">
+      <JFXButton fx:id="removeSelectedDelegate" layoutX="58.0" layoutY="691.0" onAction="#onRemoveSelectedDelegate" prefHeight="34.0" prefWidth="156.0" style="-fx-background-color: ;" text="Remove" textFill="#634eda">
          <font>
             <Font name="System Bold" size="17.0" />
          </font>
       </JFXButton>
-      <JFXButton fx:id="optimizeBtn" layoutX="206.0" layoutY="691.0" onAction="#onOptimize" prefHeight="30.0" prefWidth="156.0" style="-fx-background-color: #1E88E5;" text="Optimize" textFill="WHITE">
+      <JFXButton fx:id="optimizeBtn" layoutX="401.0" layoutY="689.0" onAction="#onOptimize" prefHeight="25.0" prefWidth="156.0" style="-fx-background-color: #1E88E5;" text="Optimize" textFill="WHITE">
          <font>
             <Font size="19.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
+      </JFXButton>
+      <JFXButton fx:id="loadDelegates" layoutX="225.0" layoutY="691.0" onAction="#onLoadDelegates" prefHeight="34.0" prefWidth="156.0" style="-fx-background-color: ;" text="Load" textFill="#634eda">
+         <font>
+            <Font name="System Bold" size="17.0" />
+         </font>
       </JFXButton>
    </children>
 </AnchorPane>

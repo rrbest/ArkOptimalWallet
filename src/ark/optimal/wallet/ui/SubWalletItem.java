@@ -20,6 +20,7 @@ public class SubWalletItem {
     private Integer votes;
     private Double payoutPercentage;
     private Boolean voted;
+    private Boolean created;
 
     private Integer delegateTotalVotes;
     private Integer delegateExcludedVotes;
@@ -47,6 +48,15 @@ public class SubWalletItem {
     public void setVoted(Boolean voted) {
         this.voted = voted;
     }
+
+    public Boolean getCreated() {
+        return created;
+    }
+
+    public void setCreated(Boolean created) {
+        this.created = created;
+    }
+    
 
     public Double getPayoutPercentage() {
         return payoutPercentage;

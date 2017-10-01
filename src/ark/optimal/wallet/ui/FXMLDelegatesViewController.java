@@ -11,12 +11,18 @@ import ark.optimal.wallet.services.accountservices.AccountService;
 import ark.optimal.wallet.services.optimizationservices.OptimizationService;
 import ark.optimal.wallet.services.storageservices.StorageService;
 import ark.optimal.wallet.services.xchangeservices.XChangeServices;
+import ark.optimal.wallet.ui.main.FXMLArkOptimalWalletMainViewController;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import io.ark.core.Transaction;
 import io.ark.core.TransactionService;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,11 +67,18 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import javafx.util.Duration;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.spongycastle.jcajce.provider.asymmetric.dsa.DSASigner;
 
 /**
@@ -123,8 +136,6 @@ public class FXMLDelegatesViewController implements Initializable {
     @FXML
     private JFXTextField delegatePayoutPercentage;
     @FXML
-    private JFXTextField delegateExcludedPercentage;
-    @FXML
     private JFXButton updateSelected;
     @FXML
     private TableColumn<Delegate, Double> _payoutPercentage;
@@ -132,6 +143,11 @@ public class FXMLDelegatesViewController implements Initializable {
     private TableColumn<Delegate, Integer> _excludedVotes;
     @FXML
     private JFXButton optimizeBtn;
+    @FXML
+    private JFXButton loadDelegates;
+    @FXML
+    private JFXTextField delegateExcludedVotes;
+    private FXMLArkOptimalWalletMainViewController mainViewController;
 
     /**
      * Initializes the controller class.
@@ -254,11 +270,14 @@ public class FXMLDelegatesViewController implements Initializable {
 
     @FXML
     private void onSearch(ActionEvent event) {
-        searchDelegate();
+        _delegatestable.getSelectionModel().clearSelection();
+        String n = delegateNameOrPublicKey.getText();
+        searchDelegate(n);
     }
 
-    private void searchDelegate() {
-        String n = delegateNameOrPublicKey.getText();
+    private Delegate searchDelegate(String n) {
+        
+        delegateNameOrPublicKey.setText("");
         Delegate d = null;
         if (delegatesMap.containsKey(n)) {
             d = delegatesMap.get(n);
@@ -268,7 +287,8 @@ public class FXMLDelegatesViewController implements Initializable {
             if (d == null) {
                 d = AccountService.getDelegateByUsername(n);
                 if (d == null) {
-                    return;
+                    new AlertController().alertUser("Delegate doesn't exist");
+                    return d;
                 }
 
             }
@@ -279,11 +299,11 @@ public class FXMLDelegatesViewController implements Initializable {
         }
 
         updateDelegateView(d);
-        _delegatestable.getSelectionModel().clearSelection();
         _delegatestable.requestFocus();
         _delegatestable.getSelectionModel().select(d);
         _delegatestable.scrollTo(d);
         delegateNameOrPublicKey.setText("");
+        return d;
     }
 
     private void updateDelegateView(Delegate d) {
@@ -294,9 +314,9 @@ public class FXMLDelegatesViewController implements Initializable {
         Iterator<Delegate> itr = selection.iterator();
         Delegate delegate = itr.next();
         String delegatePPercentageStr = delegate.getPayoutPercentage().toString();
-        String delegateEPercentageStr = delegate.getExlcudedPercentage().toString();
+        String delegateExcludedStr = delegate.getExcludedVotes().toString();
         delegatePayoutPercentage.setText(delegatePPercentageStr);
-        delegateExcludedPercentage.setText(delegateEPercentageStr);
+        delegateExcludedVotes.setText(delegateExcludedStr);
 
         if (selection.size() > 1) {
             _votefordelegate.setDisable(true);
@@ -305,8 +325,8 @@ public class FXMLDelegatesViewController implements Initializable {
                 if (!delegatePPercentageStr.equals(del.getPayoutPercentage().toString())) {
                     delegatePayoutPercentage.setText("");
                 }
-                if (!delegateEPercentageStr.equals(del.getExlcudedPercentage().toString())) {
-                    delegateExcludedPercentage.setText("");
+                if (!delegateExcludedStr.equals(del.getExcludedVotes().toString())) {
+                    delegateExcludedVotes.setText("");
                 }
 
             }
@@ -466,9 +486,9 @@ public class FXMLDelegatesViewController implements Initializable {
         Iterator<Delegate> itr = selection.iterator();
         while (itr.hasNext()) {
             Delegate d = itr.next();
-            d.setExlcudedPercentage(new Double(delegateExcludedPercentage.getText()));
+            d.setExcludedVotes(new Integer(delegateExcludedVotes.getText()).intValue());
             Delegate dirtyDelegate = StorageService.getInstance().getWallet().getDelegates().get(d.getUsername());
-            dirtyDelegate.setExlcudedPercentage(d.getExlcudedPercentage());
+            dirtyDelegate.setExcludedVotes(d.getExcludedVotes());
             StorageService.getInstance().addDelegate(dirtyDelegate, true);
 
         }
@@ -486,7 +506,9 @@ public class FXMLDelegatesViewController implements Initializable {
     @FXML
     private void onSearchDelegate(KeyEvent event) {
         if (event.getCode() == KeyCode.ENTER) {
-            searchDelegate();
+            _delegatestable.getSelectionModel().clearSelection();
+            String n = delegateNameOrPublicKey.getText();
+            searchDelegate(n);
         }
 
     }
@@ -526,4 +548,98 @@ public class FXMLDelegatesViewController implements Initializable {
         this._delegatestable.refresh();
     }
 
+    @FXML
+    private void onLoadDelegates(ActionEvent event) {
+
+        try {
+            Path path = Paths.get(StorageService.getInstance().getWalletFilePath());
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Open Delegates File");
+            fileChooser.setInitialDirectory(path.getParent().toFile());
+            fileChooser.setInitialFileName(path.getFileName().toString());
+
+            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Excel File", "*.xlsx"));
+            File selectedFile = fileChooser.showOpenDialog(this.mainViewController.getHomeViewController().getAppController().getMainStage());
+            if (selectedFile == null) {
+                new AlertController().alertUser("Please open delegate file");
+                return;
+            }
+
+            FileInputStream excelFile = new FileInputStream(selectedFile);
+            Workbook workbook = new XSSFWorkbook(excelFile);
+            Sheet datatypeSheet = workbook.getSheetAt(0);
+            Iterator<Row> iterator = datatypeSheet.iterator();
+            iterator.next(); // pass header row
+            while (iterator.hasNext()) {
+
+                Row currentRow = iterator.next();
+                Iterator<Cell> cellIterator = currentRow.iterator();
+
+                Cell delegateCell = cellIterator.next();
+                String delegateName = delegateCell.getStringCellValue();
+                Cell payoutpctCell = cellIterator.next();
+                Double payoutpct = payoutpctCell.getNumericCellValue();
+                Cell excludedVotesCell = cellIterator.next();
+                Double excludedVotes = excludedVotesCell.getNumericCellValue();
+                Delegate delegate = searchDelegate(delegateName);
+                if(delegate == null){
+                    continue;
+                }
+                delegate.setPayoutPercentage(payoutpct);
+                delegate.setExcludedVotes(excludedVotes.intValue());
+                _delegatestable.getSelectionModel().select(delegate);
+            }
+        } catch (FileNotFoundException e) {
+            new AlertController().alertUser("Please make sure to select the delegate XLSX file");
+        } catch (IOException e) {
+            new AlertController().alertUser("Please make sure the delegate XLSX file has correct data types \n some delegate data might have been loaded");
+        } catch (Exception e) {
+            new AlertController().alertUser("Please make sure the delegate XLSX file has correct data types \n some delegate data might have been loaded");
+        } finally {
+            _delegatestable.refresh();
+        }
+       
+
+    }
+
+    public void setMainViewControler(FXMLArkOptimalWalletMainViewController mainViewController) {
+        this.mainViewController = mainViewController;
+    }
+    private class DelegateData {
+
+        private String name;
+        private Double payoutPercentage;
+        private Integer excludedVotes;
+
+        public DelegateData(String name, Double payoutPercentage, Integer excludedVotes) {
+            this.name = name;
+            this.payoutPercentage = payoutPercentage;
+            this.excludedVotes = excludedVotes;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public Double getPayoutPercentage() {
+            return payoutPercentage;
+        }
+
+        public void setPayoutPercentage(Double payoutPercentage) {
+            this.payoutPercentage = payoutPercentage;
+        }
+
+        public Integer getExcludedVotes() {
+            return excludedVotes;
+        }
+
+        public void setExcludedVotes(Integer excludedVotes) {
+            this.excludedVotes = excludedVotes;
+        }
+        
+    }
 }

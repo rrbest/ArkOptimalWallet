@@ -189,7 +189,7 @@ public class StorageService {
     public synchronized void addDelegate(Delegate d, boolean masterThread) {
         if (!masterThread) {
             Delegate dirtyDelegate = this.wallet.getDelegates().get(d.getUsername());
-            d.setExlcudedPercentage(dirtyDelegate.getExlcudedPercentage());
+            d.setExcludedVotes(dirtyDelegate.getExcludedVotes());
             d.setPayoutPercentage(dirtyDelegate.getPayoutPercentage());
 
         }

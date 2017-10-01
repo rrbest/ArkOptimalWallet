@@ -67,9 +67,9 @@ public class FXMLVotesViewController implements Initializable {
     @FXML
     private TableColumn<VoteItem, Double> subWalletPayoutPercentage;
     @FXML
-    private TableColumn<VoteItem, Double> masterExcludedVotesPercentage;
+    private TableColumn<VoteItem, Integer> masterExcludedVotes;
     @FXML
-    private TableColumn<VoteItem, Double> subWalletExcludedVotesPercentage;
+    private TableColumn<VoteItem, Integer> subWalletExcludedVotes;
 
     /**
      * Initializes the controller class.
@@ -91,8 +91,8 @@ public class FXMLVotesViewController implements Initializable {
         masterPayoutPercentage.setCellValueFactory(new PropertyValueFactory<VoteItem, Double>("payoutpercentage"));
         masterPayoutPercentage.setCellFactory(new FXMLVotesViewController.ColumnFormatter<VoteItem, Double>());
 
-        masterExcludedVotesPercentage.setCellValueFactory(new PropertyValueFactory<VoteItem, Double>("excludedVotesPercentage"));
-        masterExcludedVotesPercentage.setCellFactory(new FXMLVotesViewController.ColumnFormatter<VoteItem, Double>());
+        masterExcludedVotes.setCellValueFactory(new PropertyValueFactory<VoteItem, Integer>("excludedVotes"));
+        masterExcludedVotes.setCellFactory(new FXMLVotesViewController.ColumnFormatter<VoteItem, Integer>());
 
         masterAddress.setCellValueFactory(new PropertyValueFactory<VoteItem, Hyperlink>("address_link"));
         masterAddress.setCellFactory(new FXMLVotesViewController.HyperlinkCell());
@@ -111,8 +111,8 @@ public class FXMLVotesViewController implements Initializable {
         subWalletPayoutPercentage.setCellValueFactory(new PropertyValueFactory<VoteItem, Double>("payoutpercentage"));
         subWalletPayoutPercentage.setCellFactory(new FXMLVotesViewController.ColumnFormatter<VoteItem, Double>());
 
-        subWalletExcludedVotesPercentage.setCellValueFactory(new PropertyValueFactory<VoteItem, Double>("excludedVotesPercentage"));
-        subWalletExcludedVotesPercentage.setCellFactory(new FXMLVotesViewController.ColumnFormatter<VoteItem, Double>());
+        subWalletExcludedVotes.setCellValueFactory(new PropertyValueFactory<VoteItem, Integer>("excludedVotes"));
+        subWalletExcludedVotes.setCellFactory(new FXMLVotesViewController.ColumnFormatter<VoteItem, Integer>());
 
         subWalletAddress.setCellValueFactory(new PropertyValueFactory<VoteItem, Hyperlink>("address_link"));
         subWalletAddress.setCellFactory(new FXMLVotesViewController.HyperlinkCell());
@@ -133,7 +133,7 @@ public class FXMLVotesViewController implements Initializable {
             } else {
                 StorageService.getInstance().addDelegate(d, true);
             }
-            VoteItem vi = new VoteItem(d.getUsername(), d.getRate(), account.getUsername(), account.getBalance().intValue(), d.getPayoutPercentage(), d.getExlcudedPercentage());
+            VoteItem vi = new VoteItem(d.getUsername(), d.getRate(), account.getUsername(), account.getBalance().intValue(), d.getPayoutPercentage(), d.getExcludedVotes());
             masterVotedDelegateTable.getItems().add(vi);
         }
         SubWalletsVotedDelegateTable.getItems().clear();
@@ -152,7 +152,7 @@ public class FXMLVotesViewController implements Initializable {
                     sub.getVotedDelegates().set(0, delegate);
                 }
                 delegate = sub.getVotedDelegates().get(0);
-                VoteItem vi = new VoteItem(delegateName, delegate.getRate(), sub.getUsername(), sub.getBalance().intValue(), delegate.getPayoutPercentage(), delegate.getExlcudedPercentage());
+                VoteItem vi = new VoteItem(delegateName, delegate.getRate(), sub.getUsername(), sub.getBalance().intValue(), delegate.getPayoutPercentage(), delegate.getExcludedVotes());
                 SubWalletsVotedDelegateTable.getItems().add(vi);
 
             }

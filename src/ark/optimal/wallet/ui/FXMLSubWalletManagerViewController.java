@@ -119,6 +119,10 @@ public class FXMLSubWalletManagerViewController implements Initializable {
     private JFXButton optimizeBtn;
     @FXML
     private JFXButton removeSelected;
+    @FXML
+    private JFXButton loadFromList;
+    @FXML
+    private TableColumn<SubWalletItem, Boolean> created;
 
     /**
      * Initializes the controller class.
@@ -248,6 +252,34 @@ public class FXMLSubWalletManagerViewController implements Initializable {
 
         voted.setEditable(false);
 
+        created.setCellValueFactory(new PropertyValueFactory<SubWalletItem, Boolean>("created"));
+        created.setCellFactory(p -> {
+            CheckBox checkBox = new CheckBox();
+            TableCell<SubWalletItem, Boolean> tableCell = new TableCell<SubWalletItem, Boolean>() {
+
+                @Override
+                protected void updateItem(Boolean item, boolean empty) {
+
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setGraphic(null);
+                    } else {
+                        setGraphic(checkBox);
+                        checkBox.setSelected(item);
+                        checkBox.setDisable(true);
+                    }
+                }
+            };
+
+            tableCell.setAlignment(Pos.CENTER);
+            tableCell.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+            return tableCell;
+        });
+
+        created.setEditable(false);
+
+        
         _delegateTotalVotes.setCellValueFactory(new PropertyValueFactory<SubWalletItem, Integer>("delegateTotalVotes"));
         _delegateExcludedVotes.setCellValueFactory(new PropertyValueFactory<SubWalletItem, Integer>("delegateExcludedVotes"));
 
@@ -301,8 +333,10 @@ public class FXMLSubWalletManagerViewController implements Initializable {
 
             //  }
             transactionItems.add(ti);
+            si.setCreated(Boolean.TRUE);
 
         }
+        subWalletsTable.refresh();
         StorageService.getInstance().addAccountToUserAccounts(account, true);
         this.accountsViewMenuController.selectAccountItem(account);
 
@@ -338,12 +372,14 @@ public class FXMLSubWalletManagerViewController implements Initializable {
     @FXML
     private void onSearchDelegate(KeyEvent event) {
         if (event.getCode() == KeyCode.ENTER) {
-            searchDelegate();
+            String n = delegateNameOrPublicKey.getText();
+            searchDelegate(n);
         }
 
     }
-    private void searchDelegate() {
-        String n = delegateNameOrPublicKey.getText();
+    private void searchDelegate(String n) {
+        //String n = delegateNameOrPublicKey.getText();
+        delegateNameOrPublicKey.setText("");
         SubWalletItem si = null;
         if (subWalletsMap.containsKey(n)) {
             si = subWalletsMap.get(n);
@@ -361,8 +397,9 @@ public class FXMLSubWalletManagerViewController implements Initializable {
             si = new SubWalletItem(d.getUsername(), d.getRate(), subWalletName, 0, d.getPayoutPercentage());
             si.setChecked(Boolean.FALSE);
             si.setVoted(Boolean.FALSE);
+            si.setCreated(Boolean.FALSE);
             si.setDelegateTotalVotes(d.getVote());
-            si.setDelegateExcludedVotes(new Double(d.getVote() * d.getExlcudedPercentage() / 100.0).intValue());
+            si.setDelegateExcludedVotes(d.getExcludedVotes());
 
             subWalletsTable.getItems().add(si);
             subWalletsMap.put(d.getUsername(), si);
@@ -373,12 +410,13 @@ public class FXMLSubWalletManagerViewController implements Initializable {
         subWalletsTable.requestFocus();
         subWalletsTable.getSelectionModel().select(si);
         subWalletsTable.scrollTo(si);
-        delegateNameOrPublicKey.setText("");
+        
     }
 
     @FXML
     private void onSearch(ActionEvent event) {
-        searchDelegate();
+        String n = delegateNameOrPublicKey.getText();
+        searchDelegate(n);
     }
 
     private void closeWindow() {
@@ -574,8 +612,9 @@ public class FXMLSubWalletManagerViewController implements Initializable {
             }
             si.setChecked(checked);
             si.setVoted(checked);
+            si.setCreated(true);
             si.setDelegateTotalVotes(delegate.getVote());
-            si.setDelegateExcludedVotes(new Double(delegate.getVote() * delegate.getExlcudedPercentage() / 100.0).intValue());
+            si.setDelegateExcludedVotes(delegate.getExcludedVotes());
             subWalletsTable.getItems().add(si);
             subWalletsMap.put(delegate.getUsername(), si);
 
@@ -718,6 +757,14 @@ public class FXMLSubWalletManagerViewController implements Initializable {
         master.setSubAccounts(subs);
         StorageService.getInstance().addAccountToUserAccounts(master, true);
 
+    }
+
+    @FXML
+    private void onLoadFromDelegatesList(ActionEvent event) {
+        for(String name : StorageService.getInstance().getWallet().getDelegates().keySet()){
+            searchDelegate(name);
+        }
+        
     }
 
     private class HyperlinkCell implements Callback<TableColumn<SubWalletItem, Hyperlink>, TableCell<SubWalletItem, Hyperlink>> {

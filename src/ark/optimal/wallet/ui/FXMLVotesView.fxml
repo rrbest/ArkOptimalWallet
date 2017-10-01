@@ -28,7 +28,7 @@
                   <TableColumn fx:id="masterAddress" prefWidth="249.0" text="MasterWallet" />
                   <TableColumn fx:id="masterVotes" prefWidth="105.0" text="Votes/Ark" />
                   <TableColumn fx:id="masterPayoutPercentage" prefWidth="114.0" text="Payout %" />
-                  <TableColumn fx:id="masterExcludedVotesPercentage" prefWidth="121.0" text="Excluded Votes %" />
+                  <TableColumn fx:id="masterExcludedVotes" prefWidth="121.0" text="Excluded Votes" />
                </columns>
             </TableView>
             <Separator prefWidth="200.0" />
@@ -47,7 +47,7 @@
                   <TableColumn fx:id="subWalletAddress" prefWidth="249.0" text="SubWallet" />
                   <TableColumn fx:id="subWalletVotes" prefWidth="105.0" text="Votes/Ark" />
                   <TableColumn fx:id="subWalletPayoutPercentage" prefWidth="114.0" text="Payout %" />
-                  <TableColumn fx:id="subWalletExcludedVotesPercentage" prefWidth="124.0" text="Excluded Votes %" />
+                  <TableColumn fx:id="subWalletExcludedVotes" prefWidth="124.0" text="Excluded Votes" />
                </columns>
             </TableView>
          </children>
