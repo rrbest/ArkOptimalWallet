@@ -247,7 +247,8 @@ public class StorageService {
             }
         } catch (FileNotFoundException ex) {
             return this.wallet;
-
+        } catch (Exception ex) {
+            return this.wallet;
         }
         return this.wallet;
 
