@@ -62,7 +62,7 @@ public class OptimizationService {
                     double[] ret = new double[delegates.size()];
                     for (int i = 0; i < delegates.size(); i++) {
                         double x = dmd.getQuick(i);
-                        double v = delegates.get(i).getVote() * delegates.get(i).getExcludedVotes();
+                        double v = delegates.get(i).getVote() - delegates.get(i).getExcludedVotes();
                         double p = delegates.get(i).getPayoutPercentage();
                         //double h = (p * x) / (v + x);
                         double h = -(p * v) / Math.pow(v+x, 2);
