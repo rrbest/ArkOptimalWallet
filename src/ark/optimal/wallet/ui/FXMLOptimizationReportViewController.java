@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -119,9 +120,19 @@ public class FXMLOptimizationReportViewController implements Initializable {
         this.executeTrades.setVisible(true);
         this.closeReport.setVisible(true);
         this.passphrase = passphrase;
-        this.optVotes = votes;
         this.account = account;
         double balance = votes.values().stream().mapToDouble(Double::doubleValue).sum();
+        String maxkey = Collections.max(votes.entrySet(), Map.Entry.comparingByValue()).getKey();
+        double sumFractions = 0.0;
+        for (String delegateName : votes.keySet()) {
+            double v = new Double(votes.get(delegateName).intValue()); 
+            sumFractions += votes.get(delegateName) - v;
+            votes.put(delegateName, v);
+        }
+        double maxVotes = votes.get(maxkey) + sumFractions;
+        votes.put(maxkey, maxVotes);
+        this.optVotes = votes;
+        
         optReportTitle.setText("Optimization Report - " + account.getUsername() + " / Ѧ" + balance);
         votedDelegatesTable.getItems().clear();
         for (String delegateName : votes.keySet()) {
@@ -143,6 +154,17 @@ public class FXMLOptimizationReportViewController implements Initializable {
         double balance = votes.values().stream().mapToDouble(Double::doubleValue).sum();
         optReportTitle.setText("Optimization Report - " + masterName + " / Ѧ" + balance);
         votedDelegatesTable.getItems().clear();
+        
+        String maxkey = Collections.max(votes.entrySet(), Map.Entry.comparingByValue()).getKey();
+        double sumFractions = 0.0;
+        for (String delegateName : votes.keySet()) {
+            double v = new Double(votes.get(delegateName).intValue()); 
+            sumFractions += votes.get(delegateName) - v;
+            votes.put(delegateName, v);
+        }
+        double maxVotes = votes.get(maxkey) + sumFractions;
+        votes.put(maxkey, maxVotes);
+        
         for (String delegateName : votes.keySet()) {
             String subUsername = masterName + "(" + delegateName + ")";
             Delegate d = StorageService.getInstance().getWallet().getDelegates().get(delegateName);

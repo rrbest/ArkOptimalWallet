@@ -279,7 +279,6 @@ public class FXMLSubWalletManagerViewController implements Initializable {
 
         created.setEditable(false);
 
-        
         _delegateTotalVotes.setCellValueFactory(new PropertyValueFactory<SubWalletItem, Integer>("delegateTotalVotes"));
         _delegateExcludedVotes.setCellValueFactory(new PropertyValueFactory<SubWalletItem, Integer>("delegateExcludedVotes"));
 
@@ -377,6 +376,7 @@ public class FXMLSubWalletManagerViewController implements Initializable {
         }
 
     }
+
     private void searchDelegate(String n) {
         //String n = delegateNameOrPublicKey.getText();
         delegateNameOrPublicKey.setText("");
@@ -410,7 +410,7 @@ public class FXMLSubWalletManagerViewController implements Initializable {
         subWalletsTable.requestFocus();
         subWalletsTable.getSelectionModel().select(si);
         subWalletsTable.scrollTo(si);
-        
+
     }
 
     @FXML
@@ -643,6 +643,10 @@ public class FXMLSubWalletManagerViewController implements Initializable {
             new AlertController().alertUser("Passphrase is not corresponding to account");
             return;
         }
+        if (selectedSubWallets.size() < 2) {
+            new AlertController().alertUser("Please select two or more subwallets to run optimization");
+            return;
+        }
 
         try {
             runOptimization(selectedAccount, masterPassphrase.getText());
@@ -658,7 +662,7 @@ public class FXMLSubWalletManagerViewController implements Initializable {
         int walletsVotes = 0;
         for (String delegateName : account.getSubAccounts().keySet()) {
             Account subaccount = account.getSubAccounts().get(delegateName);
-            subaccount = AccountService.getAccount(subaccount.getAddress());
+            subaccount = StorageService.getInstance().getWallet().getSubAccounts().get(subaccount.getAddress());
             Double walletVotes = subaccount.getBalance() - 1;
             if (walletVotes != null && walletVotes > 0) {
                 walletsVotes += walletVotes.intValue();
@@ -761,10 +765,10 @@ public class FXMLSubWalletManagerViewController implements Initializable {
 
     @FXML
     private void onLoadFromDelegatesList(ActionEvent event) {
-        for(String name : StorageService.getInstance().getWallet().getDelegates().keySet()){
+        for (String name : StorageService.getInstance().getWallet().getDelegates().keySet()) {
             searchDelegate(name);
         }
-        
+
     }
 
     private class HyperlinkCell implements Callback<TableColumn<SubWalletItem, Hyperlink>, TableCell<SubWalletItem, Hyperlink>> {

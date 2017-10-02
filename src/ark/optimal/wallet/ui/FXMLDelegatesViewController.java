@@ -516,6 +516,11 @@ public class FXMLDelegatesViewController implements Initializable {
     @FXML
     private void onOptimize(ActionEvent event) {
 
+        if(this.selectedDelegates.size() < 2){
+           new AlertController().alertUser("Please select two or more delegates to run optimization");
+           return;
+        }
+        
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLOptimizationSetupView.fxml"));
             Parent root1 = (Parent) fxmlLoader.load();
