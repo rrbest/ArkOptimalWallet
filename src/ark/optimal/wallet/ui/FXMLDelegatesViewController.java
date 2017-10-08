@@ -276,7 +276,7 @@ public class FXMLDelegatesViewController implements Initializable {
     }
 
     private Delegate searchDelegate(String n) {
-        
+        n = n.replaceAll("\\s+", "");
         delegateNameOrPublicKey.setText("");
         Delegate d = null;
         if (delegatesMap.containsKey(n)) {
